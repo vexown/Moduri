@@ -1,0 +1,1 @@
+# This is a template application based on Raspberry Pico running the FreeRTOS system
