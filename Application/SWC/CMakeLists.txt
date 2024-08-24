@@ -24,7 +24,7 @@ target_include_directories(blinky_main PRIVATE
 # Link libraries and dependencies
 target_link_libraries(blinky_main 
                       pico_stdlib  
-                      pico_cyw43_arch_none
+                      pico_cyw43_arch_lwip_threadsafe_background
                       FreeRTOS-Kernel 
                       FreeRTOS-Kernel-Heap1)
 

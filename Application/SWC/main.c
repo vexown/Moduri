@@ -40,7 +40,18 @@
 /* Library includes. */
 #include <stdio.h>
 #include "pico/stdlib.h"
+
+/* WiFi includes */
 #include "pico/cyw43_arch.h"
+#include "WiFi_Credentials.h"
+
+#ifndef WIFI_CREDENTIALS_PROVIDED
+#error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
+#endif
+
+/*-----------------------------------------------------------*/
+
+#define WIFI_CONNECTION_TIMEOUT_MS 10000 
 
 /*-----------------------------------------------------------*/
 
@@ -59,12 +70,11 @@ void vApplicationTickHook( void );
 
 int main( void )
 {
-    /* Configure the Raspberry Pico hardware for blinky */
+    /* Configure and initialize Raspberry Pico W hardware */
     prvSetupHardware();
 
     /* Go to the main C file which does some setup and starts the scheduler */
     blinky_main();
-
 }
 
 /*-----------------------------------------------------------*/
@@ -72,7 +82,31 @@ int main( void )
 static void prvSetupHardware( void )
 {
     stdio_init_all();
-    cyw43_arch_init();
+
+    /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
+    if (cyw43_arch_init_with_country(CYW43_COUNTRY_POLAND)) 
+    {
+        printf("failed to initialize\n");
+    } 
+    else 
+    {
+        printf("initialized successfully\n");
+    }
+
+    /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
+    cyw43_arch_enable_sta_mode();
+
+    /* Attempt to connect to a wireless access point.
+       Blocking until the network is joined, a failure is detected or a timeout occurs */
+    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
+    {
+        printf("failed to connect\n");
+    }
+    else
+    {
+        printf("connected sucessfully\n");
+    }
+
 }
 /*-----------------------------------------------------------*/
 
