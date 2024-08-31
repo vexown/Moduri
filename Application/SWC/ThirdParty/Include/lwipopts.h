@@ -1,3 +1,30 @@
+/*
+ * lwipopts.h - Configuration Options for lwIP (Lightweight IP)
+ *
+ * Purpose:
+ *   This file is used to configure the behavior of the lwIP stack for the specific
+ *   needs of the embedded project. It allows customization of various features such
+ *   as memory management, network protocols, debugging, and integration with an OS.
+ *
+ * Configuration:
+ *   - NO_SYS: Set to 0 to enable OS support (e.g., FreeRTOS). Set to 1 for a bare-metal
+ *             environment without OS support.
+ *   - MEM_SIZE: Total amount of memory available for lwIP’s heap.
+ *   - MEMP_NUM_*: Number of memory pools for different object types (e.g., pbufs, TCP PCBs).
+ *   - TCP_MSS: Maximum segment size for TCP connections.
+ *   - TCP_SND_BUF, TCP_WND: Buffer sizes for TCP send and receive windows.
+ *   - LWIP_UDP: Set to 1 to enable UDP support.
+ *   - IP_REASSEMBLY: Enable or disable IP packet reassembly.
+ *   - LWIP_DEBUG: Enable or disable debugging features and logging.
+ *
+ * Notes:
+ *   - Modify these settings based on the specific requirements of your application,
+ *     including memory constraints, performance needs, and debugging requirements.
+ *   - Ensure that this file is correctly included in the build configuration and that
+ *     paths are set appropriately.
+ *
+ */
+
 #ifndef _LWIPOPTS_EXAMPLE_COMMONH_H
 #define _LWIPOPTS_EXAMPLE_COMMONH_H
 
@@ -7,11 +34,12 @@
 
 // allow override in some examples
 #ifndef NO_SYS
-#define NO_SYS                      1
+#define NO_SYS                      0
 #endif
+
 // allow override in some examples
 #ifndef LWIP_SOCKET
-#define LWIP_SOCKET                 0
+#define LWIP_SOCKET                 1
 #endif
 #if PICO_CYW43_ARCH_POLL
 #define MEM_LIBC_MALLOC             1
@@ -86,5 +114,19 @@
 #define PPP_DEBUG                   LWIP_DBG_OFF
 #define SLIP_DEBUG                  LWIP_DBG_OFF
 #define DHCP_DEBUG                  LWIP_DBG_OFF
+
+#if !NO_SYS
+#define TCPIP_THREAD_STACKSIZE 1024
+#define DEFAULT_THREAD_STACKSIZE 2048
+#define DEFAULT_RAW_RECVMBOX_SIZE 8
+#define TCPIP_MBOX_SIZE 8
+#define LWIP_TIMEVAL_PRIVATE 0
+
+// not necessary, can be done either way
+#define LWIP_TCPIP_CORE_LOCKING_INPUT 1
+
+// ping_thread sets socket receive timeout, so enable this feature
+#define LWIP_SO_RCVTIMEO 1
+#endif
 
 #endif /* __LWIPOPTS_H__ */
