@@ -39,9 +39,21 @@
 #include "hardware/gpio.h"
 #include "pico/cyw43_arch.h"
 
+/* WiFi includes */
+#include "pico/cyw43_arch.h"
+#include "WiFi_Credentials.h"
+
+#ifndef WIFI_CREDENTIALS_PROVIDED
+#error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
+#endif
+
+/* WiFi macros */
+#define WIFI_CONNECTION_TIMEOUT_MS 10000 
+
 /* Priorities for the tasks */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
 #define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
+#define NETWORK_TASK_PRIORITY 				( tskIDLE_PRIORITY + 1 )
 
 /* The rate at which data is sent to the queue. The rate is once every mainQUEUE_SEND_FREQUENCY_MS (once every 1000ms by default) */
 #define mainQUEUE_SEND_FREQUENCY_MS			( 1000 / portTICK_PERIOD_MS )
@@ -59,6 +71,7 @@ void blinky_main( void );
 /* Tasks declarations */
 static void prvQueueReceiveTask( void *pvParameters );
 static void prvQueueSendTask( void *pvParameters );
+static void networkTask(__unused void *params);
 
 /*-----------------------------------------------------------*/
 
@@ -71,6 +84,8 @@ void blinky_main( void )
 {
 
 	printf("Setting up the RTOS configuration... \n");
+
+	TaskHandle_t task;
     /* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
 
@@ -85,6 +100,7 @@ void blinky_main( void )
 					NULL );								/* The task handle is not required, so NULL is passed. */
 
 		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+    	xTaskCreate( networkTask, "NET", configMINIMAL_STACK_SIZE, NULL, NETWORK_TASK_PRIORITY , &task);
 
 		/* Start the tasks and timer running. */
 		printf("RTOS configuration finished, starting the scheduler... \n");
@@ -98,6 +114,42 @@ void blinky_main( void )
 	FreeRTOS web site for more details on the FreeRTOS heap
 	http://www.freertos.org/a00111.html. */
 	for( ;; );
+}
+
+static void networkTask(__unused void *params)
+{
+    /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
+    if (cyw43_arch_init()) 
+    {
+        printf("failed to initialize\n");
+    } 
+    else 
+    {
+        printf("initialized successfully\n");
+    }
+
+    /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
+    cyw43_arch_enable_sta_mode();
+
+    /* Attempt to connect to a wireless access point.
+       Blocking until the network is joined, a failure is detected or a timeout occurs */
+    printf("Connecting to Wi-Fi...\n");
+    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
+    {
+        printf("failed to connect\n");
+    }
+    else
+    {
+        printf("connected sucessfully\n");
+    }
+
+    while(true) 
+	{
+        vTaskDelay(100);
+    }
+
+    cyw43_arch_deinit();
+
 }
 
 static void prvQueueSendTask( void *pvParameters )

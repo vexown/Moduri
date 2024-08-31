@@ -41,17 +41,11 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-/* WiFi includes */
-#include "pico/cyw43_arch.h"
-#include "WiFi_Credentials.h"
-
-#ifndef WIFI_CREDENTIALS_PROVIDED
-#error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
-#endif
-
 /*-----------------------------------------------------------*/
 
-#define WIFI_CONNECTION_TIMEOUT_MS 10000 
+#ifndef RUN_FREERTOS_ON_CORE
+#define RUN_FREERTOS_ON_CORE 0
+#endif
 
 /*-----------------------------------------------------------*/
 
@@ -81,31 +75,28 @@ int main( void )
 
 static void prvSetupHardware( void )
 {
+    const char *rtos_type;
+
     stdio_init_all();
 
-    /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
-    if (cyw43_arch_init_with_country(CYW43_COUNTRY_POLAND)) 
-    {
-        printf("failed to initialize\n");
-    } 
-    else 
-    {
-        printf("initialized successfully\n");
-    }
+    /* Check if we're running FreeRTOS on single core or both RP2040 cores */
+    /* - Standard FreeRTOS is designed for single-core systems, with simpler task 
+       scheduling and communication mechanisms.
+       - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run 
+       concurrently across multiple cores */
+#if ( configNUMBER_OF_CORES > 1 )
+    rtos_type = "FreeRTOS SMP";
+#else
+    rtos_type = "FreeRTOS";
+#endif
 
-    /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
-    cyw43_arch_enable_sta_mode();
-
-    /* Attempt to connect to a wireless access point.
-       Blocking until the network is joined, a failure is detected or a timeout occurs */
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
-    {
-        printf("failed to connect\n");
-    }
-    else
-    {
-        printf("connected sucessfully\n");
-    }
+#if ( configNUMBER_OF_CORES == 2 )
+    printf("Starting %s on both cores:\n", rtos_type);
+#elif ( RUN_FREERTOS_ON_CORE == 1 )
+    printf("Attempting to start %s on core 1- this case is not currently supported in this program \n");
+#else
+    printf("Starting %s on core 0:\n", rtos_type);
+#endif
 
 }
 /*-----------------------------------------------------------*/

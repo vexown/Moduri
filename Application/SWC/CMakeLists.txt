@@ -23,10 +23,11 @@ target_include_directories(blinky_main PRIVATE
 
 # Link libraries and dependencies
 target_link_libraries(blinky_main 
-                      pico_stdlib  
-                      pico_cyw43_arch_lwip_threadsafe_background
-                      FreeRTOS-Kernel 
-                      FreeRTOS-Kernel-Heap1)
+                        pico_cyw43_arch_lwip_sys_freertos
+                        pico_stdlib
+                        pico_lwip_iperf
+                        FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
+                        )
 
 # Add extra outputs specific to the Pico SDK
 pico_add_extra_outputs(blinky_main)
