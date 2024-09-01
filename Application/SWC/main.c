@@ -51,8 +51,8 @@
 
 /* Hardware setup function */
 static void prvSetupHardware( void );
-/* Main function which does some set up and starts the scheduler */
-extern void blinky_main( void );
+/* OS function which does some set up and starts the scheduler */
+extern void OS_start( void );
 
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented within this file. */
 void vApplicationMallocFailedHook( void );
@@ -68,7 +68,7 @@ int main( void )
     prvSetupHardware();
 
     /* Go to the main C file which does some setup and starts the scheduler */
-    blinky_main();
+    OS_start();
 }
 
 /*-----------------------------------------------------------*/

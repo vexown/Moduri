@@ -63,8 +63,7 @@
 
 /*-----------------------------------------------------------*/
 
-/* Main function called by main() from main.c (lol). This one does some setup and starts the scheduler */
-void blinky_main( void );
+void OS_start( void );
 
 /*-----------------------------------------------------------*/
 
@@ -80,7 +79,7 @@ static QueueHandle_t xQueue = NULL;
 
 /*-----------------------------------------------------------*/
 
-void blinky_main( void )
+void OS_start( void )
 {
 
 	printf("Setting up the RTOS configuration... \n");

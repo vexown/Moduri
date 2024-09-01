@@ -2,7 +2,7 @@
 # CMakeLists.txt
 #
 # Description:
-# This is the top-level CMake configuration file for the Blinky project.
+# This is the top-level CMake configuration file for the Moduri project.
 # It sets up the project and includes necessary CMake modules for building
 # the project. The configuration includes:
 # 1. Minimum required CMake version.
@@ -45,7 +45,7 @@ include(FreeRTOS_Kernel_import.cmake)
 ############################################################################
 
 # Set project name and supported languages
-project(Blinky C CXX ASM)
+project(Moduri C CXX ASM)
 
 # Set C and C++ standards
 set(CMAKE_C_STANDARD 11)
