@@ -170,7 +170,7 @@ static void networkTask(__unused void *params)
 	{
         vTaskDelay(NETWORK_TASK_PERIOD_MS);
 
-		send_message("hello from Pico W!");
+		send_message_TCP("Yo from Pico W!");
     }
 }
 
