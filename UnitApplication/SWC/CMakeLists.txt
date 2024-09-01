@@ -1,15 +1,15 @@
 message("########## Application/Standard CMakeLists.txt - start ##########")
 
-# Add subdirectory for OS component
+# Add subdirectories of the Software Components
 add_subdirectory(OS)
-
-# Add subdirectory for ThirdParty files
 add_subdirectory(ThirdParty)
+add_subdirectory(Comms)
 
 # Define the executable target for the application
 add_executable(moduri
         main.c
-        ${OS_SOURCE_FILES}  # Use the variable defined in the Moduri CMakeLists.txt
+        ${OS_SOURCE_FILES}
+        ${COMMS_SOURCE_FILES}
         )
 
 # Set compile definitions if needed
@@ -19,6 +19,7 @@ target_compile_definitions(moduri PRIVATE)
 target_include_directories(moduri PRIVATE
         ${OS_INCLUDE_DIR} 
         ${THIRDPARTY_INCLUDE_DIR}
+        ${COMMS_INCLUDE_DIR}
         )
 
 # Link libraries and dependencies

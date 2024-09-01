@@ -37,11 +37,12 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
-#include "pico/cyw43_arch.h"
 
 /* WiFi includes */
 #include "pico/cyw43_arch.h"
+#include "lwip/sockets.h"
 #include "WiFi_Credentials.h"
+#include "WiFi_Transmit.h"
 
 #ifndef WIFI_CREDENTIALS_PROVIDED
 #error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
@@ -53,13 +54,19 @@
 /* Priorities for the tasks */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
 #define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
-#define NETWORK_TASK_PRIORITY 				( tskIDLE_PRIORITY + 1 )
+#define NETWORK_TASK_PRIORITY 				( tskIDLE_PRIORITY + 3 )
+
+/* Task periods */
+#define NETWORK_TASK_PERIOD_MS				( 5000 )
 
 /* The rate at which data is sent to the queue. The rate is once every mainQUEUE_SEND_FREQUENCY_MS (once every 1000ms by default) */
 #define mainQUEUE_SEND_FREQUENCY_MS			( 1000 / portTICK_PERIOD_MS )
 
 /* The number of items the queue can hold */
 #define mainQUEUE_LENGTH					( 1 )
+
+/* Stack sizes */
+#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 1024 )
 
 /*-----------------------------------------------------------*/
 
@@ -110,13 +117,13 @@ void OS_start( void )
 		/* Create the tasks */
 		xTaskCreate( prvQueueReceiveTask,				/* The function that implements the task. */
 					"Rx", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
-					configMINIMAL_STACK_SIZE, 			/* The size of the stack to allocate to the task. */
+					STACK_1024_BYTES,		 			/* The size of the stack to allocate to the task. */
 					NULL, 								/* The parameter passed to the task - not used in this case. */
 					mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
 					NULL );								/* The task handle is not required, so NULL is passed. */
 
-		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-    	xTaskCreate( networkTask, "NET", configMINIMAL_STACK_SIZE, NULL, NETWORK_TASK_PRIORITY , &task);
+		xTaskCreate( prvQueueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+    	xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , &task);
 
 		/* Start the tasks and timer running. */
 		printf("RTOS configuration finished, starting the scheduler... \n");
@@ -159,13 +166,12 @@ static void networkTask(__unused void *params)
         printf("connected sucessfully\n");
     }
 
-    while(true) 
+    for( ;; )
 	{
-        vTaskDelay(100);
+        vTaskDelay(NETWORK_TASK_PERIOD_MS);
+
+		send_message("hello from Pico W!");
     }
-
-    cyw43_arch_deinit();
-
 }
 
 static void prvQueueSendTask( void *pvParameters )
