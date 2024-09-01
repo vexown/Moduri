@@ -81,10 +81,27 @@ static QueueHandle_t xQueue = NULL;
 
 void OS_start( void )
 {
+	TaskHandle_t task;
+	const char *rtos_type;
+
+    /* Check if we're running FreeRTOS on single core or both RP2040 cores */
+    /* - Standard FreeRTOS is designed for single-core systems, with simpler task 
+       scheduling and communication mechanisms.
+       - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run 
+       concurrently across multiple cores */
+#if ( configNUMBER_OF_CORES > 1 )
+    rtos_type = "FreeRTOS SMP";
+#else
+    rtos_type = "FreeRTOS";
+#endif
+
+#if ( configNUMBER_OF_CORES == 2 )
+    printf("Starting %s on both cores\n", rtos_type);
+#else
+	printf("Starting %s on one of the cores\n", rtos_type);
+#endif
 
 	printf("Setting up the RTOS configuration... \n");
-
-	TaskHandle_t task;
     /* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
 
