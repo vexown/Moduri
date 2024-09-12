@@ -68,6 +68,10 @@
 /* Stack sizes */
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 1024 )
 
+/* Wifi Communication Types */
+#define UDP_COMMUNICATION 					(0xAA)
+#define TCP_COMMUNICATION 					(0xAB)
+
 /*-----------------------------------------------------------*/
 
 void OS_start( void );
@@ -83,6 +87,9 @@ static void networkTask(__unused void *params);
 
 /* The queue instance */
 static QueueHandle_t xQueue = NULL;
+
+/* WiFi Communication Type */
+static uint8_t TransportLayerType = UDP_COMMUNICATION; /* initial communication type is UDP */
 
 /*-----------------------------------------------------------*/
 
@@ -170,7 +177,18 @@ static void networkTask(__unused void *params)
 	{
         vTaskDelay(NETWORK_TASK_PERIOD_MS);
 
-		send_message_TCP("Yo from Pico W!");
+		if(TransportLayerType == UDP_COMMUNICATION)
+		{
+			send_message_UDP("UDP yelling");
+		}
+		else if(TransportLayerType == TCP_COMMUNICATION)
+		{
+			send_message_TCP("Yo from Pico W!");
+		}
+		else
+		{
+			printf("Communication type not supported.");
+		}
     }
 }
 

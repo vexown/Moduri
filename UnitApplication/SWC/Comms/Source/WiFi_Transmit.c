@@ -23,7 +23,8 @@ void send_message_TCP(const char* message)
 {
     int bytes_sent;
     int client_socket;
-    struct sockaddr_in server_socket;
+    struct sockaddr_in server_addr;
+    uint32_t ip_addr_net_order;
     
     /* Create a socket for Pico W (client) */
     /* This is a wrapper around the netconn_new function that creates a new network connection 
@@ -38,17 +39,25 @@ void send_message_TCP(const char* message)
         return;
     }
 
-    /* Set up the server socket configuration */
-    memset((char *)&server_socket, 0, sizeof(server_socket)); // start with 0'd out parameters
-    server_socket.sin_family = AF_INET; //server uses IPv4
-    server_socket.sin_port = htons(SERVER_PORT);
-    server_socket.sin_addr.s_addr = inet_addr(SERVER_IP_ADDRESS);
-
+    /* Set up the server address */
+    memset((char *)&server_addr, 0, sizeof(server_addr)); // start with 0'd out parameters
+    server_addr.sin_family = AF_INET; //server uses IPv4
+    server_addr.sin_port = htons(SERVER_PORT);
+    ip_addr_net_order = inet_addr(SERVER_IP_ADDRESS); //converts ASCII IP address to IP address in network order
+    if(ip_addr_net_order != IPADDR_NONE)
+    {
+        server_addr.sin_addr.s_addr = ip_addr_net_order;
+    }
+    else
+    {
+        printf("Invalid IP address \n");
+    }
+    
     /* Establish a connection between the client and the server TCP socket */ 
     /* It takes three arguments: the socket descriptor, the server address structure, and the length of the server address structure. 
         The function first checks if the socket is valid and if the remote address matches the socket type (IPv4 or IPv6). 
         It then extracts the remote IP address and port from the address structure and calls the netconn_connect function to establish the connection. */
-    if (connect(client_socket, (struct sockaddr *)&server_socket, sizeof(server_socket)) != E_OK) 
+    if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) != E_OK) 
     {
         printf("ERROR connecting \n");
     }
@@ -57,6 +66,52 @@ void send_message_TCP(const char* message)
     /* The lwip_send function in LwIP is a wrapper around the netconn_write_partly function that sends data over a TCP socket. 
        It takes four arguments: the socket descriptor, the data to be sent, the size of the data, and flags that specify additional options. */
     bytes_sent = send(client_socket, message, strlen(message), NO_FLAG);
+    if (bytes_sent == E_NOT_OK) //send function returns either number of bytes sent or -1 if something went wrong
+    {
+        printf("ERROR writing to socket \n");
+    }
+    else if(bytes_sent != strlen(message))
+    {
+        printf("ERROR - not all bytes of the message were sent \n");
+    }
+
+    /* Close the socket */
+    close(client_socket);
+}
+
+void send_message_UDP(const char* message) 
+{
+    int bytes_sent;
+    int client_socket;
+    struct sockaddr_in server_addr;
+    uint32_t ip_addr_net_order;
+
+    /* Create a socket for Pico W (client) */
+    if ((client_socket = socket(AF_INET, SOCK_DGRAM, 0 /*unused*/)) != E_OK) 
+    {
+        printf("ERROR opening socket \n");
+        return;
+    }
+
+    /* Set up the server address */
+    memset(&server_addr, 0, sizeof(server_addr)); // start with 0'd out parameters
+    server_addr.sin_family = AF_INET; //server uses IPv4
+    server_addr.sin_port = htons(SERVER_PORT);
+    ip_addr_net_order = inet_addr(SERVER_IP_ADDRESS); //converts ASCII IP address to IP address in network order
+    if(ip_addr_net_order != IPADDR_NONE)
+    {
+        server_addr.sin_addr.s_addr = ip_addr_net_order;
+    }
+    else
+    {
+        printf("Invalid IP address \n");
+    }
+
+    /* Send the message */
+    /* The lwip_sendto function sends data to a specific address using a socket. Used for UDP communication using the LwIP stack.
+       Uses netconn_send to actually send the data to the specified destination address.
+       It takes 6 arguments: the socket descriptor, the data to be sent, the size of the data, flags that specify additional options, destination addr and addr length */
+    bytes_sent = sendto(client_socket, message, strlen(message), NO_FLAG, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (bytes_sent == E_NOT_OK) //send function returns either number of bytes sent or -1 if something went wrong
     {
         printf("ERROR writing to socket \n");
