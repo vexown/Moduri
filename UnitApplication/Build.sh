@@ -54,6 +54,14 @@ cmake --build .
 
 echo "Build complete."
 
+echo "Copying output files..."
+
+cp -v ./SWC/moduri.elf     ../output
+cp -v ./SWC/moduri.elf.map ../output
+cp -v ./SWC/moduri.uf2     ../output
+
+echo "Done"
+
 # Prompt the user to press any key to exit
 echo "Press any key to exit the script."
 
