@@ -66,7 +66,7 @@
 #define mainQUEUE_LENGTH					( 1 )
 
 /* Stack sizes */
-#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 1024 )
+#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 256 ) /* This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */
 
 /* Wifi Communication Types */
 #define UDP_COMMUNICATION 					(0xAA)
