@@ -43,6 +43,7 @@
 #include "lwip/sockets.h"
 #include "WiFi_Credentials.h"
 #include "WiFi_Transmit.h"
+#include "WiFi_Receive.h"
 
 #ifndef WIFI_CREDENTIALS_PROVIDED
 #error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
@@ -69,8 +70,16 @@
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 256 ) /* This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */
 
 /* Wifi Communication Types */
-#define UDP_COMMUNICATION 					(0xAA)
-#define TCP_COMMUNICATION 					(0xAB)
+typedef enum {
+    UDP_COMMUNICATION = 0xAA,
+    TCP_COMMUNICATION = 0xAB
+} TransportLayerType;
+
+/* WiFi Direction Mode */
+typedef enum {
+    RECEIVE_MODE = 0,
+    TRANSMIT_MODE = 1
+} CommDirectionType;
 
 /*-----------------------------------------------------------*/
 
@@ -89,7 +98,10 @@ static void networkTask(__unused void *params);
 static QueueHandle_t xQueue = NULL;
 
 /* WiFi Communication Type */
-static uint8_t TransportLayerType = UDP_COMMUNICATION; /* initial communication type is UDP */
+static TransportLayerType TransportLayer = UDP_COMMUNICATION; /* initial communication type is UDP */
+
+/* WiFi Communication Direction */
+static CommDirectionType CommDirection = RECEIVE_MODE;
 
 /*-----------------------------------------------------------*/
 
@@ -148,6 +160,8 @@ void OS_start( void )
 
 static void networkTask(__unused void *params)
 {
+	char buffer[128] = {0};
+
     /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
     if (cyw43_arch_init()) 
     {
@@ -177,11 +191,22 @@ static void networkTask(__unused void *params)
 	{
         vTaskDelay(NETWORK_TASK_PERIOD_MS);
 
-		if(TransportLayerType == UDP_COMMUNICATION)
+		if(TransportLayer == UDP_COMMUNICATION)
 		{
-			send_message_UDP("UDP yelling");
+			if(CommDirection == RECEIVE_MODE)
+			{
+				receive_message_UDP(buffer, sizeof(buffer));
+			}
+			else if(CommDirection == TRANSMIT_MODE)
+			{
+				send_message_UDP("UDP yelling");
+			}
+			else
+			{
+				printf("Communication direction not supported. \n");
+			}
 		}
-		else if(TransportLayerType == TCP_COMMUNICATION)
+		else if(TransportLayer == TCP_COMMUNICATION)
 		{
 			send_message_TCP("Yo from Pico W!");
 		}
@@ -208,7 +233,6 @@ static void prvQueueSendTask( void *pvParameters )
 		/* Place this task in the blocked state until it is time to run again. */
 		int32_t SendToQueue_freq_ms = mainQUEUE_SEND_FREQUENCY_MS/2;
 		vTaskDelayUntil( &xNextWakeTime, SendToQueue_freq_ms );
-		printf("SendToQueue_freq_ms = %u ms\n", SendToQueue_freq_ms);
 		
 		/* Send to the queue - causing the queue receive task to unblock and
 		toggle the LED.  0 is used as the block time so the sending operation
