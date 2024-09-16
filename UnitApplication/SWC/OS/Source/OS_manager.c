@@ -1,4 +1,9 @@
-/********************************* SYSTEM *************************************/
+/**
+ * File: OS_manager.c
+ * Description: High-level FreeRTOS configuration. Setup of tasks and other 
+ * system-related mechanisms 
+ */
+
 /* FreeRTOS V202107.00
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
@@ -25,6 +30,9 @@
  * 1 tab == 4 spaces!
  *******************************************************************************/
 
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
 /* Standard includes. */
 #include <stdio.h>
 
@@ -45,6 +53,10 @@
 #include "WiFi_Transmit.h"
 #include "WiFi_Receive.h"
 
+/*******************************************************************************/
+/*                                 MACROS                                      */
+/*******************************************************************************/
+
 /* WiFi macros */
 #define WIFI_CONNECTION_TIMEOUT_MS 			(10000) //10s 
 
@@ -63,6 +75,10 @@
 /* Stack sizes */
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) //This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes)
 
+/*******************************************************************************/
+/*                               DATA TYPES                                    */
+/*******************************************************************************/
+
 /* Wifi Communication Types */
 typedef enum {
     UDP_COMMUNICATION = 0xAA,
@@ -75,18 +91,23 @@ typedef enum {
     TRANSMIT_MODE = 1
 } CommDirectionType;
 
-/*-----------------------------------------------------------*/
+/*******************************************************************************/
+/*                        GLOBAL FUNCTION DECLARATIONS                         */
+/*******************************************************************************/
+void OS_start(void);
 
-void OS_start( void );
+/*******************************************************************************/
+/*                        STATIC FUNCTION DECLARATIONS                         */
+/*******************************************************************************/
 
-/*-----------------------------------------------------------*/
+/***************************** Tasks declarations ******************************/
+static void queueReceiveTask(__unused void *taskParams );
+static void queueSendTask(__unused void *taskParams );
+static void networkTask(__unused void *taskParams);
 
-/* Tasks declarations */
-static void prvQueueReceiveTask( void *pvParameters );
-static void prvQueueSendTask( void *pvParameters );
-static void networkTask(__unused void *params);
-
-/*-----------------------------------------------------------*/
+/*******************************************************************************/
+/*                             STATIC VARIABLES                                */
+/*******************************************************************************/
 
 /* The queue instance */
 static QueueHandle_t xQueue = NULL;
@@ -95,13 +116,24 @@ static QueueHandle_t xQueue = NULL;
 static TransportLayerType TransportLayer = UDP_COMMUNICATION; /* initial communication type is UDP */
 
 /* WiFi Communication Direction */
-static CommDirectionType CommDirection = RECEIVE_MODE;
+static CommDirectionType CommDirection = RECEIVE_MODE; /* initial direction is receive */
 
-/*-----------------------------------------------------------*/
+/*******************************************************************************/
+/*                          GLOBAL FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
 
+/* 
+ * Function: OS_start
+ * 
+ * Description: Global function called from main.c. Initial OS setup and starts scheduler
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
 void OS_start( void )
 {
-	TaskHandle_t task;
 	const char *rtos_type;
 
     /* Check if we're running FreeRTOS on single core or both RP2040 cores */
@@ -122,21 +154,21 @@ void OS_start( void )
 #endif
 
 	printf("Setting up the RTOS configuration... \n");
-    /* Create the queue. */
-	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
+
+    /* Create a queue that can hold mainQUEUE_LENGTH number of items, each of which is sizeof(uint32_t) bytes in size (4bytes) */
+	xQueue = xQueueCreate(mainQUEUE_LENGTH, sizeof(uint32_t)); // 1 x uint32_t queue
 
 	if( xQueue != NULL )
 	{
 		/* Create the tasks */
-		xTaskCreate( prvQueueReceiveTask,				/* The function that implements the task. */
-					"Rx", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
+		xTaskCreate( queueReceiveTask,				/* The function that implements the task. */
+					"RX", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
 					STACK_1024_BYTES,		 			/* The size of the stack to allocate to the task. */
 					NULL, 								/* The parameter passed to the task - not used in this case. */
 					mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
 					NULL );								/* The task handle is not required, so NULL is passed. */
-
-		xTaskCreate( prvQueueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-    	xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , &task);
+		xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+    	xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
 
 		/* Start the tasks and timer running. */
 		printf("RTOS configuration finished, starting the scheduler... \n");
@@ -152,7 +184,21 @@ void OS_start( void )
 	for( ;; );
 }
 
-static void networkTask(__unused void *pvParameters)
+/*******************************************************************************/
+/*                          STATIC FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+/* 
+ * Function: networkTask
+ * 
+ * Description: Network task handling the Wi-Fi communication (receive/send TCP and UDP)
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void networkTask(__unused void *taskParams)
 {
 	TickType_t xLastWakeTime;
 	char buffer[128] = {0};
@@ -215,7 +261,17 @@ static void networkTask(__unused void *pvParameters)
     }
 }
 
-static void prvQueueSendTask(__unused void *pvParameters )
+/* 
+ * Function: queueSendTask
+ * 
+ * Description: Demo task for sending data to a queue
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void queueSendTask(__unused void *taskParams)
 {
 	TickType_t xLastWakeTime;
 	const unsigned long ulValueToSend = 100UL;
@@ -226,7 +282,7 @@ static void prvQueueSendTask(__unused void *pvParameters )
 	for( ;; )
 	{
 		/* Place this task in the blocked state until it is time to run again. */
-		vTaskDelayUntil(&xLastWakeTime, QUEUE_SEND_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
+		vTaskDelayUntil(&xLastWakeTime, QUEUE_SEND_TASK_PERIOD_TICKS); // Execute periodically at consistent intervals based on a reference time
 		
 		/* Send to the queue - causing the queue receive task to unblock and
 		toggle the LED.  0 is used as the block time so the sending operation
@@ -236,15 +292,22 @@ static void prvQueueSendTask(__unused void *pvParameters )
 	}
 }
 
-static void prvQueueReceiveTask( void *pvParameters )
+/* 
+ * Function: queueReceiveTask
+ * 
+ * Description: Demo task for receiving data from a queue (also flashes the on-board LED)
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void queueReceiveTask(__unused void *taskParams)
 {
 	unsigned long ulReceivedValue;
 	const unsigned long ulExpectedValue = 100UL;
 
 	static int state_LED;
-
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
 
 	for( ;; )
 	{
