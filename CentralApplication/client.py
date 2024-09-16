@@ -1,7 +1,7 @@
 import socket
 import time
 
-SERVER_IP = "192.168.1.188"  # Pico W's IP address
+SERVER_IP = "192.168.1.193"  # Pico W's IP address
 SERVER_PORT = 12345          # Pico W's socket port
 MESSAGE = "Yo from PC!"
 
