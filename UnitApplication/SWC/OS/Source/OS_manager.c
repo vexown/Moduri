@@ -37,37 +37,31 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "hardware/gpio.h"
-
-/* WiFi includes */
 #include "pico/cyw43_arch.h"
 #include "lwip/sockets.h"
-#include "WiFi_Credentials.h"
+
+/* WiFi includes */
+#include "WiFi_Credentials.h" //Create WiFi_Credentials.h with your WiFi login and password as const char* variables called ssid and pass
 #include "WiFi_Transmit.h"
 #include "WiFi_Receive.h"
 
-#ifndef WIFI_CREDENTIALS_PROVIDED
-#error "Create WiFi_Credentials.h with your WiFi login and password as char* variables called ssid and pass. Define WIFI_CREDENTIALS_PROVIDED there to pass this check"                                                       
-#endif
-
 /* WiFi macros */
-#define WIFI_CONNECTION_TIMEOUT_MS 10000 
+#define WIFI_CONNECTION_TIMEOUT_MS 			(10000) //10s 
 
 /* Priorities for the tasks */
-#define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
-#define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
-#define NETWORK_TASK_PRIORITY 				( tskIDLE_PRIORITY + 3 )
+#define mainQUEUE_RECEIVE_TASK_PRIORITY		(tskIDLE_PRIORITY + 2)
+#define	mainQUEUE_SEND_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
+#define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 3)
 
-/* Task periods */
-#define NETWORK_TASK_PERIOD_MS				( 5000 )
+/* Task periods: portTICK_PERIOD_MS = (1/configTICK_RATE_HZ) * 1000 = 1ms per tick */
+#define QUEUE_SEND_TASK_PERIOD_TICKS		(TickType_t)(500 / portTICK_PERIOD_MS) //500ms
+#define NETWORK_TASK_PERIOD_TICKS			(TickType_t)(5000 / portTICK_PERIOD_MS) //5s
 
-/* The rate at which data is sent to the queue. The rate is once every mainQUEUE_SEND_FREQUENCY_MS (once every 1000ms by default) */
-#define mainQUEUE_SEND_FREQUENCY_MS			( 1000 / portTICK_PERIOD_MS )
-
-/* The number of items the queue can hold */
-#define mainQUEUE_LENGTH					( 1 )
+/* Queue configuration */
+#define mainQUEUE_LENGTH					(1)
 
 /* Stack sizes */
-#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)( 256 ) /* This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */
+#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) //This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes)
 
 /* Wifi Communication Types */
 typedef enum {
@@ -158,9 +152,13 @@ void OS_start( void )
 	for( ;; );
 }
 
-static void networkTask(__unused void *params)
+static void networkTask(__unused void *pvParameters)
 {
+	TickType_t xLastWakeTime;
 	char buffer[128] = {0};
+
+	/* Initialize xLastWakeTime - this only needs to be done once. */
+	xLastWakeTime = xTaskGetTickCount();
 
     /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
     if (cyw43_arch_init()) 
@@ -189,7 +187,7 @@ static void networkTask(__unused void *params)
 
     for( ;; )
 	{
-        vTaskDelay(NETWORK_TASK_PERIOD_MS);
+        vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 
 		if(TransportLayer == UDP_COMMUNICATION)
 		{
@@ -217,22 +215,18 @@ static void networkTask(__unused void *params)
     }
 }
 
-static void prvQueueSendTask( void *pvParameters )
+static void prvQueueSendTask(__unused void *pvParameters )
 {
-	TickType_t xNextWakeTime;
+	TickType_t xLastWakeTime;
 	const unsigned long ulValueToSend = 100UL;
 
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
-
-	/* Initialise xNextWakeTime - this only needs to be done once. */
-	xNextWakeTime = xTaskGetTickCount();
+	/* Initialize xLastWakeTime - this only needs to be done once. */
+	xLastWakeTime = xTaskGetTickCount();
 
 	for( ;; )
 	{
 		/* Place this task in the blocked state until it is time to run again. */
-		int32_t SendToQueue_freq_ms = mainQUEUE_SEND_FREQUENCY_MS/2;
-		vTaskDelayUntil( &xNextWakeTime, SendToQueue_freq_ms );
+		vTaskDelayUntil(&xLastWakeTime, QUEUE_SEND_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 		
 		/* Send to the queue - causing the queue receive task to unblock and
 		toggle the LED.  0 is used as the block time so the sending operation
