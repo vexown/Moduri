@@ -1,28 +1,65 @@
+/**
+ * File: main.c
+ * Description: First executed user code after crt0.S assembly startup code defined
+ * in the pico-sdk (located in pico-sdk/src/rp2_common/pico_crt0/crt0.S)
+ */
+
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
 
 /* Library includes. */
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-/*-----------------------------------------------------------*/
-/* Hardware setup function */
-static void prvSetupHardware( void );
-/* OS function which does some set up and starts the scheduler */
+/*******************************************************************************/
+/*                        GLOBAL FUNCTION DECLARATIONS                         */
+/*******************************************************************************/
 extern void OS_start( void );
 
-/*-----------------------------------------------------------*/
+/*******************************************************************************/
+/*                        STATIC FUNCTION DECLARATIONS                         */
+/*******************************************************************************/
 
-int main( void )
+/* Hardware setup function */
+static void setupHardware( void );
+
+/*******************************************************************************/
+/*                          GLOBAL FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+/* 
+ * Function: main
+ * 
+ * Description: First user code function, does initial HW setup and calls the OS
+ *              start function
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: technically 'int' value but the program is a loop we will never return
+ */
+int main(void)
 {
-    /* Configure and initialize Raspberry Pico W hardware */
-    prvSetupHardware();
-
-    /* Go to the main C file which does some setup and starts the scheduler */
+    setupHardware();
     OS_start();
 }
 
-/*-----------------------------------------------------------*/
+/*******************************************************************************/
+/*                         STATIC FUNCTION DEFINITIONS                         */
+/*******************************************************************************/
 
-static void prvSetupHardware( void )
+/* 
+ * Function: main
+ * 
+ * Description: Configure and initialize Raspberry Pico W hardware 
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void setupHardware(void)
 {
     stdio_init_all();
 }

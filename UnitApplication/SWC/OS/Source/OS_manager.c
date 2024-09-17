@@ -97,7 +97,7 @@ typedef enum {
 void OS_start(void);
 
 /*******************************************************************************/
-/*                        STATIC FUNCTION DECLARATIONS                         */
+/*                         TASK FUNCTION DECLARATIONS                          */
 /*******************************************************************************/
 
 /***************************** Tasks declarations ******************************/
@@ -136,21 +136,15 @@ void OS_start( void )
 {
 	const char *rtos_type;
 
-    /* Check if we're running FreeRTOS on single core or both RP2040 cores */
-    /* - Standard FreeRTOS is designed for single-core systems, with simpler task 
-       scheduling and communication mechanisms.
-       - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run 
-       concurrently across multiple cores */
-#if ( configNUMBER_OF_CORES > 1 )
-    rtos_type = "FreeRTOS SMP";
+    /** Check if we're running FreeRTOS on single core or both RP2040 cores:
+      * - Standard FreeRTOS is designed for single-core systems, with simpler task scheduling and communication mechanisms.
+	  * - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run concurrently across multiple cores */
+#if (configNUMBER_OF_CORES == 2)
+ 	rtos_type = "FreeRTOS SMP";
+    printf("Running %s on both cores \n", rtos_type);
 #else
-    rtos_type = "FreeRTOS";
-#endif
-
-#if ( configNUMBER_OF_CORES == 2 )
-    printf("Starting %s on both cores\n", rtos_type);
-#else
-	printf("Starting %s on one of the cores\n", rtos_type);
+	rtos_type = "FreeRTOS";
+	printf("Running %s on one core \n", rtos_type);
 #endif
 
 	printf("Setting up the RTOS configuration... \n");
@@ -185,7 +179,7 @@ void OS_start( void )
 }
 
 /*******************************************************************************/
-/*                          STATIC FUNCTION DEFINITIONS                        */
+/*                            TASK FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
 /* 
@@ -200,8 +194,11 @@ void OS_start( void )
  */
 static void networkTask(__unused void *taskParams)
 {
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
 	TickType_t xLastWakeTime;
-	char buffer[128] = {0};
+	char message_buffer[128] = {0};
 
 	/* Initialize xLastWakeTime - this only needs to be done once. */
 	xLastWakeTime = xTaskGetTickCount();
@@ -219,7 +216,7 @@ static void networkTask(__unused void *taskParams)
     /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
     cyw43_arch_enable_sta_mode();
 
-    /* Attempt to connect to a wireless access point.
+    /* Attempt to connect to a wireless access point (currently my Tenda WiFi router)
        Blocking until the network is joined, a failure is detected or a timeout occurs */
     printf("Connecting to Wi-Fi...\n");
     if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
@@ -231,6 +228,9 @@ static void networkTask(__unused void *taskParams)
         printf("connected sucessfully\n");
     }
 
+	/*******************************************************************************/
+	/*                               Task Loop Code                                */
+	/*******************************************************************************/
     for( ;; )
 	{
         vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
@@ -239,7 +239,7 @@ static void networkTask(__unused void *taskParams)
 		{
 			if(CommDirection == RECEIVE_MODE)
 			{
-				receive_message_UDP(buffer, sizeof(buffer));
+				receive_message_UDP(message_buffer, sizeof(message_buffer));
 			}
 			else if(CommDirection == TRANSMIT_MODE)
 			{
@@ -273,12 +273,18 @@ static void networkTask(__unused void *taskParams)
  */
 static void queueSendTask(__unused void *taskParams)
 {
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
 	TickType_t xLastWakeTime;
 	const unsigned long ulValueToSend = 100UL;
 
 	/* Initialize xLastWakeTime - this only needs to be done once. */
 	xLastWakeTime = xTaskGetTickCount();
 
+	/*******************************************************************************/
+	/*                               Task Loop Code                                */
+	/*******************************************************************************/
 	for( ;; )
 	{
 		/* Place this task in the blocked state until it is time to run again. */
@@ -304,11 +310,16 @@ static void queueSendTask(__unused void *taskParams)
  */
 static void queueReceiveTask(__unused void *taskParams)
 {
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
 	unsigned long ulReceivedValue;
+	static int state_LED;
 	const unsigned long ulExpectedValue = 100UL;
 
-	static int state_LED;
-
+	/*******************************************************************************/
+	/*                               Task Loop Code                                */
+	/*******************************************************************************/
 	for( ;; )
 	{
 		/* Wait until something arrives in the queue - this task will block

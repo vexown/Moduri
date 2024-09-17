@@ -1,3 +1,8 @@
+/**
+ * File: OS_hooks.c
+ * Description: File containing definitions of the hooks used by the OS
+ */
+
 /*
  * FreeRTOS V202107.00
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
@@ -25,61 +30,111 @@
  * 1 tab == 4 spaces!
  */
 
-#include "FreeRTOS.h"
-#include "task.h"
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
+
+/* Standard includes. */
 #include <stdio.h>
 
-/* Hook called if a call to pvPortMalloc() fails because there is insufficient
-    free memory available in the FreeRTOS heap.  pvPortMalloc() is called
-    internally by FreeRTOS API functions that create tasks, queues, software
-    timers, and semaphores.  The size of the FreeRTOS heap is set by the
-    configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
-void vApplicationMallocFailedHook( void )
+/* Kernel includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+
+/*******************************************************************************/
+/*                          GLOBAL FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+/* 
+ * Function: vApplicationMallocFailedHook
+ * 
+ * Description: Hook called if a call to pvPortMalloc() fails because there is insufficient
+ *  free memory available in the FreeRTOS heap.  pvPortMalloc() is called
+ *  internally by FreeRTOS API functions that create tasks, queues, software
+ *  timers, and semaphores.  The size of the FreeRTOS heap is set by the
+ *  configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+void vApplicationMallocFailedHook(void)
 {
     /* Force an assertion failure by passing a NULL pointer to the configASSERT macro, triggering the error handling routine. */
-    configASSERT( ( volatile void * ) NULL );
+    configASSERT(( volatile void * ) NULL);
 }
 
-/* Run time stack overflow checking is performed if
-    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
-    function is called if a stack overflow is detected. */
-void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+/* 
+ * Function: vApplicationStackOverflowHook
+ * 
+ * Description: Run time stack overflow checking is performed if
+ *  configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook
+ *  function is called if a stack overflow is detected. 
+ * 
+ * Parameters:
+ *   - pxTask: handle of the task in which stack overflow happened
+ *   - pcTaskName: task ASCII identifier
+ * 
+ * Returns: void
+ */
+void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
 {
-    ( void ) pcTaskName;
-    ( void ) pxTask;
+    /* cast to void to aVOID (heh) compiler warnings */
+    (void)pcTaskName;
+    (void)pxTask;
     
     /* Force an assertion failure by passing a NULL pointer to the configASSERT macro, triggering the error handling routine. */
-    configASSERT( ( volatile void * ) NULL );
+    configASSERT(( volatile void * ) NULL);
 }
 
-/* The Idle Hook function is called repeatedly by the idle task, which is 
-    the lowest priority task in the system. This function can be used to 
-    perform low-priority background tasks when the CPU has no other work 
-    to do. It must not attempt to block or call any API functions that could 
-    block because the idle task needs to run whenever no other tasks are 
-    ready to execute.
 
-    Typical uses for the idle hook might include monitoring system status, 
-    performing background tasks, or placing the CPU into a low-power mode 
-    to conserve energy when idle. If not needed, this function can be left 
-    empty. */
-void vApplicationIdleHook( void )
+/* 
+ * Function: vApplicationIdleHook
+ * 
+ * Description: The Idle Hook function is called repeatedly by the idle task, which is 
+ *   the lowest priority task in the system. This function can be used to 
+ *   perform low-priority background tasks when the CPU has no other work 
+ *   to do. It must not attempt to block or call any API functions that could 
+ *   block because the idle task needs to run whenever no other tasks are 
+ *   ready to execute.
+ *
+ *   Typical uses for the idle hook might include monitoring system status, 
+ *   performing background tasks, or placing the CPU into a low-power mode 
+ *   to conserve energy when idle. If not needed, this function can be left 
+ *   empty.
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+void vApplicationIdleHook(void)
 {
 
 }
 
-/* The Tick Hook function is called by each tick interrupt.
-    This function allows you to execute code at the frequency
-    of the system tick (as configured by configTICK_RATE_HZ in
-    FreeRTOSConfig.h).
-
-    You can use this function to perform periodic operations,
-    such as monitoring system status, toggling LEDs, or
-    incrementing software timers. Since this function is called
-    very frequently, it is important to keep the code inside it
-    efficient and quick to execute to avoid negatively impacting
-    the real-time performance of the system. */
-void vApplicationTickHook( void )
+/* 
+ * Function: vApplicationTickHook
+ * 
+ * Description: The Tick Hook function is called by each tick interrupt.
+ *   This function allows you to execute code at the frequency
+ *   of the system tick (as configured by configTICK_RATE_HZ in
+ *   FreeRTOSConfig.h).
+ *
+ *   You can use this function to perform periodic operations,
+ *   such as monitoring system status, toggling LEDs, or
+ *   incrementing software timers. Since this function is called
+ *   very frequently, it is important to keep the code inside it
+ *   efficient and quick to execute to avoid negatively impacting
+ *   the real-time performance of the system.
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+void vApplicationTickHook(void)
 {
 
 }

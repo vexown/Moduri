@@ -1,15 +1,38 @@
+/**
+ * File: WiFi_Transmit.c
+ * Description: Implementation related to sending messages or commands via UDP or TCP.
+ */
+
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
+
+/* Standard includes. */
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+
+/* SDK includes */
 #include <lwip/sockets.h>
 #include <lwip/netdb.h>
 #include <lwip/dns.h>
+
+/* WiFi includes */
 #include "WiFi_Common.h"
 
-/**
- * Sends a message over a TCP socket to a specified IP address and port.
- *
- * @param message The message to send.
+/*******************************************************************************/
+/*                          GLOBAL FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+/* 
+ * Function: send_message_TCP
+ * 
+ * Description: Sends a message over a TCP socket to a specified IP address and port.
+ * 
+ * Parameters:
+ *   - message: The message to send (string)
+ * 
+ * Returns: void
  */
 void send_message_TCP(const char* message) 
 {
@@ -71,6 +94,16 @@ void send_message_TCP(const char* message)
     close(client_socket);
 }
 
+/* 
+ * Function: send_message_UDP
+ * 
+ * Description: Sends a message over a UDP socket to a specified IP address and port.
+ * 
+ * Parameters:
+ *   - message: The message to send (string)
+ * 
+ * Returns: void
+ */
 void send_message_UDP(const char* message) 
 {
     int bytes_sent;

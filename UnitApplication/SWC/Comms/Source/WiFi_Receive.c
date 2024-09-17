@@ -1,12 +1,41 @@
+/**
+ * File: WiFi_Receive.c
+ * Description: Implementation related to receiving messages or commands via UDP or TCP.
+ */
+
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
+
+/* Standard includes. */
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
+
+/* SDK includes */
 #include <lwip/sockets.h>
 #include <lwip/netdb.h>
 #include <lwip/dns.h>
-#include "WiFi_Common.h"
-#include <errno.h>
 
+/* WiFi includes */
+#include "WiFi_Common.h"
+
+/*******************************************************************************/
+/*                          GLOBAL FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+/* 
+ * Function: receive_message_UDP
+ * 
+ * Description: Receives a message over a UDP socket (from the PC central app)
+ * 
+ * Parameters:
+ *  - buffer: stores the received message
+ *  - buffer_size: size of the message buffer
+ * 
+ * Returns: void
+ */
 void receive_message_UDP(char* buffer, int buffer_size) 
 {
     int bytes_received;
