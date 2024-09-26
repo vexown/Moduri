@@ -9,6 +9,7 @@ add_subdirectory(Comms)
 add_executable(moduri
         main.c
         ${OS_SOURCE_FILES}
+        ${THIRDPARTY_SOURCE_FILES}
         ${COMMS_SOURCE_FILES}
         )
 

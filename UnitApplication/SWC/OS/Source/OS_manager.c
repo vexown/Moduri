@@ -53,6 +53,9 @@
 #include "WiFi_Transmit.h"
 #include "WiFi_Receive.h"
 
+/* Misc includes */
+#include "Common.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
@@ -68,6 +71,9 @@
 /* Task periods: portTICK_PERIOD_MS = (1/configTICK_RATE_HZ) * 1000 = 1ms per tick */
 #define QUEUE_SEND_TASK_PERIOD_TICKS		(TickType_t)(500 / portTICK_PERIOD_MS) //500ms
 #define NETWORK_TASK_PERIOD_TICKS			(TickType_t)(5000 / portTICK_PERIOD_MS) //5s
+
+/* Other Task-related macros */
+#define NUM_OF_TASKS 						(3)
 
 /* Queue configuration */
 #define mainQUEUE_LENGTH					(1)
@@ -135,6 +141,7 @@ static CommDirectionType CommDirection = RECEIVE_MODE; /* initial direction is r
 void OS_start( void )
 {
 	const char *rtos_type;
+	BaseType_t taskCreationStatus[NUM_OF_TASKS];
 
     /** Check if we're running FreeRTOS on single core or both RP2040 cores:
       * - Standard FreeRTOS is designed for single-core systems, with simpler task scheduling and communication mechanisms.
@@ -155,14 +162,27 @@ void OS_start( void )
 	if( xQueue != NULL )
 	{
 		/* Create the tasks */
-		xTaskCreate( queueReceiveTask,				/* The function that implements the task. */
-					"RX", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
-					STACK_1024_BYTES,		 			/* The size of the stack to allocate to the task. */
-					NULL, 								/* The parameter passed to the task - not used in this case. */
-					mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
-					NULL );								/* The task handle is not required, so NULL is passed. */
-		xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-    	xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
+		taskCreationStatus[0] = xTaskCreate( queueReceiveTask,					/* The function that implements the task. */
+											"RX", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
+											STACK_1024_BYTES,		 			/* The size of the stack to allocate to the task. */
+											NULL, 								/* The parameter passed to the task - not used in this case. */
+											mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
+											NULL );								/* The task handle is not required, so NULL is passed. */
+		taskCreationStatus[1] = xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+    	taskCreationStatus[2] = xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
+
+		/* Check if the tasks were created successfully */
+		for(uint8_t i = 0; i < NUM_OF_TASKS; i++)
+		{
+			if(taskCreationStatus[i] == pdPASS)
+			{
+				printf("Task number %u created successfully \n", i);
+			}
+			else /* pdFAIL */
+			{
+				haltOnError(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
+			}
+		}
 
 		/* Start the tasks and timer running. */
 		printf("RTOS configuration finished, starting the scheduler... \n");
