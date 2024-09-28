@@ -180,7 +180,7 @@ void OS_start( void )
 			}
 			else /* pdFAIL */
 			{
-				haltOnError(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
+				CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
 			}
 		}
 

@@ -18,7 +18,7 @@
 /*******************************************************************************/
 
 /* 
- * Function: haltOnError
+ * Function: CriticalErrorHandler
  * 
  * Description:  Function to trap execution and with an error code
  * 
@@ -28,7 +28,7 @@
  * 
  * Returns: void
  */
-void haltOnError(uint8_t moduleId, uint8_t errorId)
+void CriticalErrorHandler(uint8_t moduleId, uint8_t errorId)
 {
     printf("CRTICIAL ERROR OCCURED. moduleId: %u, errorId: %u. Going into endless loop...\n", moduleId, errorId);
     

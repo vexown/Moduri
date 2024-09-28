@@ -22,6 +22,6 @@
 /*                         GLOBAL FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
 
-void haltOnError(uint8_t moduleId, uint8_t errorId);
+void CriticalErrorHandler(uint8_t moduleId, uint8_t errorId);
 
 #endif
