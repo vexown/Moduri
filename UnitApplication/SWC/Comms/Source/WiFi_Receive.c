@@ -58,7 +58,7 @@ void receive_message_UDP(char* buffer, int buffer_size)
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET; // IPv4
     server_addr.sin_port = htons(SERVER_PORT);
-    if (inet_pton(AF_INET, PICO_W_IP_ADDRESS, &server_addr.sin_addr) <= E_OK) // Convert the IP address from string to binary form
+    if (inet_pton(AF_INET, PICO_W_STATIC_IP_ADDRESS, &server_addr.sin_addr) <= E_OK) // Convert the IP address from string to binary form
     {
         printf("Invalid IP address format\n");
         close(server_socket);
@@ -73,7 +73,7 @@ void receive_message_UDP(char* buffer, int buffer_size)
         return;
     }
 
-    printf("Server is listening on %s:%d\n", PICO_W_IP_ADDRESS, SERVER_PORT);
+    printf("Server is listening on %s:%d\n", PICO_W_STATIC_IP_ADDRESS, SERVER_PORT);
 
     /* Set the socket timeout */
     timeout.tv_sec = 0;  // Set seconds timeout

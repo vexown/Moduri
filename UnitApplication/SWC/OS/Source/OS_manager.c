@@ -52,6 +52,7 @@
 #include "WiFi_Credentials.h" //Create WiFi_Credentials.h with your WiFi login and password as const char* variables called ssid and pass
 #include "WiFi_Transmit.h"
 #include "WiFi_Receive.h"
+#include "WiFi_Common.h"
 
 /* Misc includes */
 #include "Common.h"
@@ -218,6 +219,8 @@ static void networkTask(__unused void *taskParams)
 	/*                          Task Initialization Code                           */
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
+	ip4_addr_t ipaddr, netmask, gateway, dns;
+	struct netif *netif;
 	char message_buffer[128] = {0};
 
 	/* Initialize xLastWakeTime - this only needs to be done once. */
@@ -247,6 +250,13 @@ static void networkTask(__unused void *taskParams)
     {
         printf("connected sucessfully\n");
     }
+
+	/* Set the Pico W's network interface's to specific static address, netmask, and gateway */
+	netif = netif_default;
+    ipaddr.addr = ipaddr_addr(PICO_W_STATIC_IP_ADDRESS);
+    netmask.addr = ipaddr_addr(NETMASK_ADDR);
+    gateway.addr = ipaddr_addr(GATEWAY_ADDR);
+    netif_set_addr(netif, &ipaddr, &netmask, &gateway);
 
 	/*******************************************************************************/
 	/*                               Task Loop Code                                */
