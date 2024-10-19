@@ -68,11 +68,14 @@
 # ****************************************************************************
 
 # Open a new Windows Terminal window and run the OpenOCD startup script
-wt.exe bash -c "./StartOpenOCD.sh && exec bash"
+wt.exe --title "OpenOCD" bash -c "./StartOpenOCD.sh && exec bash"
 
 # Wait for 1 second to ensure OpenOCD has initialized
 sleep 1
 
-# Launch GDB with the specified ELF file and execute GDB commands from gdb_commands.txt
-gdb-multiarch output/moduri.elf -x gdb_commands.txt
+# Launch GDB for core0
+wt.exe --title "Core0 GDB" bash -c "./StartGDB_Core0.sh && exec bash"
+
+# Launch GDB for core1
+wt.exe --title "Core1 GDB" bash -c "./StartGDB_Core1.sh && exec bash"
 
