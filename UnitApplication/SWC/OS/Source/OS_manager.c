@@ -98,6 +98,12 @@ typedef enum {
     TRANSMIT_MODE = 1
 } CommDirectionType;
 
+/* Communication State */
+typedef enum {
+    ACTIVE = 0,
+    PASSIVE_LISTEN = 1
+} CommStateType;
+
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
@@ -120,15 +126,17 @@ static void networkTask(__unused void *taskParams);
 static QueueHandle_t xQueue = NULL;
 
 /* WiFi Communication Type */
-static TransportLayerType TransportLayer = UDP_COMMUNICATION; /* initial communication type is UDP */
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* initial communication type is TCP */
 
 /* WiFi Communication Direction */
 static CommDirectionType CommDirection = RECEIVE_MODE; /* initial direction is receive */
 
+/* Current Communication State */
+static CommStateType CommState = ACTIVE; /* Active by default */
+
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
-
 /* 
  * Function: OS_start
  * 
@@ -265,6 +273,12 @@ static void networkTask(__unused void *taskParams)
 	{
         vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 
+		while(CommState == PASSIVE_LISTEN)
+		{
+			vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Continously blocks the task, only wake up to check the state */
+		}
+
+		/* CommState ACTIVE */
 		if(TransportLayer == UDP_COMMUNICATION)
 		{
 			if(CommDirection == RECEIVE_MODE)
@@ -282,7 +296,18 @@ static void networkTask(__unused void *taskParams)
 		}
 		else if(TransportLayer == TCP_COMMUNICATION)
 		{
-			send_message_TCP("Yo from Pico W!");
+			if(CommDirection == RECEIVE_MODE)
+			{
+				if(start_TCP_server() == true) CommState = PASSIVE_LISTEN;
+			}
+			else if(CommDirection == TRANSMIT_MODE)
+			{
+				send_message_TCP("Yo from Pico W!");
+			}
+			else
+			{
+				printf("Communication direction not supported. \n");
+			}
 		}
 		else
 		{

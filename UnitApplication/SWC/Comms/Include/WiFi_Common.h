@@ -8,6 +8,7 @@
                                                      //(the 0 address is the network address and 255 is the broadcast address).
 #define GATEWAY_ADDR                "192.168.1.1"    //Gateway IP address (in this case the Tenda Wifi router is the gateway so it's its' address)
 #define SERVER_PORT                 (uint16_t)12345  //TODO - server port for testing, later you can think about which one to use permanently
+#define TCP_PORT                    4242
 
 /* Misc defines */
 #define E_OK           0
