@@ -15,5 +15,8 @@
 #define ERRNO_FAIL     -1
 #define NO_FLAG        0
 
+/* Non-specific functions */
+bool connectToWifi(void);
+void WiFi_MainFunction(void);
 
 #endif

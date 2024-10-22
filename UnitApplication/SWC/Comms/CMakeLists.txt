@@ -5,6 +5,8 @@ message("########## Comms/CMakeLists.txt - start ##########")
 set(COMMS_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_Transmit.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_Receive.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_Init.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_main.c 
     )
 
 # Define the path to the include directory for Comms

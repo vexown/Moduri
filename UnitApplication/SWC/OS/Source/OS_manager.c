@@ -49,7 +49,6 @@
 #include "lwip/sockets.h"
 
 /* WiFi includes */
-#include "WiFi_Credentials.h" //Create WiFi_Credentials.h with your WiFi login and password as const char* variables called ssid and pass
 #include "WiFi_Transmit.h"
 #include "WiFi_Receive.h"
 #include "WiFi_Common.h"
@@ -60,9 +59,6 @@
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-
-/* WiFi macros */
-#define WIFI_CONNECTION_TIMEOUT_MS 			(10000) //10s 
 
 /* Priorities for the tasks */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		(tskIDLE_PRIORITY + 2)
@@ -86,23 +82,6 @@
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
 
-/* Wifi Communication Types */
-typedef enum {
-    UDP_COMMUNICATION = 0xAA,
-    TCP_COMMUNICATION = 0xAB
-} TransportLayerType;
-
-/* WiFi Direction Mode */
-typedef enum {
-    RECEIVE_MODE = 0,
-    TRANSMIT_MODE = 1
-} CommDirectionType;
-
-/* Communication State */
-typedef enum {
-    ACTIVE = 0,
-    PASSIVE_LISTEN = 1
-} CommStateType;
 
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DECLARATIONS                         */
@@ -124,15 +103,6 @@ static void networkTask(__unused void *taskParams);
 
 /* The queue instance */
 static QueueHandle_t xQueue = NULL;
-
-/* WiFi Communication Type */
-static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* initial communication type is TCP */
-
-/* WiFi Communication Direction */
-static CommDirectionType CommDirection = RECEIVE_MODE; /* initial direction is receive */
-
-/* Current Communication State */
-static CommStateType CommState = ACTIVE; /* Active by default */
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -227,44 +197,14 @@ static void networkTask(__unused void *taskParams)
 	/*                          Task Initialization Code                           */
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
-	ip4_addr_t ipaddr, netmask, gateway, dns;
-	struct netif *netif;
-	char message_buffer[128] = {0};
+
+	if(connectToWifi() == false)
+	{
+		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WIFI_DID_NOT_CONNECT);
+	}
 
 	/* Initialize xLastWakeTime - this only needs to be done once. */
 	xLastWakeTime = xTaskGetTickCount();
-
-    /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
-    if (cyw43_arch_init()) 
-    {
-        printf("failed to initialize\n");
-    } 
-    else 
-    {
-        printf("initialized successfully\n");
-    }
-
-    /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
-    cyw43_arch_enable_sta_mode();
-
-    /* Attempt to connect to a wireless access point (currently my Tenda WiFi router)
-       Blocking until the network is joined, a failure is detected or a timeout occurs */
-    printf("Connecting to Wi-Fi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
-    {
-        printf("failed to connect\n");
-    }
-    else
-    {
-        printf("connected sucessfully\n");
-    }
-
-	/* Set the Pico W's network interface's to specific static address, netmask, and gateway */
-	netif = netif_default;
-    ipaddr.addr = ipaddr_addr(PICO_W_STATIC_IP_ADDRESS);
-    netmask.addr = ipaddr_addr(NETMASK_ADDR);
-    gateway.addr = ipaddr_addr(GATEWAY_ADDR);
-    netif_set_addr(netif, &ipaddr, &netmask, &gateway);
 
 	/*******************************************************************************/
 	/*                               Task Loop Code                                */
@@ -273,47 +213,9 @@ static void networkTask(__unused void *taskParams)
 	{
         vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 
-		while(CommState == PASSIVE_LISTEN)
-		{
-			vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Continously blocks the task, only wake up to check the state */
-		}
+		WiFi_MainFunction();
+	}
 
-		/* CommState ACTIVE */
-		if(TransportLayer == UDP_COMMUNICATION)
-		{
-			if(CommDirection == RECEIVE_MODE)
-			{
-				receive_message_UDP(message_buffer, sizeof(message_buffer));
-			}
-			else if(CommDirection == TRANSMIT_MODE)
-			{
-				send_message_UDP("UDP yelling");
-			}
-			else
-			{
-				printf("Communication direction not supported. \n");
-			}
-		}
-		else if(TransportLayer == TCP_COMMUNICATION)
-		{
-			if(CommDirection == RECEIVE_MODE)
-			{
-				if(start_TCP_server() == true) CommState = PASSIVE_LISTEN;
-			}
-			else if(CommDirection == TRANSMIT_MODE)
-			{
-				send_message_TCP("Yo from Pico W!");
-			}
-			else
-			{
-				printf("Communication direction not supported. \n");
-			}
-		}
-		else
-		{
-			printf("Communication type not supported.");
-		}
-    }
 }
 
 /* 
