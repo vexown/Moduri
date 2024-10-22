@@ -43,6 +43,14 @@ typedef struct
 } tcpServerType;
 
 /*******************************************************************************/
+/*                         STATIC FUNCTION DECLARATIONS                        */
+/*******************************************************************************/
+static bool tcp_server_open(tcpServerType *tcpServer);
+static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
+static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
+static void tcp_server_close(tcpServerType *tcpServer);
+
+/*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
@@ -119,6 +127,49 @@ void receive_message_UDP(char* buffer, int buffer_size)
     /* Close the socket */
     close(server_socket);
 }
+
+/* 
+ * Function: start_TCP_server
+ * 
+ * Description: Starts the TCP server by initializing the tcpServerType structure 
+ *              and calling the tcp_server_open function. It handles any necessary 
+ *              setup before the server begins accepting connections.
+ * 
+ * Returns: bool indicating the success (true) or failure (false) of starting the TCP server.
+ */
+bool start_TCP_server(void) 
+{
+	bool serverOpenedAndListening = false;
+    bool status = false;
+
+	tcpServerType *tcpServer = (tcpServerType*)pvPortCalloc(1, sizeof(tcpServerType)); /* Warning - the server is running forever once started so this memory is not freed */
+    if (tcpServer == NULL)
+	{
+		printf("Failed to allocate memory for the TCP server \n");
+        status = false;
+    }
+	else
+	{
+		serverOpenedAndListening = tcp_server_open(tcpServer);
+		if (serverOpenedAndListening == false) 
+		{
+			printf("TCP did not successfully open, closing the server and freeing memory... \n");
+			tcp_server_close(tcpServer);
+			vPortFree(tcpServer);
+            status = false;
+		}
+		else
+		{
+			printf("TCP server started and listening for incoming connections... \n");
+			status = true;
+		}
+	}
+    return status;
+}
+
+/*******************************************************************************/
+/*                          STATIC FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
 
 /* 
  * Function: tcp_server_close
@@ -340,45 +391,6 @@ static bool tcp_server_open(tcpServerType *tcpServer)
 
     /* Return true to indicate the server has been successfully opened and is listening for incoming connections */
     return true;
-}
-
-/* 
- * Function: start_TCP_server
- * 
- * Description: Starts the TCP server by initializing the tcpServerType structure 
- *              and calling the tcp_server_open function. It handles any necessary 
- *              setup before the server begins accepting connections.
- * 
- * Returns: bool indicating the success (true) or failure (false) of starting the TCP server.
- */
-bool start_TCP_server(void) 
-{
-	bool serverOpenedAndListening = false;
-    bool status = false;
-
-	tcpServerType *tcpServer = (tcpServerType*)pvPortCalloc(1, sizeof(tcpServerType)); /* Warning - the server is running forever once started so this memory is not freed */
-    if (tcpServer == NULL)
-	{
-		printf("Failed to allocate memory for the TCP server \n");
-        status = false;
-    }
-	else
-	{
-		serverOpenedAndListening = tcp_server_open(tcpServer);
-		if (serverOpenedAndListening == false) 
-		{
-			printf("TCP did not successfully open, closing the server and freeing memory... \n");
-			tcp_server_close(tcpServer);
-			vPortFree(tcpServer);
-            status = false;
-		}
-		else
-		{
-			printf("TCP server started and listening for incoming connections... \n");
-			status = true;
-		}
-	}
-    return status;
 }
 
 
