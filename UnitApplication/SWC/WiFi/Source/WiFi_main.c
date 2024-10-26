@@ -48,7 +48,7 @@ typedef enum {
 /*******************************************************************************/
 
 /* WiFi Communication Type */
-static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communication type is TCP */
+static TransportLayerType TransportLayer = UDP_COMMUNICATION; /* default communication type is TCP */
 
 /* Current Communication State */
 static CommStateType CommState = INIT; 
@@ -82,14 +82,39 @@ void WiFi_MainFunction(void)
 
     if(CommState == LISTEN)
     {
-        tcp_client_process_recv_message(&received_command);
-        /* Note - for Pico to process the command send them from the Central Application in the following format: "cmd:X" where x = 0..255 */
-        if(received_command != PICO_DO_NOTHING) WiFi_ProcessCommand(received_command); 
+        if(TransportLayer == TCP_COMMUNICATION)
+        {
+            tcp_client_process_recv_message(&received_command);
+            /* Note - for Pico to process the command send them from the Central Application in the following format: "cmd:X" where x = 0..255 */
+            if(received_command != PICO_DO_NOTHING) WiFi_ProcessCommand(received_command); 
+        }
+        else if(TransportLayer == UDP_COMMUNICATION)
+        {
+            udp_client_process_recv_message(&received_command);
+            /* Note - for Pico to process the command send them from the Central Application in the following format: "cmd:X" where x = 0..255 */
+            if(received_command != PICO_DO_NOTHING) WiFi_ProcessCommand(received_command); 
+        }
+        else
+        {
+            printf("Communication Type not supported\n");
+        }
     }
 
     if(CommState == ACTIVE_SEND_AND_RECEIVE)
     {
-        tcp_client_send(message, strlen(message));
+        if(TransportLayer == TCP_COMMUNICATION)
+        {
+            tcp_client_send(message, strlen(message));
+        }
+        else if(TransportLayer == UDP_COMMUNICATION)
+        {
+            udp_client_send(message);
+        }
+        else
+        {
+            printf("Communication Type not supported\n");
+        }
+        
     }
 
     if(CommState == INIT)
@@ -101,6 +126,14 @@ void WiFi_MainFunction(void)
 #else /* defaults to Pico as TCP client */
             if(start_TCP_client() == true) CommState = LISTEN;
 #endif
+        }
+        else if(TransportLayer == UDP_COMMUNICATION)
+        {
+            if(start_UDP_client() == true) CommState = LISTEN;
+        }
+        else
+        {
+            printf("Communication Type not supported \n");
         }
     }
 }

@@ -1,7 +1,8 @@
 #ifndef WIFI_UDP_H
 #define WIFI_UDP_H
 
-void receive_message_UDP(char* buffer, int buffer_size);
-void send_message_UDP(const char* message);
+bool start_UDP_client(void);
+bool udp_client_send(const char* message);
+void udp_client_process_recv_message(uint8_t *received_command);
 
 #endif

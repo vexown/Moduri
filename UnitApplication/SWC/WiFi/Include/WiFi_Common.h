@@ -10,6 +10,9 @@
 #define SERVER_PORT                 (uint16_t)12345  //TODO - server port for testing, later you can think about which one to use permanently
 #define TCP_PORT                    8080
 #define TCP_RECV_BUFFER_SIZE        1024             //in bytes
+#define UDP_SERVER_PORT             5000
+#define UDP_CLIENT_PORT             5001
+#define UDP_RECV_BUFFER_SIZE        1024
 
 /* Misc defines */
 #define E_OK           0
