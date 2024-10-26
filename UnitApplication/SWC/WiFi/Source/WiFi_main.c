@@ -54,6 +54,11 @@ static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communi
 static CommStateType CommState = INIT; 
 
 /*******************************************************************************/
+/*                          STATIC FUNCTION DECLARATIONS                       */
+/*******************************************************************************/
+void WiFi_ProcessCommand(uint8_t command);
+
+/*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 /* 
@@ -72,12 +77,14 @@ static CommStateType CommState = INIT;
 
 void WiFi_MainFunction(void)
 {
-    char message_buffer[128] = {0};
     const char *message = "Yo from Pico W!";
+    uint8_t received_command = PICO_DO_NOTHING;
 
     if(CommState == LISTEN)
     {
-        return; /* Do nothing, will return and immedietaly block */
+        tcp_client_process_recv_message(&received_command);
+        /* Note - for Pico to process the command send them from the Central Application in the following format: "cmd:X" where x = 0..255 */
+        if(received_command != PICO_DO_NOTHING) WiFi_ProcessCommand(received_command); 
     }
 
     if(CommState == ACTIVE_SEND_AND_RECEIVE)
@@ -92,13 +99,20 @@ void WiFi_MainFunction(void)
 #ifdef PICO_AS_TCP_SERVER
             if(start_TCP_server() == true) CommState = LISTEN;
 #else /* defaults to Pico as TCP client */
-            if(start_TCP_client() == true) CommState = ACTIVE_SEND_AND_RECEIVE;
+            if(start_TCP_client() == true) CommState = LISTEN;
 #endif
         }
     }
 }
 
+/*******************************************************************************/
+/*                          STATIC FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
 
+void WiFi_ProcessCommand(uint8_t command)
+{
+    printf("Processing command nr %u... \n", command);
+}
 
 
 

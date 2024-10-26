@@ -3,6 +3,7 @@
         "wifi_common.h": "c",
         "common.h": "c",
         "stdint.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "compare": "c"
     }
 }

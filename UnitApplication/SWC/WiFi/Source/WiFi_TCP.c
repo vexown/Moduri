@@ -9,9 +9,11 @@
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
+#include "semphr.h"
 
 /* Standard includes */
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>
@@ -54,18 +56,22 @@ typedef struct {
 /*******************************************************************************/
 /*                               STATIC VARIABLES                              */
 /*******************************************************************************/
-TCP_Client_t *clientGlobal;
+static TCP_Client_t *clientGlobal;
+static SemaphoreHandle_t bufferMutex;
 
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
+#ifdef PICO_AS_TCP_SERVER
 static bool tcp_server_open(tcpServerType *tcpServer);
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
 static void tcp_server_close(tcpServerType *tcpServer);
+#else
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 TCP_Client_t* tcp_client_init(void);
+#endif
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -129,8 +135,120 @@ bool start_TCP_client(void)
     } else {
         printf("TCP client initialization failed\n");
     }
+
+    bufferMutex = xSemaphoreCreateMutex();
+    if (bufferMutex == NULL) 
+    {
+        printf("Failed to create mutex\n");
+        status = false;
+    }
     
     return status;
+}
+
+/* 
+ * Function: tcp_client_send
+ * 
+ * Description: 
+ *      Checks if the TCP client is connected. If connected, it uses tcp_write() 
+ *      to queue the data for sending and then uses tcp_output() to actually send 
+ *      the queued data over the network.
+ * 
+ * Parameters:
+ *  - const char *data: Pointer to the data buffer to be sent.
+ *  - uint16_t length: Length of the data to be sent.
+ * 
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_CONN if the client is not connected or other 
+ *            error codes from tcp_write() or tcp_output()) of the send operation.
+ */
+err_t tcp_client_send(const char *data, uint16_t length) {
+    err_t err = ERR_OK;
+    
+    // Check if clientGlobal exists and is connected
+    if (clientGlobal == NULL || !clientGlobal->is_connected || clientGlobal->pcb == NULL) {
+        printf("Cannot send - client not connected\n");
+        return ERR_CONN;
+    }
+    
+    // Send data
+    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
+    if (err == ERR_OK) {
+        // Actually send the data
+        err = tcp_output(clientGlobal->pcb);
+        if (err != ERR_OK) {
+            printf("tcp_output failed: %d\n", err);
+        }
+    } else {
+        printf("tcp_write failed: %d\n", err);
+    }
+    
+    return err;
+}
+
+/* 
+ * Function: tcp_client_process_recv_message
+ * 
+ * Description: 
+ *      Prints the received buffer and analyzes its content.
+ *      Checks if the buffer starts with "cmd:".
+ *      If it does, it extracts the numeric value following "cmd:"
+ *      and stores it as the received command.
+ * 
+ * Parameters:
+ *  - received_command: Pointer to store the extracted command value
+ * 
+ * Returns: 
+ *  - void
+ */
+void tcp_client_process_recv_message(uint8_t *received_command) 
+{
+    // Wait for the mutex before accessing the buffer
+    if (xSemaphoreTake(bufferMutex, NO_DELAY) == pdTRUE) 
+    {
+        // Access the receive buffer
+        uint8_t *buffer = clientGlobal->receive_buffer;
+
+        // Print the entire received buffer
+        printf("Received message: %s\n", buffer);
+
+        // Check if the buffer starts with "cmd:"
+        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
+        {
+            // Extract the number after "cmd:"
+            // Explanation of atoi return value:
+            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
+            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
+            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
+            int command_value = atoi((const char *)&buffer[4]);
+
+            // Ensure the command value is within 0-255 range
+            if (command_value >= 0 && command_value <= 255) 
+            {
+                *received_command = (uint8_t)command_value;
+                printf("Received command: %u\n", *received_command);
+            } 
+            else 
+            {
+                printf("Command value out of range (0-255).\n");
+            }
+        } 
+        else 
+        {
+            printf("No command found in received message.\n");
+        }
+
+        // Clear the buffer after processing
+        memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
+
+        // Release the mutex after access
+        xSemaphoreGive(bufferMutex); 
+    } 
+    else 
+    {
+        printf("Failed to acquire the pointer to receive buffer.\n");
+    }
 }
 
 #endif
@@ -365,47 +483,6 @@ static bool tcp_server_open(tcpServerType *tcpServer)
 #else
 
 /* 
- * Function: tcp_client_send
- * 
- * Description: 
- *      Checks if the TCP client is connected. If connected, it uses tcp_write() 
- *      to queue the data for sending and then uses tcp_output() to actually send 
- *      the queued data over the network.
- * 
- * Parameters:
- *  - const char *data: Pointer to the data buffer to be sent.
- *  - uint16_t length: Length of the data to be sent.
- * 
- * Returns: 
- *  - err_t: An error code indicating the success (ERR_OK) or failure 
- *            (e.g., ERR_CONN if the client is not connected or other 
- *            error codes from tcp_write() or tcp_output()) of the send operation.
- */
-err_t tcp_client_send(const char *data, uint16_t length) {
-    err_t err = ERR_OK;
-    
-    // Check if clientGlobal exists and is connected
-    if (clientGlobal == NULL || !clientGlobal->is_connected || clientGlobal->pcb == NULL) {
-        printf("Cannot send - client not connected\n");
-        return ERR_CONN;
-    }
-    
-    // Send data
-    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
-    if (err == ERR_OK) {
-        // Actually send the data
-        err = tcp_output(clientGlobal->pcb);
-        if (err != ERR_OK) {
-            printf("tcp_output failed: %d\n", err);
-        }
-    } else {
-        printf("tcp_write failed: %d\n", err);
-    }
-    
-    return err;
-}
-
-/* 
  * Function: tcp_client_recv_callback
  * 
  * Description: 
@@ -449,13 +526,24 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
         return ERR_MEM;
     }
 
-    // Copy received data to our buffer
-    memcpy(client->receive_buffer, p->payload, p->tot_len);
-    client->receive_length = p->tot_len;
+    // Wait for the mutex before accessing the buffer
+    if (xSemaphoreTake(bufferMutex, NO_DELAY) == pdTRUE) 
+    {
+        // Copy received data to our buffer
+        memcpy(client->receive_buffer, p->payload, p->tot_len);
+        client->receive_length = p->tot_len;
+        client->receive_buffer[p->tot_len] = '\0';  // Null terminate, assuming the received data will be used as string
 
-    // Print received data (for testing)
-    client->receive_buffer[p->tot_len] = '\0';  // Null terminate
-    printf("Received: %s\n", client->receive_buffer);
+        // Print received data (for testing)
+        //printf("Received: %s\n", client->receive_buffer);
+
+        // Release the mutex after finishing with the buffer
+        xSemaphoreGive(bufferMutex);
+    } 
+    else 
+    {
+        printf("Failed to take mutex\n");
+    }
 
     // Free the pbuf
     pbuf_free(p);
