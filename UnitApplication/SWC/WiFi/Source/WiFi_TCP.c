@@ -114,7 +114,7 @@ bool start_TCP_server(void)
 /* 
  * Function: start_TCP_client
  * 
- * Description: Starts the TCP client by xxxxxxxxxxxxxx
+ * Description: Starts the TCP client and reports the status
  * 
  * Returns: bool indicating the success (true) or failure (false) of starting the TCP client.
  */
@@ -368,14 +368,18 @@ static bool tcp_server_open(tcpServerType *tcpServer)
  * Function: tcp_client_send
  * 
  * Description: 
- *      Checks if client is connected
- *      Uses tcp_write() to queue the data
- *      Uses tcp_output() to actually send the data
+ *      Checks if the TCP client is connected. If connected, it uses tcp_write() 
+ *      to queue the data for sending and then uses tcp_output() to actually send 
+ *      the queued data over the network.
  * 
  * Parameters:
- *  - xxxxxxxxxxxxxxxxxxx
+ *  - const char *data: Pointer to the data buffer to be sent.
+ *  - uint16_t length: Length of the data to be sent.
  * 
- * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_CONN if the client is not connected or other 
+ *            error codes from tcp_write() or tcp_output()) of the send operation.
  */
 err_t tcp_client_send(const char *data, uint16_t length) {
     err_t err = ERR_OK;
@@ -405,15 +409,23 @@ err_t tcp_client_send(const char *data, uint16_t length) {
  * Function: tcp_client_recv_callback
  * 
  * Description: 
- *      Called automatically when data arrives
- *      Handles incoming data and stores it in our buffer
- *      Prints received data (for testing)
- *      Sends acknowledgment back to server
+ *      This callback function is called automatically when data arrives 
+ *      at the TCP client. It handles the incoming data by storing it in 
+ *      the client's buffer, prints the received data (for testing), and 
+ *      sends an acknowledgment back to the server.
  * 
  * Parameters:
- *  - xxxxxxxxxxxxxxxxxxx
+ *  - void *arg: A pointer to the TCP client structure (TCP_Client_t) that 
+ *                is passed when the callback is registered.
+ *  - struct tcp_pcb *tpcb: Pointer to the TCP protocol control block 
+ *                            associated with the connection.
+ *  - struct pbuf *p: Pointer to the pbuf structure containing the received data.
+ *  - err_t err: An error code indicating the result of the receive operation.
  * 
- * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_MEM if the received data exceeds the buffer size 
+ *            or other error codes related to handling the incoming data).
  */
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
                                     struct pbuf *p, err_t err) {
@@ -455,17 +467,23 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
 }
 
 /* 
- * Function: tcp_client_recv_callback
+ * Function: tcp_client_connected_callback
  * 
  * Description: 
- *      Called when connection is established
- *      Sets up receive callback
- *      Updates connection status
+ *      This callback function is called when a connection to the server is 
+ *      established. It sets up the receive callback for handling incoming 
+ *      data and updates the connection status of the TCP client.
  * 
  * Parameters:
- *  - xxxxxxxxxxxxxxxxxxx
+ *  - void *arg: A pointer to the TCP client structure (TCP_Client_t) that 
+ *                is passed when the callback is registered.
+ *  - struct tcp_pcb *tpcb: Pointer to the TCP protocol control block 
+ *                            associated with the connection.
+ *  - err_t err: An error code indicating the result of the connection attempt.
  * 
- * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., other error codes if the connection attempt failed).
  */
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) {
     TCP_Client_t *client = (TCP_Client_t*)arg;
@@ -484,17 +502,21 @@ static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_
 }
 
 /* 
- * Function: tcp_client_recv_callback
+ * Function: tcp_client_init
  * 
  * Description: 
- *      Allocates and initializes client structure
- *      Creates TCP PCB
- *      Initiates connection to server
+ *      Allocates and initializes the TCP client structure, creates a new 
+ *      TCP protocol control block (PCB), and initiates a connection to the 
+ *      specified server. This function prepares the client for communication 
+ *      by setting up necessary callbacks and connecting to the server.
  * 
  * Parameters:
- *  - xxxxxxxxxxxxxxxxxxx
+ *  - None
  * 
- * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ * Returns: 
+ *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
+ *                   successful; NULL if initialization or connection 
+ *                   fails.
  */
 TCP_Client_t* tcp_client_init(void) {
     ip_addr_t server_ip;
