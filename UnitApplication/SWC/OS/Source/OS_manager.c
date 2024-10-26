@@ -49,8 +49,8 @@
 #include "lwip/sockets.h"
 
 /* WiFi includes */
-#include "WiFi_Transmit.h"
-#include "WiFi_Receive.h"
+#include "WiFi_UDP.h"
+#include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 
 /* Misc includes */
@@ -75,8 +75,9 @@
 /* Queue configuration */
 #define mainQUEUE_LENGTH					(1)
 
-/* Stack sizes */
-#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) //This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes)
+/* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
+#define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) 
+#define STACK_2048_BYTES					(configSTACK_DEPTH_TYPE)(512) 
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
@@ -148,7 +149,7 @@ void OS_start( void )
 											mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
 											NULL );								/* The task handle is not required, so NULL is passed. */
 		taskCreationStatus[1] = xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-    	taskCreationStatus[2] = xTaskCreate( networkTask, "NET", STACK_1024_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
+    	taskCreationStatus[2] = xTaskCreate( networkTask, "NET", STACK_2048_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
 
 		/* Check if the tasks were created successfully */
 		for(uint8_t i = 0; i < NUM_OF_TASKS; i++)

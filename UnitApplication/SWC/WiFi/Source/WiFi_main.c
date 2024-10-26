@@ -18,8 +18,8 @@
 #include "pico/cyw43_arch.h"
 
 /* WiFi includes */
-#include "WiFi_Transmit.h"
-#include "WiFi_Receive.h"
+#include "WiFi_UDP.h"
+#include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 
 /*******************************************************************************/
@@ -36,16 +36,11 @@ typedef enum {
     TCP_COMMUNICATION = 0xAB
 } TransportLayerType;
 
-/* WiFi Direction Mode */
-typedef enum {
-    RECEIVE_MODE = 0,
-    TRANSMIT_MODE = 1
-} CommDirectionType;
-
 /* Communication State */
 typedef enum {
-    ACTIVE = 0,
-    PASSIVE_LISTEN = 1
+    INIT = 0,
+    LISTEN = 1,
+    ACTIVE_SEND_AND_RECEIVE = 2
 } CommStateType;
 
 /*******************************************************************************/
@@ -53,13 +48,10 @@ typedef enum {
 /*******************************************************************************/
 
 /* WiFi Communication Type */
-static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* initial communication type is TCP */
-
-/* WiFi Communication Direction */
-static CommDirectionType CommDirection = RECEIVE_MODE; /* initial direction is receive */
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communication type is TCP */
 
 /* Current Communication State */
-static CommStateType CommState = ACTIVE; /* Active by default */
+static CommStateType CommState = INIT; 
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -81,46 +73,28 @@ static CommStateType CommState = ACTIVE; /* Active by default */
 void WiFi_MainFunction(void)
 {
     char message_buffer[128] = {0};
+    const char *message = "Yo from Pico W!";
 
-    if(CommState == PASSIVE_LISTEN)
+    if(CommState == LISTEN)
     {
         return; /* Do nothing, will return and immedietaly block */
     }
 
-    /* CommState ACTIVE */
-    if(TransportLayer == UDP_COMMUNICATION)
+    if(CommState == ACTIVE_SEND_AND_RECEIVE)
     {
-        if(CommDirection == RECEIVE_MODE)
-        {
-            receive_message_UDP(message_buffer, sizeof(message_buffer));
-        }
-        else if(CommDirection == TRANSMIT_MODE)
-        {
-            send_message_UDP("UDP yelling");
-        }
-        else
-        {
-            printf("Communication direction not supported. \n");
-        }
+        tcp_client_send(message, strlen(message));
     }
-    else if(TransportLayer == TCP_COMMUNICATION)
+
+    if(CommState == INIT)
     {
-        if(CommDirection == RECEIVE_MODE)
+        if(TransportLayer == TCP_COMMUNICATION)
         {
-            if(start_TCP_server() == true) CommState = PASSIVE_LISTEN;
+#ifdef PICO_AS_TCP_SERVER
+            if(start_TCP_server() == true) CommState = LISTEN;
+#else /* defaults to Pico as TCP client */
+            if(start_TCP_client() == true) CommState = ACTIVE_SEND_AND_RECEIVE;
+#endif
         }
-        else if(CommDirection == TRANSMIT_MODE)
-        {
-            send_message_TCP("Yo from Pico W!");
-        }
-        else
-        {
-            printf("Communication direction not supported. \n");
-        }
-    }
-    else
-    {
-        printf("Communication type not supported.");
     }
 }
 

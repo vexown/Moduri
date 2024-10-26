@@ -1,6 +1,6 @@
 /**
- * File: WiFi_Transmit.c
- * Description: Implementation related to sending messages or commands via UDP or TCP.
+ * File: WiFi_UDP.c
+ * Description: High level implementation for lwIP-based UDP communication between Unit and Central Application.
  */
 
 /*******************************************************************************/
@@ -25,73 +25,77 @@
 /*******************************************************************************/
 
 /* 
- * Function: send_message_TCP
+ * Function: receive_message_UDP
  * 
- * Description: Sends a message over a TCP socket to a specified IP address and port.
+ * Description: Receives a message over a UDP socket (from the PC central app)
  * 
  * Parameters:
- *   - message: The message to send (string)
+ *  - buffer: stores the received message
+ *  - buffer_size: size of the message buffer
  * 
  * Returns: void
  */
-void send_message_TCP(const char* message) 
+void receive_message_UDP(char* buffer, int buffer_size) 
 {
-    int bytes_sent;
-    int client_socket;
-    struct sockaddr_in server_addr;
-    uint32_t ip_addr_net_order;
-    
-    /* Create a socket for Pico W (client) */
-    /* This is a wrapper around the netconn_new function that creates a new network connection 
-       and associates it with a socket descriptor. It takes three arguments: 
-            the domain (usually AF_INET for IPv4), 
-            the type of socket (such as SOCK_STREAM for TCP or SOCK_DGRAM for UDP), 
-            and the protocol (e.g., IPPROTO_TCP or IPPROTO_UDP) - in our case when we use SOCK_STREAM this parameter is unused (TCP implied). 
-    The function then creates a netconn object based on the specified parameters, allocates a socket descriptor, and associates the netconn with the socket */
-    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0 /*unused*/)) == ERRNO_FAIL) 
+    int bytes_received;
+    int server_socket;
+    struct sockaddr_in client_addr, server_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    struct timeval timeout;
+
+    /* Clear out the message buffer */
+    memset(buffer, 0, sizeof(buffer));
+
+    /* Create a UDP socket for the server running on Pico W */
+    if ((server_socket = socket(AF_INET, SOCK_DGRAM, 0 /*unused*/)) == ERRNO_FAIL) 
     {
         printf("ERROR opening socket: %s\n", strerror(errno));
         return;
     }
 
-    /* Set up the server address */
-    memset((char *)&server_addr, 0, sizeof(server_addr)); // start with 0'd out parameters
-    server_addr.sin_family = AF_INET; //server uses IPv4
+    /* Set up the server address (IP and port) */
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET; // IPv4
     server_addr.sin_port = htons(SERVER_PORT);
-    ip_addr_net_order = inet_addr(PC_IP_ADDRESS); //converts ASCII IP address to IP address in network order
-    if(ip_addr_net_order != IPADDR_NONE)
+    if (inet_pton(AF_INET, PICO_W_STATIC_IP_ADDRESS, &server_addr.sin_addr) <= E_OK) // Convert the IP address from string to binary form
     {
-        server_addr.sin_addr.s_addr = ip_addr_net_order;
-    }
-    else
-    {
-        printf("Invalid IP address \n");
-    }
-    
-    /* Establish a connection between the client and the server TCP socket */ 
-    /* It takes three arguments: the socket descriptor, the server address structure, and the length of the server address structure. 
-        The function first checks if the socket is valid and if the remote address matches the socket type (IPv4 or IPv6). 
-        It then extracts the remote IP address and port from the address structure and calls the netconn_connect function to establish the connection. */
-    if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) != E_OK) 
-    {
-        printf("ERROR connecting \n");
+        printf("Invalid IP address format\n");
+        close(server_socket);
+        return;
     }
 
-    /* Send the message */
-    /* The lwip_send function in LwIP is a wrapper around the netconn_write_partly function that sends data over a TCP socket. 
-       It takes four arguments: the socket descriptor, the data to be sent, the size of the data, and flags that specify additional options. */
-    bytes_sent = send(client_socket, message, strlen(message), NO_FLAG);
-    if (bytes_sent == ERRNO_FAIL) //send function returns either number of bytes sent or -1 if something went wrong
+    /* Bind the server socket to the specified IP address and port */
+    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == ERRNO_FAIL) 
     {
-        printf("ERROR writing to socket \n");
+        printf("Binding failed: %d\n", errno);
+        close(server_socket);
+        return;
     }
-    else if(bytes_sent != strlen(message))
+
+    printf("Server is listening on %s:%d\n", PICO_W_STATIC_IP_ADDRESS, SERVER_PORT);
+
+    /* Set the socket timeout */
+    timeout.tv_sec = 0;  // Set seconds timeout
+    timeout.tv_usec = 100000; // Set microseconds timeout (100 ms)
+    setsockopt(server_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
+    /* Receive the message if there is one available */
+    if ((bytes_received = recvfrom(server_socket, buffer, buffer_size, NO_FLAG, (struct sockaddr *)&client_addr, &client_addr_len)) == ERRNO_FAIL) 
     {
-        printf("ERROR - not all bytes of the message were sent \n");
+        printf("Message not received (possibly timeout if errno 0): %s (errno: %d)\n", strerror(errno), errno);
+    } 
+    else /* all bytes received successfully */
+    {
+        /* Null-terminate the received message */
+        if (bytes_received > 0) 
+        {
+            buffer[bytes_received] = '\0';
+            printf("Received UDP message: %s\n", buffer);
+        }
     }
 
     /* Close the socket */
-    close(client_socket);
+    close(server_socket);
 }
 
 /* 

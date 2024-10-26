@@ -1,6 +1,6 @@
 /**
- * File: WiFi_Receive.c
- * Description: Implementation related to receiving messages or commands via UDP or TCP.
+ * File: WiFi_TCP.c
+ * Description: High level implementation for lwIP-based TCP communication between Unit and Central Application.
  */
 
 /*******************************************************************************/
@@ -24,6 +24,7 @@
 #include <lwip/dns.h>
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"
+#include "lwip/err.h"
 
 /* WiFi includes */
 #include "WiFi_Common.h"
@@ -42,6 +43,19 @@ typedef struct
     bool complete;
 } tcpServerType;
 
+/* Basic TCP client structure */
+typedef struct {
+    struct tcp_pcb *pcb;                      // The TCP protocol control block - lwIP's main structure for a TCP connection
+    uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
+    uint16_t receive_length;                  // Length of received data
+    bool is_connected;                        // Connection status
+} TCP_Client_t;
+
+/*******************************************************************************/
+/*                               STATIC VARIABLES                              */
+/*******************************************************************************/
+TCP_Client_t *clientGlobal;
+
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
@@ -49,85 +63,15 @@ static bool tcp_server_open(tcpServerType *tcpServer);
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
 static void tcp_server_close(tcpServerType *tcpServer);
+static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
+static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
+TCP_Client_t* tcp_client_init(void);
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
-/* 
- * Function: receive_message_UDP
- * 
- * Description: Receives a message over a UDP socket (from the PC central app)
- * 
- * Parameters:
- *  - buffer: stores the received message
- *  - buffer_size: size of the message buffer
- * 
- * Returns: void
- */
-void receive_message_UDP(char* buffer, int buffer_size) 
-{
-    int bytes_received;
-    int server_socket;
-    struct sockaddr_in client_addr, server_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    struct timeval timeout;
-
-    /* Clear out the message buffer */
-    memset(buffer, 0, sizeof(buffer));
-
-    /* Create a UDP socket for the server running on Pico W */
-    if ((server_socket = socket(AF_INET, SOCK_DGRAM, 0 /*unused*/)) == ERRNO_FAIL) 
-    {
-        printf("ERROR opening socket: %s\n", strerror(errno));
-        return;
-    }
-
-    /* Set up the server address (IP and port) */
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET; // IPv4
-    server_addr.sin_port = htons(SERVER_PORT);
-    if (inet_pton(AF_INET, PICO_W_STATIC_IP_ADDRESS, &server_addr.sin_addr) <= E_OK) // Convert the IP address from string to binary form
-    {
-        printf("Invalid IP address format\n");
-        close(server_socket);
-        return;
-    }
-
-    /* Bind the server socket to the specified IP address and port */
-    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == ERRNO_FAIL) 
-    {
-        printf("Binding failed: %d\n", errno);
-        close(server_socket);
-        return;
-    }
-
-    printf("Server is listening on %s:%d\n", PICO_W_STATIC_IP_ADDRESS, SERVER_PORT);
-
-    /* Set the socket timeout */
-    timeout.tv_sec = 0;  // Set seconds timeout
-    timeout.tv_usec = 100000; // Set microseconds timeout (100 ms)
-    setsockopt(server_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-
-    /* Receive the message if there is one available */
-    if ((bytes_received = recvfrom(server_socket, buffer, buffer_size, NO_FLAG, (struct sockaddr *)&client_addr, &client_addr_len)) == ERRNO_FAIL) 
-    {
-        printf("Message not received (possibly timeout if errno 0): %s (errno: %d)\n", strerror(errno), errno);
-    } 
-    else /* all bytes received successfully */
-    {
-        /* Null-terminate the received message */
-        if (bytes_received > 0) 
-        {
-            buffer[bytes_received] = '\0';
-            printf("Received UDP message: %s\n", buffer);
-        }
-    }
-
-    /* Close the socket */
-    close(server_socket);
-}
-
+#ifdef PICO_AS_TCP_SERVER
 /* 
  * Function: start_TCP_server
  * 
@@ -166,11 +110,36 @@ bool start_TCP_server(void)
 	}
     return status;
 }
+#else
+/* 
+ * Function: start_TCP_client
+ * 
+ * Description: Starts the TCP client by xxxxxxxxxxxxxx
+ * 
+ * Returns: bool indicating the success (true) or failure (false) of starting the TCP client.
+ */
+bool start_TCP_client(void) 
+{
+    clientGlobal = tcp_client_init();
+    bool status = false;
+
+    if (clientGlobal != NULL) {
+        printf("TCP client initialized successfully\n");
+        status = true;
+    } else {
+        printf("TCP client initialization failed\n");
+    }
+    
+    return status;
+}
+
+#endif
 
 /*******************************************************************************/
 /*                          STATIC FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
+#ifdef PICO_AS_TCP_SERVER
 /* 
  * Function: tcp_server_close
  * 
@@ -393,4 +362,180 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     return true;
 }
 
+#else
+
+/* 
+ * Function: tcp_client_send
+ * 
+ * Description: 
+ *      Checks if client is connected
+ *      Uses tcp_write() to queue the data
+ *      Uses tcp_output() to actually send the data
+ * 
+ * Parameters:
+ *  - xxxxxxxxxxxxxxxxxxx
+ * 
+ * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ */
+err_t tcp_client_send(const char *data, uint16_t length) {
+    err_t err = ERR_OK;
+    
+    // Check if clientGlobal exists and is connected
+    if (clientGlobal == NULL || !clientGlobal->is_connected || clientGlobal->pcb == NULL) {
+        printf("Cannot send - client not connected\n");
+        return ERR_CONN;
+    }
+    
+    // Send data
+    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
+    if (err == ERR_OK) {
+        // Actually send the data
+        err = tcp_output(clientGlobal->pcb);
+        if (err != ERR_OK) {
+            printf("tcp_output failed: %d\n", err);
+        }
+    } else {
+        printf("tcp_write failed: %d\n", err);
+    }
+    
+    return err;
+}
+
+/* 
+ * Function: tcp_client_recv_callback
+ * 
+ * Description: 
+ *      Called automatically when data arrives
+ *      Handles incoming data and stores it in our buffer
+ *      Prints received data (for testing)
+ *      Sends acknowledgment back to server
+ * 
+ * Parameters:
+ *  - xxxxxxxxxxxxxxxxxxx
+ * 
+ * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ */
+static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
+                                    struct pbuf *p, err_t err) {
+    TCP_Client_t *client = (TCP_Client_t*)arg;
+    
+    // Check if connection closed by remote host
+    if (p == NULL) {
+        client->is_connected = false;
+        return ERR_OK;
+    }
+    
+    // Handle receive error
+    if (err != ERR_OK) {
+        pbuf_free(p);
+        return err;
+    }
+
+    // Check if received data fits our buffer
+    if (p->tot_len > TCP_RECV_BUFFER_SIZE) {
+        pbuf_free(p);
+        return ERR_MEM;
+    }
+
+    // Copy received data to our buffer
+    memcpy(client->receive_buffer, p->payload, p->tot_len);
+    client->receive_length = p->tot_len;
+
+    // Print received data (for testing)
+    client->receive_buffer[p->tot_len] = '\0';  // Null terminate
+    printf("Received: %s\n", client->receive_buffer);
+
+    // Free the pbuf
+    pbuf_free(p);
+
+    // Send acknowledgment to tcp
+    tcp_recved(tpcb, p->tot_len);
+
+    return ERR_OK;
+}
+
+/* 
+ * Function: tcp_client_recv_callback
+ * 
+ * Description: 
+ *      Called when connection is established
+ *      Sets up receive callback
+ *      Updates connection status
+ * 
+ * Parameters:
+ *  - xxxxxxxxxxxxxxxxxxx
+ * 
+ * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ */
+static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) {
+    TCP_Client_t *client = (TCP_Client_t*)arg;
+    
+    if (err != ERR_OK) {
+        return err;
+    }
+
+    client->is_connected = true;
+    
+    // Set up receive callback
+    tcp_recv(tpcb, tcp_client_recv_callback);
+    
+    printf("TCP client connected to server\n");
+    return ERR_OK;
+}
+
+/* 
+ * Function: tcp_client_recv_callback
+ * 
+ * Description: 
+ *      Allocates and initializes client structure
+ *      Creates TCP PCB
+ *      Initiates connection to server
+ * 
+ * Parameters:
+ *  - xxxxxxxxxxxxxxxxxxx
+ * 
+ * Returns: xxxxxxxxxxxxxxxxxxxxxx
+ */
+TCP_Client_t* tcp_client_init(void) {
+    ip_addr_t server_ip;
+    
+    // Allocate client structure
+    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
+    if (client == NULL) {
+        printf("Failed to allocate client structure\n");
+        return NULL;
+    }
+
+    // Initialize client structure
+    client->pcb = NULL;
+    client->receive_length = 0;
+    client->is_connected = false;
+
+    // Create new TCP PCB
+    client->pcb = tcp_new();
+    if (client->pcb == NULL) {
+        printf("Failed to create TCP PCB\n");
+        vPortFree(client);
+        return NULL;
+    }
+
+    // Set client structure as argument for callbacks
+    tcp_arg(client->pcb, client);
+
+    // Convert server IP string to IP address structure
+    ipaddr_aton(PC_IP_ADDRESS, &server_ip);
+
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
+    if (err != ERR_OK) {
+        printf("TCP connect failed: %d\n", err);
+        tcp_close(client->pcb);
+        vPortFree(client);
+        return NULL;
+    }
+
+    return client;
+}
+
+#endif
 
