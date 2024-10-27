@@ -229,15 +229,15 @@ Discarded input sections
                 0x00000000      0x400 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .bss.udp_client_pcb
                 0x00000000        0x4 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
- .debug_info    0x00000000      0xeb1 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
- .debug_abbrev  0x00000000      0x2de CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
+ .debug_info    0x00000000      0xeb4 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
+ .debug_abbrev  0x00000000      0x30b CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .debug_loclists
                 0x00000000      0x270 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .debug_aranges
                 0x00000000       0x48 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .debug_rnglists
                 0x00000000       0x34 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
- .debug_line    0x00000000      0x4b7 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
+ .debug_line    0x00000000      0x4b8 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .debug_str     0x00000000      0x808 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .comment       0x00000000       0x27 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .debug_frame   0x00000000       0xb4 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
@@ -4138,9 +4138,9 @@ Discarded input sections
                 0x00000000        0x8 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .bss.lockout_victim_initialized
                 0x00000000        0x2 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
- .text          0x00000000        0x0 /tmp/ccN0Wmtv.o
- .data          0x00000000        0x0 /tmp/ccN0Wmtv.o
- .bss           0x00000000        0x0 /tmp/ccN0Wmtv.o
+ .text          0x00000000        0x0 /tmp/ccisFxBw.o
+ .data          0x00000000        0x0 /tmp/ccisFxBw.o
+ .bss           0x00000000        0x0 /tmp/ccisFxBw.o
  .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x00000000       0x60 /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(libc_a-strncpy.o)
@@ -4972,7 +4972,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
 .boot2          0x10000000      0x100
                 0x10000000                        __boot2_start__ = .
  *(.boot2)
- .boot2         0x10000000      0x100 /tmp/ccN0Wmtv.o
+ .boot2         0x10000000      0x100 /tmp/ccisFxBw.o
                 0x10000100                        __boot2_end__ = .
                 0x00000001                        ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -8986,7 +8986,7 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/stream_buffer.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/tasks.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/timers.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
-LOAD /tmp/ccN0Wmtv.o
+LOAD /tmp/ccisFxBw.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -9193,7 +9193,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000f68       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .ARM.attributes
-                0x00000f94       0x22 /tmp/ccN0Wmtv.o
+                0x00000f94       0x22 /tmp/ccisFxBw.o
  .ARM.attributes
                 0x00000fb6       0x1e /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes
