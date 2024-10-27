@@ -21,7 +21,9 @@
 #define NO_DELAY       0
 
 /* Commands from PC to Pico */
-#define PICO_DO_NOTHING     0
+#define PICO_DO_NOTHING                 0
+#define PICO_TRANSITION_TO_ACTIVE_MODE  1
+#define PICO_TRANSITION_TO_LISTEN_MODE  2
 
 
 /* Non-specific functions */
