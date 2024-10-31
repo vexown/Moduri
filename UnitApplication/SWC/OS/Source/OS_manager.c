@@ -53,6 +53,9 @@
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 
+/* Monitor includes */
+#include "Monitor_Common.h"
+
 /* Misc includes */
 #include "Common.h"
 
@@ -60,17 +63,16 @@
 /*                                 MACROS                                      */
 /*******************************************************************************/
 
-/* Priorities for the tasks */
-#define mainQUEUE_RECEIVE_TASK_PRIORITY		(tskIDLE_PRIORITY + 2)
-#define	mainQUEUE_SEND_TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
-#define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 3)
+/* Priorities for the tasks (bigger number = higher prio) */
+#define MONITOR_TASK_PRIORITY				(tskIDLE_PRIORITY + 1)
+#define	mainQUEUE_SEND_TASK_PRIORITY		(tskIDLE_PRIORITY + 2)
+#define mainQUEUE_RECEIVE_TASK_PRIORITY		(tskIDLE_PRIORITY + 3)
+#define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 4)
 
 /* Task periods: portTICK_PERIOD_MS = (1/configTICK_RATE_HZ) * 1000 = 1ms per tick */
 #define QUEUE_SEND_TASK_PERIOD_TICKS		(TickType_t)(500 / portTICK_PERIOD_MS) //500ms
 #define NETWORK_TASK_PERIOD_TICKS			(TickType_t)(5000 / portTICK_PERIOD_MS) //5s
-
-/* Other Task-related macros */
-#define NUM_OF_TASKS 						(3)
+#define MONITOR_TASK_PERIOD_TICKS			(TickType_t)(11000 / portTICK_PERIOD_MS) //11s
 
 /* Queue configuration */
 #define mainQUEUE_LENGTH					(1)
@@ -97,6 +99,7 @@ void OS_start(void);
 static void queueReceiveTask(__unused void *taskParams );
 static void queueSendTask(__unused void *taskParams );
 static void networkTask(__unused void *taskParams);
+static void monitorTask(__unused void *taskParams);
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
@@ -150,6 +153,7 @@ void OS_start( void )
 											NULL );								/* The task handle is not required, so NULL is passed. */
 		taskCreationStatus[1] = xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
     	taskCreationStatus[2] = xTaskCreate( networkTask, "NET", STACK_2048_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
+		taskCreationStatus[3] = xTaskCreate( monitorTask, "Monitor", STACK_1024_BYTES, NULL, MONITOR_TASK_PRIORITY , NULL);
 
 		/* Check if the tasks were created successfully */
 		for(uint8_t i = 0; i < NUM_OF_TASKS; i++)
@@ -181,6 +185,36 @@ void OS_start( void )
 /*******************************************************************************/
 /*                            TASK FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
+
+/* 
+ * Function: monitorTask
+ * 
+ * Description: Monitoring Task providing information about the system behavior and performance
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void monitorTask(__unused void *taskParams) 
+{
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
+	TickType_t xLastWakeTime;
+
+	/* Initialize xLastWakeTime - this only needs to be done once. */
+	xLastWakeTime = xTaskGetTickCount();
+	/*******************************************************************************/
+	/*                               Task Loop Code                                */
+	/*******************************************************************************/
+    for( ;; )
+	{
+		vTaskDelayUntil(&xLastWakeTime, MONITOR_TASK_PERIOD_TICKS); // Execute periodically at consistent intervals based on a reference time
+
+		Monitor_MainFunction();
+    }
+}
 
 /* 
  * Function: networkTask

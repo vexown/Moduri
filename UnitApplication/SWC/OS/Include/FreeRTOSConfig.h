@@ -40,6 +40,9 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
+extern void Monitor_initRuntimeCounter(void);
+extern unsigned long Monitor_getRuntimeCounter(void);
+
 /* Scheduler Related */
 
 /* Set to 1 to use preemption. This allows higher priority tasks to 
@@ -143,7 +146,9 @@
 /* Run time and task stats gathering related definitions. */
 
 /* Set to 1 to generate run time statistics. */
-#define configGENERATE_RUN_TIME_STATS           0
+#define configGENERATE_RUN_TIME_STATS              1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()   Monitor_initRuntimeCounter()
+#define portGET_RUN_TIME_COUNTER_VALUE()           Monitor_getRuntimeCounter()
 
 /* Set to 1 to enable tracing facilities. */
 #define configUSE_TRACE_FACILITY                1

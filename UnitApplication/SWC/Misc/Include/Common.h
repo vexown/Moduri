@@ -19,6 +19,10 @@
 /* Module IDs */
 #define MODULE_ID_OS                        (uint8_t)(0x1U)
 
+/* Other Task-related macros */
+#define NUM_OF_TASKS 						(4)
+#define MAX_NUM_OF_TASKS				    (20)
+
 /*******************************************************************************/
 /*                         GLOBAL FUNCTION DECLARATIONS                        */
 /*******************************************************************************/

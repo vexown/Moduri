@@ -4,6 +4,7 @@
         "common.h": "c",
         "stdint.h": "c",
         "stdio.h": "c",
-        "compare": "c"
+        "compare": "c",
+        "wifi_udp.h": "c"
     }
 }

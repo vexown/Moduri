@@ -4,6 +4,7 @@ message("########## Application/Standard CMakeLists.txt - start ##########")
 add_subdirectory(OS)
 add_subdirectory(Misc)
 add_subdirectory(WiFi)
+add_subdirectory(Monitor)
 
 # Define the executable target for the application
 add_executable(moduri
@@ -11,6 +12,7 @@ add_executable(moduri
         ${OS_SOURCE_FILES}
         ${MISC_SOURCE_FILES}
         ${WIFI_SOURCE_FILES}
+        ${MONITOR_SOURCE_FILES}
         )
 
 # Set compile definitions if needed
@@ -21,6 +23,7 @@ target_include_directories(moduri PRIVATE
         ${OS_INCLUDE_DIR} 
         ${MISC_INCLUDE_DIR}
         ${WIFI_INCLUDE_DIR}
+        ${MONITOR_INCLUDE_DIR}
         )
 
 # Link libraries and dependencies
