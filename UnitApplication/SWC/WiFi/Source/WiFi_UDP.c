@@ -23,6 +23,9 @@
 /* WiFi includes */
 #include "WiFi_Common.h"
 
+/* Misc includes */
+#include "Common.h"
+
 /*******************************************************************************/
 /*                                STATIC VARIABLES                             */
 /*******************************************************************************/
@@ -73,7 +76,7 @@ void udp_client_process_recv_message(uint8_t *received_command)
         uint8_t *buffer = recv_data;
 
         // Print the entire received buffer
-        printf("Received message: %s\n", buffer);
+        LOG("Received message: %s\n", buffer);
 
         // Check if the buffer starts with "cmd:"
         if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
@@ -89,16 +92,16 @@ void udp_client_process_recv_message(uint8_t *received_command)
             if (command_value >= 0 && command_value <= 255) 
             {
                 *received_command = (uint8_t)command_value;
-                printf("Received command: %u\n", *received_command);
+                LOG("Received command: %u\n", *received_command);
             } 
             else 
             {
-                printf("Command value out of range (0-255).\n");
+                LOG("Command value out of range (0-255).\n");
             }
         } 
         else 
         {
-            printf("No command found in received message.\n");
+            LOG("No command found in received message.\n");
         }
 
         // Clear the buffer after processing
@@ -109,7 +112,7 @@ void udp_client_process_recv_message(uint8_t *received_command)
     } 
     else 
     {
-        printf("Failed to acquire the pointer to receive buffer.\n");
+        LOG("Failed to acquire the pointer to receive buffer.\n");
     }
 }
 
@@ -137,17 +140,17 @@ bool start_UDP_client(void)
 
     if (status == true) 
     {
-        printf("UDP client initialized successfully\n");
+        LOG("UDP client initialized successfully\n");
     } 
     else 
     {
-        printf("UDP client initialization failed\n");
+        LOG("UDP client initialization failed\n");
     }
 
     bufferMutex = xSemaphoreCreateMutex();
     if (bufferMutex == NULL) 
     {
-        printf("Failed to create mutex\n");
+        LOG("Failed to create mutex\n");
         status = false;
     }
     
@@ -192,7 +195,7 @@ bool udp_client_send(const char* message)
     // Send the message
     bool result = udp_send_message(message, &dest_addr);
     if (!result) {
-        printf("Failed to send UDP message to %s\n", PC_IP_ADDRESS);
+        LOG("Failed to send UDP message to %s\n", PC_IP_ADDRESS);
     }
     
     return result;
@@ -243,7 +246,7 @@ static void udp_receive_callback(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 
                 recv_data[p->len] = '\0';  // Null terminate, assuming the received data will be used as string
 
-                printf("Received UDP message from %s:%d\n", ipaddr_ntoa(addr), port);
+                LOG("Received UDP message from %s:%d\n", ipaddr_ntoa(addr), port);
             }
 
             // Release the mutex after finishing with the buffer
@@ -251,7 +254,7 @@ static void udp_receive_callback(void *arg, struct udp_pcb *pcb, struct pbuf *p,
         } 
         else 
         {
-            printf("Failed to take mutex\n");
+            LOG("Failed to take mutex\n");
         }
         
         pbuf_free(p);
@@ -337,14 +340,14 @@ static bool udp_client_init(void)
     // Create new UDP PCB
     udp_client_pcb = udp_new();
     if (!udp_client_pcb) {
-        printf("Failed to create UDP PCB\n");
+        LOG("Failed to create UDP PCB\n");
         return false;
     }
     
     // Bind to local port
     err_t err = udp_bind(udp_client_pcb, IP_ADDR_ANY, UDP_CLIENT_PORT);
     if (err != ERR_OK) {
-        printf("Failed to bind UDP PCB: %d\n", err);
+        LOG("Failed to bind UDP PCB: %d\n", err);
         udp_remove(udp_client_pcb);
         return false;
     }
@@ -355,11 +358,11 @@ static bool udp_client_init(void)
     // Print network information
     struct netif *netif = netif_default;
     if (netif != NULL) {
-        printf("\nNetwork Information:\n");
-        printf("IP Address: %s\n", ipaddr_ntoa(&netif->ip_addr));
-        printf("Netmask: %s\n", ipaddr_ntoa(&netif->netmask));
-        printf("Gateway: %s\n", ipaddr_ntoa(&netif->gw));
-        printf("Listening on port: %d\n\n", UDP_CLIENT_PORT);
+        LOG("\nNetwork Information:\n");
+        LOG("IP Address: %s\n", ipaddr_ntoa(&netif->ip_addr));
+        LOG("Netmask: %s\n", ipaddr_ntoa(&netif->netmask));
+        LOG("Gateway: %s\n", ipaddr_ntoa(&netif->gw));
+        LOG("Listening on port: %d\n\n", UDP_CLIENT_PORT);
     }
     
     return true;

@@ -12,6 +12,13 @@
 /*                                 MACROS                                      */
 /*******************************************************************************/
 
+/* Enable printf only in Debug builds */
+#ifdef DEBUG_BUILD
+    #define LOG printf
+#else /* RELEASE_BUILD or build type not defined (or defined with invalid type) */
+    #define LOG(...)
+#endif
+
 /* Error IDs */
 #define ERROR_ID_TASK_FAILED_TO_CREATE      (uint8_t)(0x1U)
 #define ERROR_ID_WIFI_DID_NOT_CONNECT       (uint8_t)(0x2U)

@@ -4131,9 +4131,9 @@ Discarded input sections
                 0x00000000        0x8 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .bss.lockout_victim_initialized
                 0x00000000        0x2 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
- .text          0x00000000        0x0 /tmp/ccquLEW7.o
- .data          0x00000000        0x0 /tmp/ccquLEW7.o
- .bss           0x00000000        0x0 /tmp/ccquLEW7.o
+ .text          0x00000000        0x0 /tmp/ccdyCYA0.o
+ .data          0x00000000        0x0 /tmp/ccdyCYA0.o
+ .bss           0x00000000        0x0 /tmp/ccdyCYA0.o
  .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x00000000       0x60 /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(libc_a-strncpy.o)
@@ -4965,7 +4965,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
 .boot2          0x10000000      0x100
                 0x10000000                        __boot2_start__ = .
  *(.boot2)
- .boot2         0x10000000      0x100 /tmp/ccquLEW7.o
+ .boot2         0x10000000      0x100 /tmp/ccdyCYA0.o
                 0x10000100                        __boot2_end__ = .
                 0x00000001                        ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -9039,7 +9039,7 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/stream_buffer.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/tasks.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/timers.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
-LOAD /tmp/ccquLEW7.o
+LOAD /tmp/ccdyCYA0.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -9248,7 +9248,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000f94       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .ARM.attributes
-                0x00000fc0       0x22 /tmp/ccquLEW7.o
+                0x00000fc0       0x22 /tmp/ccdyCYA0.o
  .ARM.attributes
                 0x00000fe2       0x1e /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes

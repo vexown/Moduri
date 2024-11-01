@@ -22,6 +22,9 @@
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 
+/* Misc includes */
+#include "Common.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
@@ -113,7 +116,7 @@ void WiFi_MainFunction(void)
  */
 static void WiFi_ProcessCommand(uint8_t command)
 {
-    printf("Processing command nr %u... \n", command);
+    LOG("Processing command nr %u... \n", command);
 
     switch (command)
     {
@@ -121,15 +124,15 @@ static void WiFi_ProcessCommand(uint8_t command)
             /* do nothing */
             break;
         case PICO_TRANSITION_TO_ACTIVE_MODE:
-            printf("Transitioning to Active Mode...\n");
+            LOG("Transitioning to Active Mode...\n");
             CommState = ACTIVE_SEND_AND_RECEIVE;
             break;
         case PICO_TRANSITION_TO_LISTEN_MODE:
-            printf("Transitioning to Listen Mode...\n");
+            LOG("Transitioning to Listen Mode...\n");
             CommState = LISTEN;
             break;
         default:
-            printf("Command not supported \n");
+            LOG("Command not supported \n");
             break;
     }
 }
@@ -164,7 +167,7 @@ static void WiFi_ListenState(void)
     }
     else
     {
-        printf("Communication Type not supported\n");
+        LOG("Communication Type not supported\n");
     }
 }
 
@@ -211,7 +214,7 @@ static void WiFi_ActiveState(void)
     }
     else
     {
-        printf("Communication Type not supported\n");
+        LOG("Communication Type not supported\n");
     }
 }
 
@@ -252,7 +255,7 @@ static void WiFi_InitCommunication(void)
     }
     else
     {
-        printf("Communication Type not supported \n");
+        LOG("Communication Type not supported \n");
     }
 }
 

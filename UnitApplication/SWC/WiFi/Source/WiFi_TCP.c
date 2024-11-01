@@ -31,6 +31,9 @@
 /* WiFi includes */
 #include "WiFi_Common.h"
 
+/* Misc includes */
+#include "Common.h"
+
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -95,7 +98,7 @@ bool start_TCP_server(void)
 	tcpServerType *tcpServer = (tcpServerType*)pvPortCalloc(1, sizeof(tcpServerType)); /* Warning - the server is running forever once started so this memory is not freed */
     if (tcpServer == NULL)
 	{
-		printf("Failed to allocate memory for the TCP server \n");
+		LOG("Failed to allocate memory for the TCP server \n");
         status = false;
     }
 	else
@@ -103,14 +106,14 @@ bool start_TCP_server(void)
 		serverOpenedAndListening = tcp_server_open(tcpServer);
 		if (serverOpenedAndListening == false) 
 		{
-			printf("TCP did not successfully open, closing the server and freeing memory... \n");
+			LOG("TCP did not successfully open, closing the server and freeing memory... \n");
 			tcp_server_close(tcpServer);
 			vPortFree(tcpServer);
             status = false;
 		}
 		else
 		{
-			printf("TCP server started and listening for incoming connections... \n");
+			LOG("TCP server started and listening for incoming connections... \n");
 			status = true;
 		}
 	}
@@ -130,16 +133,16 @@ bool start_TCP_client(void)
     bool status = false;
 
     if (clientGlobal != NULL) {
-        printf("TCP client initialized successfully\n");
+        LOG("TCP client initialized successfully\n");
         status = true;
     } else {
-        printf("TCP client initialization failed\n");
+        LOG("TCP client initialization failed\n");
     }
 
     bufferMutex = xSemaphoreCreateMutex();
     if (bufferMutex == NULL) 
     {
-        printf("Failed to create mutex\n");
+        LOG("Failed to create mutex\n");
         status = false;
     }
     
@@ -168,7 +171,7 @@ err_t tcp_client_send(const char *data, uint16_t length) {
     
     // Check if clientGlobal exists and is connected
     if (clientGlobal == NULL || !clientGlobal->is_connected || clientGlobal->pcb == NULL) {
-        printf("Cannot send - client not connected\n");
+        LOG("Cannot send - client not connected\n");
         return ERR_CONN;
     }
     
@@ -178,10 +181,10 @@ err_t tcp_client_send(const char *data, uint16_t length) {
         // Actually send the data
         err = tcp_output(clientGlobal->pcb);
         if (err != ERR_OK) {
-            printf("tcp_output failed: %d\n", err);
+            LOG("tcp_output failed: %d\n", err);
         }
     } else {
-        printf("tcp_write failed: %d\n", err);
+        LOG("tcp_write failed: %d\n", err);
     }
     
     return err;
@@ -211,7 +214,7 @@ void tcp_client_process_recv_message(uint8_t *received_command)
         uint8_t *buffer = clientGlobal->receive_buffer;
 
         // Print the entire received buffer
-        printf("Received message: %s\n", buffer);
+        LOG("Received message: %s\n", buffer);
 
         // Check if the buffer starts with "cmd:"
         if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
@@ -227,16 +230,16 @@ void tcp_client_process_recv_message(uint8_t *received_command)
             if (command_value >= 0 && command_value <= 255) 
             {
                 *received_command = (uint8_t)command_value;
-                printf("Received command: %u\n", *received_command);
+                LOG("Received command: %u\n", *received_command);
             } 
             else 
             {
-                printf("Command value out of range (0-255).\n");
+                LOG("Command value out of range (0-255).\n");
             }
         } 
         else 
         {
-            printf("No command found in received message.\n");
+            LOG("No command found in received message.\n");
         }
 
         // Clear the buffer after processing
@@ -247,7 +250,7 @@ void tcp_client_process_recv_message(uint8_t *received_command)
     } 
     else 
     {
-        printf("Failed to acquire the pointer to receive buffer.\n");
+        LOG("Failed to acquire the pointer to receive buffer.\n");
     }
 }
 
@@ -334,7 +337,7 @@ static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buf
     if (!buffer) 
     {
         /* Log a message and return if the buffer is NULL. */
-        printf("buffer is NULL, returning... \n");
+        LOG("buffer is NULL, returning... \n");
 		status = ERR_BUF;
     }
     else
@@ -356,7 +359,7 @@ static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buf
                 recv_data[buffer->tot_len] = '\0'; 
 
                 /* Print the received message to the console. */
-                printf("Received message: %s\n", recv_data);
+                LOG("Received message: %s\n", recv_data);
 
                 /* Free the allocated buffer to prevent memory leaks. */
                 vPortFree(recv_data);
@@ -397,13 +400,13 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
     if (err != ERR_OK || client_pcb == NULL) 
     {
         /* Log a failure message if the connection was not successful. */
-        printf("Failure in accept\n");
+        LOG("Failure in accept\n");
         status = ERR_VAL; // Return an error value to indicate failure
     }
 	else
 	{
 		/* Log a message indicating that a client has connected successfully. */
-		printf("Client connected\n");
+		LOG("Client connected\n");
 
 		/* Store the client PCB in the tcpServer structure for later use. */
 		tcpServer->client_pcb = client_pcb;
@@ -437,13 +440,13 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     struct tcp_pcb *pcb = tcp_new_ip_type(IPADDR_TYPE_ANY);
 
     /* Log the starting message with the server's IP address and port. */
-    printf("Starting server at %s on port %u\n", ip4addr_ntoa(netif_ip4_addr(netif_list)), TCP_PORT);
+    LOG("Starting server at %s on port %u\n", ip4addr_ntoa(netif_ip4_addr(netif_list)), TCP_PORT);
 
     /* Check if the PCB was successfully created. */
     if (!pcb) 
     {
         /* Log an error message if PCB creation failed. */
-        printf("failed to create pcb\n");
+        LOG("failed to create pcb\n");
         return false;
     }
 
@@ -452,7 +455,7 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     if (err) 
     {
         /* Log an error message if binding to the port failed. */
-        printf("failed to bind to port %u\n", TCP_PORT);
+        LOG("failed to bind to port %u\n", TCP_PORT);
         return false;
     }
 
@@ -461,7 +464,7 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     if (!tcpServer->server_pcb) 
     {
         /* Log an error message if setting the server to listen failed. */
-        printf("failed to listen\n");
+        LOG("failed to listen\n");
         if (pcb) 
         {
             /* Close the PCB if it was successfully created before failing to listen. */
@@ -535,14 +538,14 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
         client->receive_buffer[p->tot_len] = '\0';  // Null terminate, assuming the received data will be used as string
 
         // Print received data (for testing)
-        //printf("Received: %s\n", client->receive_buffer);
+        //LOG("Received: %s\n", client->receive_buffer);
 
         // Release the mutex after finishing with the buffer
         xSemaphoreGive(bufferMutex);
     } 
     else 
     {
-        printf("Failed to take mutex\n");
+        LOG("Failed to take mutex\n");
     }
 
     // Free the pbuf
@@ -585,7 +588,7 @@ static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_
     // Set up receive callback
     tcp_recv(tpcb, tcp_client_recv_callback);
     
-    printf("TCP client connected to server\n");
+    LOG("TCP client connected to server\n");
     return ERR_OK;
 }
 
@@ -612,7 +615,7 @@ TCP_Client_t* tcp_client_init(void) {
     // Allocate client structure
     TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
     if (client == NULL) {
-        printf("Failed to allocate client structure\n");
+        LOG("Failed to allocate client structure\n");
         return NULL;
     }
 
@@ -624,7 +627,7 @@ TCP_Client_t* tcp_client_init(void) {
     // Create new TCP PCB
     client->pcb = tcp_new();
     if (client->pcb == NULL) {
-        printf("Failed to create TCP PCB\n");
+        LOG("Failed to create TCP PCB\n");
         vPortFree(client);
         return NULL;
     }
@@ -638,7 +641,7 @@ TCP_Client_t* tcp_client_init(void) {
     // Connect to server
     err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
     if (err != ERR_OK) {
-        printf("TCP connect failed: %d\n", err);
+        LOG("TCP connect failed: %d\n", err);
         tcp_close(client->pcb);
         vPortFree(client);
         return NULL;

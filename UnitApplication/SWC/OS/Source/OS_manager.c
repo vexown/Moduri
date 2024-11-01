@@ -131,13 +131,13 @@ void OS_start( void )
 	  * - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run concurrently across multiple cores */
 #if (configNUMBER_OF_CORES == 2)
  	rtos_type = "FreeRTOS SMP";
-    printf("Running %s on both cores \n", rtos_type);
+    LOG("Running %s on both cores \n", rtos_type);
 #else
 	rtos_type = "FreeRTOS";
-	printf("Running %s on one core \n", rtos_type);
+	LOG("Running %s on one core \n", rtos_type);
 #endif
 
-	printf("Setting up the RTOS configuration... \n");
+	LOG("Setting up the RTOS configuration... \n");
 
     /* Create a queue that can hold mainQUEUE_LENGTH number of items, each of which is sizeof(uint32_t) bytes in size (4bytes) */
 	xQueue = xQueueCreate(mainQUEUE_LENGTH, sizeof(uint32_t)); // 1 x uint32_t queue
@@ -160,7 +160,7 @@ void OS_start( void )
 		{
 			if(taskCreationStatus[i] == pdPASS)
 			{
-				printf("Task number %u created successfully \n", i);
+				LOG("Task number %u created successfully \n", i);
 			}
 			else /* pdFAIL */
 			{
@@ -169,7 +169,7 @@ void OS_start( void )
 		}
 
 		/* Start the tasks and timer running. */
-		printf("RTOS configuration finished, starting the scheduler... \n");
+		LOG("RTOS configuration finished, starting the scheduler... \n");
 		vTaskStartScheduler();
 	}
 

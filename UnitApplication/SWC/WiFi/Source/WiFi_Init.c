@@ -21,6 +21,9 @@
 #include "WiFi_Credentials.h" //Create WiFi_Credentials.h with your WiFi login and password as const char* variables called ssid and pass
 #include "WiFi_Common.h"
 
+/* Misc includes */
+#include "Common.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
@@ -57,11 +60,11 @@ bool connectToWifi(void)
     /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
     if (cyw43_arch_init()) 
     {
-        printf("failed to initialize\n");
+        LOG("failed to initialize\n");
     } 
     else 
     {
-        printf("initialized successfully\n");
+        LOG("initialized successfully\n");
     }
 
     /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
@@ -69,14 +72,14 @@ bool connectToWifi(void)
 
     /* Attempt to connect to a wireless access point (currently my Tenda WiFi router)
        Blocking until the network is joined, a failure is detected or a timeout occurs */
-    printf("Connecting to Wi-Fi...\n");
+    LOG("Connecting to Wi-Fi...\n");
     if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
     {
-        printf("failed to connect\n");
+        LOG("failed to connect\n");
     }
     else
     {
-        printf("connected sucessfully\n");
+        LOG("connected sucessfully\n");
         status = true;
     }
 

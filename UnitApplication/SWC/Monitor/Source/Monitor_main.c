@@ -83,18 +83,18 @@ void Monitor_MainFunction(void)
     populatedArraySize = uxTaskGetSystemState(taskStatusArray, MAX_NUM_OF_TASKS, &totalRunTime); // returns 0 if if the MAX_NUM_OF_TASKS is too small 
     prevTotalRunTime = totalRunTime;
     
-    printf("\n=== System Statistics ===\n");
-    printf("Available Heap Space (sum of free blocks): %u bytes\n",      stats.heap_stats.xAvailableHeapSpaceInBytes);
-    printf("Size of Largest Free Block: %u bytes\n",                     stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
-    printf("Size of Smallest Free Block: %u bytes\n",                    stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
-    printf("Number of Free Blocks: %u \n",                               stats.heap_stats.xNumberOfFreeBlocks);
-    printf("Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
-    printf("Number of successfull pvPortMalloc calls %u \n",             stats.heap_stats.xNumberOfSuccessfulAllocations);
-    printf("Number of successfull vPortFree calls %u \n",                stats.heap_stats.xNumberOfSuccessfulFrees);
+    LOG("\n=== System Statistics ===\n");
+    LOG("Available Heap Space (sum of free blocks): %u bytes\n",      stats.heap_stats.xAvailableHeapSpaceInBytes);
+    LOG("Size of Largest Free Block: %u bytes\n",                     stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
+    LOG("Size of Smallest Free Block: %u bytes\n",                    stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
+    LOG("Number of Free Blocks: %u \n",                               stats.heap_stats.xNumberOfFreeBlocks);
+    LOG("Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
+    LOG("Number of successfull pvPortMalloc calls %u \n",             stats.heap_stats.xNumberOfSuccessfulAllocations);
+    LOG("Number of successfull vPortFree calls %u \n",                stats.heap_stats.xNumberOfSuccessfulFrees);
 
-    printf("\n=== Task Statistics ===\n");
-    printf("Number of Tasks: %u\n", stats.currentNumOfTasks);
-    printf("Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
+    LOG("\n=== Task Statistics ===\n");
+    LOG("Number of Tasks: %u\n", stats.currentNumOfTasks);
+    LOG("Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
 
     for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
     {
@@ -110,7 +110,7 @@ void Monitor_MainFunction(void)
         }
         
         /* Print all the relevant stats for the given Task */
-        printf("%-16s%c\t%u\t%u\t\t%u\n",
+        LOG("%-16s%c\t%u\t%u\t\t%u\n",
                 taskStatusArray[task_num].pcTaskName,
                 taskState,
                 taskStatusArray[task_num].uxCurrentPriority,
@@ -118,7 +118,7 @@ void Monitor_MainFunction(void)
                 taskStatusArray[task_num].xTaskNumber);
     }
     
-    printf("\n");
+    LOG("\n");
 }
 
 /* 

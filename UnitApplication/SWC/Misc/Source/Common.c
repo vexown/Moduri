@@ -34,7 +34,7 @@
  */
 void CriticalErrorHandler(uint8_t moduleId, uint8_t errorId)
 {
-    printf("CRTICIAL ERROR OCCURED. moduleId: %u, errorId: %u. Going into endless loop...\n", moduleId, errorId);
+    LOG("CRTICIAL ERROR OCCURED. moduleId: %u, errorId: %u. Going into endless loop...\n", moduleId, errorId);
 
     /* Enter a critical section. The idea here is to prevent leaving this endless loop by disabling all interrupts globally.
     As stated in FreeRTOS documentation:
