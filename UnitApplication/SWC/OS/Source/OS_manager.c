@@ -56,6 +56,9 @@
 /* Monitor includes */
 #include "Monitor_Common.h"
 
+/* OS includes */
+#include "OS_manager.h"
+
 /* Misc includes */
 #include "Common.h"
 
@@ -109,6 +112,11 @@ static void monitorTask(__unused void *taskParams);
 static QueueHandle_t xQueue = NULL;
 
 /*******************************************************************************/
+/*                             GLOBAL VARIABLES                                */
+/*******************************************************************************/
+TaskHandle_t monitorTaskHandle = NULL;
+
+/*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 /* 
@@ -153,7 +161,7 @@ void OS_start( void )
 											NULL );								/* The task handle is not required, so NULL is passed. */
 		taskCreationStatus[1] = xTaskCreate( queueSendTask, "TX", STACK_1024_BYTES, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
     	taskCreationStatus[2] = xTaskCreate( networkTask, "NET", STACK_2048_BYTES , NULL, NETWORK_TASK_PRIORITY , NULL);
-		taskCreationStatus[3] = xTaskCreate( monitorTask, "Monitor", STACK_1024_BYTES, NULL, MONITOR_TASK_PRIORITY , NULL);
+		taskCreationStatus[3] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY , &monitorTaskHandle);
 
 		/* Check if the tasks were created successfully */
 		for(uint8_t i = 0; i < NUM_OF_TASKS; i++)

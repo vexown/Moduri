@@ -14,17 +14,11 @@
 #define UDP_CLIENT_PORT             5001
 #define UDP_RECV_BUFFER_SIZE        1024
 
-/* Misc defines */
-#define E_OK           0
-#define ERRNO_FAIL     -1
-#define NO_FLAG        0
-#define NO_DELAY       0
-
 /* Commands from PC to Pico */
 #define PICO_DO_NOTHING                 0
 #define PICO_TRANSITION_TO_ACTIVE_MODE  1
 #define PICO_TRANSITION_TO_LISTEN_MODE  2
-
+#define PICO_TRANSITION_TO_MONITOR_MODE 3
 
 /* Non-specific functions */
 bool connectToWifi(void);

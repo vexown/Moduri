@@ -5,6 +5,7 @@
         "stdint.h": "c",
         "stdio.h": "c",
         "compare": "c",
-        "wifi_udp.h": "c"
+        "wifi_udp.h": "c",
+        "errno.h": "c"
     }
 }

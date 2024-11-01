@@ -22,6 +22,9 @@
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 
+/* OS includes */
+#include "OS_manager.h"
+
 /* Misc includes */
 #include "Common.h"
 
@@ -43,8 +46,9 @@ typedef enum {
 typedef enum {
     INIT = 0,
     LISTEN = 1,
-    ACTIVE_SEND_AND_RECEIVE = 2
-} CommStateType;
+    ACTIVE_SEND_AND_RECEIVE = 2,
+    MONITOR = 3
+} WiFiStateType;
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
@@ -54,7 +58,7 @@ typedef enum {
 static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communication type is TCP */
 
 /* Current Communication State */
-static CommStateType CommState = INIT; 
+static WiFiStateType WiFiState = INIT; 
 
 /*******************************************************************************/
 /*                          STATIC FUNCTION DECLARATIONS                       */
@@ -62,6 +66,7 @@ static CommStateType CommState = INIT;
 static void WiFi_ProcessCommand(uint8_t command);
 static void WiFi_ListenState(void);
 static void WiFi_ActiveState(void);
+static void WiFi_MonitorState(void);
 static void WiFi_InitCommunication(void);
 
 /*******************************************************************************/
@@ -83,13 +88,16 @@ static void WiFi_InitCommunication(void);
 
 void WiFi_MainFunction(void)
 {
-    switch (CommState)
+    switch (WiFiState)
     {
         case LISTEN:
             WiFi_ListenState();
             break;
         case ACTIVE_SEND_AND_RECEIVE:
             WiFi_ActiveState();
+            break;
+        case MONITOR:
+            WiFi_MonitorState();
             break;
         default: /* INIT */
             WiFi_InitCommunication();
@@ -125,11 +133,15 @@ static void WiFi_ProcessCommand(uint8_t command)
             break;
         case PICO_TRANSITION_TO_ACTIVE_MODE:
             LOG("Transitioning to Active Mode...\n");
-            CommState = ACTIVE_SEND_AND_RECEIVE;
+            WiFiState = ACTIVE_SEND_AND_RECEIVE;
             break;
         case PICO_TRANSITION_TO_LISTEN_MODE:
             LOG("Transitioning to Listen Mode...\n");
-            CommState = LISTEN;
+            WiFiState = LISTEN;
+            break;
+        case PICO_TRANSITION_TO_MONITOR_MODE:
+            LOG("Transitioning to Monitor Mode...\n");
+            WiFiState = MONITOR;
             break;
         default:
             LOG("Command not supported \n");
@@ -219,6 +231,43 @@ static void WiFi_ActiveState(void)
 }
 
 /* 
+ * Function: WiFi_MonitorState
+ * 
+ * Description: State in which the Pico W sends out Monitor data
+ * 
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ *
+ */
+static void WiFi_MonitorState(void)
+{
+    uint8_t received_command = PICO_DO_NOTHING;
+
+    if(TransportLayer == TCP_COMMUNICATION)
+    {
+        /************** RX **************/
+        /* Handle any received messages */
+        tcp_client_process_recv_message(&received_command);
+        WiFi_ProcessCommand(received_command); 
+
+         /************** TX **************/
+        /* Signal Monitor Task to send data */
+        xTaskNotifyGive(monitorTaskHandle);
+    }
+    else if(TransportLayer == UDP_COMMUNICATION)
+    {
+        /* Monitoring supported only over TCP for now */
+    }
+    else
+    {
+        LOG("Communication Type not supported\n");
+    }
+}
+
+/* 
  * Function: WiFi_InitCommunication
  * 
  * Description: Initializes the WiFi communication as:
@@ -244,14 +293,14 @@ static void WiFi_InitCommunication(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
 #ifdef PICO_AS_TCP_SERVER
-        if(start_TCP_server() == true) CommState = LISTEN;
+        if(start_TCP_server() == true) WiFiState = LISTEN;
 #else /* defaults to Pico as TCP client */
-        if(start_TCP_client() == true) CommState = LISTEN;
+        if(start_TCP_client() == true) WiFiState = LISTEN;
 #endif
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
-        if(start_UDP_client() == true) CommState = LISTEN;
+        if(start_UDP_client() == true) WiFiState = LISTEN;
     }
     else
     {

@@ -30,6 +30,12 @@
 #define NUM_OF_TASKS 						(4)
 #define MAX_NUM_OF_TASKS				    (20)
 
+/* Misc defines */
+#define E_OK           0
+#define ERRNO_FAIL     -1
+#define NO_FLAG        0
+#define NO_DELAY       0
+
 /*******************************************************************************/
 /*                         GLOBAL FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
