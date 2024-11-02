@@ -71,9 +71,13 @@
 #define MONITOR_TASK_PRIORITY				(tskIDLE_PRIORITY + 1)
 #define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 2)
 
-/* Task periods: portTICK_PERIOD_MS = (1/configTICK_RATE_HZ) * 1000 = 1ms per tick */
-#define NETWORK_TASK_PERIOD_TICKS			(TickType_t)(5000 / portTICK_PERIOD_MS) //5s
-#define MONITOR_TASK_PERIOD_TICKS			(TickType_t)(11000 / portTICK_PERIOD_MS) //11s
+/* Context for time-related macros, we use these two main helper macros from FreeRTOS (configTICK_RATE_HZ is defined in FreeRTOSConfig.h)
+	- pdMS_TO_TICKS(TimeInMs):     (TimeInMs * configTICK_RATE_HZ) / 1000
+	- pdTICKS_TO_MS(TimeInTicks):  (TimeInTicks * 1000 ) / (configTICK_RATE_HZ)
+*/
+/* Task periods */
+#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(5000)  //5s
+#define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Timer periods */
 #define ALIVE_TIMER_PERIOD                  pdMS_TO_TICKS(500) //500ms
