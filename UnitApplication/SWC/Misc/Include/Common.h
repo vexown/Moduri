@@ -20,15 +20,13 @@
 #endif
 
 /* Error IDs */
-#define ERROR_ID_TASK_FAILED_TO_CREATE      (uint8_t)(0x1U)
-#define ERROR_ID_WIFI_DID_NOT_CONNECT       (uint8_t)(0x2U)
+#define ERROR_ID_TASK_FAILED_TO_CREATE              (uint8_t)(0x1U)
+#define ERROR_ID_WIFI_DID_NOT_CONNECT               (uint8_t)(0x2U)
+#define ERROR_ID_RTOS_OBJECTS_FAILED_TO_CREATE      (uint8_t)(0x3U)
+#define ERROR_ID_SW_TIMER_FAILED_TO_START           (uint8_t)(0x4U)
 
 /* Module IDs */
-#define MODULE_ID_OS                        (uint8_t)(0x1U)
-
-/* Other Task-related macros */
-#define NUM_OF_TASKS 						(4)
-#define MAX_NUM_OF_TASKS				    (20)
+#define MODULE_ID_OS    (uint8_t)(0x1U)
 
 /* Misc defines */
 #define E_OK           0

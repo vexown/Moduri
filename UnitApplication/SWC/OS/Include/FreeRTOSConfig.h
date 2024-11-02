@@ -126,7 +126,7 @@ extern unsigned long Monitor_getRuntimeCounter(void);
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 
 /* Total heap size available for dynamic allocation. */
-#define configTOTAL_HEAP_SIZE                   (128*1024)
+#define configTOTAL_HEAP_SIZE                   (128*1024) // Using 128kB out of total 264kB of RAM available on Pico W
 
 /* Set to 1 if the application provides its own heap. */
 #define configAPPLICATION_ALLOCATED_HEAP        0
