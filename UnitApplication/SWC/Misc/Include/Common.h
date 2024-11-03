@@ -7,6 +7,7 @@
 
 /* Standard includes. */
 #include <stdint.h>
+#include <stdio.h>
 
 /*******************************************************************************/
 /*                                 MACROS                                      */

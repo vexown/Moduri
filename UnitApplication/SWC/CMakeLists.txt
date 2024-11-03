@@ -5,6 +5,7 @@ add_subdirectory(OS)
 add_subdirectory(Misc)
 add_subdirectory(WiFi)
 add_subdirectory(Monitor)
+add_subdirectory(HAL)
 
 # Define the executable target for the application
 add_executable(moduri
@@ -13,6 +14,7 @@ add_executable(moduri
         ${MISC_SOURCE_FILES}
         ${WIFI_SOURCE_FILES}
         ${MONITOR_SOURCE_FILES}
+        ${HAL_SOURCE_FILES}
         )
 
 # Set compile definitions if needed
@@ -24,6 +26,7 @@ target_include_directories(moduri PRIVATE
         ${MISC_INCLUDE_DIR}
         ${WIFI_INCLUDE_DIR}
         ${MONITOR_INCLUDE_DIR}
+        ${HAL_INCLUDE_DIR}
         )
 
 # Link libraries and dependencies
@@ -31,6 +34,8 @@ target_link_libraries(moduri
                         pico_cyw43_arch_lwip_sys_freertos
                         pico_stdlib
                         pico_lwip_iperf
+                        hardware_i2c
+                        hardware_spi
                         FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
                         )
 
