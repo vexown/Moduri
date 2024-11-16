@@ -255,6 +255,162 @@ Discarded input sections
  .text          0x00000000        0x0 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
  .data          0x00000000        0x0 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
  .bss           0x00000000        0x0 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.is_valid_pin
+                0x00000000        0xc CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Init
+                0x00000000       0x6e CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Set
+                0x00000000       0x1e CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Clear
+                0x00000000       0x1e CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Write
+                0x00000000       0x2e CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Read
+                0x00000000       0x28 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text.GPIO_Toggle
+                0x00000000       0x32 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_info    0x00000000      0xb06 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_abbrev  0x00000000      0x28c CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_loclists
+                0x00000000      0x30f CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_aranges
+                0x00000000       0x50 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_rnglists
+                0x00000000       0xa9 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_line    0x00000000      0x5d3 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_str     0x00000000      0x56e CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .debug_frame   0x00000000       0xbc CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.get_i2c_inst
+                0x00000000       0x14 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .rodata.is_valid_i2c_pins.str1.4
+                0x00000000       0x17 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.is_valid_i2c_pins
+                0x00000000       0x8c CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.i2c_write_timeout_us
+                0x00000000       0x54 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.i2c_read_timeout_us
+                0x00000000       0x54 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_Init
+                0x00000000       0x54 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_WriteByte
+                0x00000000       0x40 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_ReadByte
+                0x00000000       0x64 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_WriteMultiple
+                0x00000000       0x74 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_ReadMultipleRegisters
+                0x00000000       0x64 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_IsDeviceReady
+                0x00000000       0x3c CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .rodata.I2C_ScanBus.str1.4
+                0x00000000       0x21 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text.I2C_ScanBus
+                0x00000000       0x3c CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .rodata        0x00000000        0x6 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_info    0x00000000     0x127f CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_abbrev  0x00000000      0x432 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_loclists
+                0x00000000      0x807 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_aranges
+                0x00000000       0x70 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_rnglists
+                0x00000000       0x8c CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_line    0x00000000      0x826 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_str     0x00000000      0xa64 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .debug_frame   0x00000000      0x170 CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.spi_set_format
+                0x00000000       0x3c CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.get_spi_inst
+                0x00000000       0x14 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .rodata.is_valid_spi_pins.str1.4
+                0x00000000       0x14 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.is_valid_spi_pins
+                0x00000000      0x10c CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_Init
+                0x00000000       0xb4 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_TransferByte
+                0x00000000       0x26 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_WriteByte
+                0x00000000       0x1c CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_ReadByte
+                0x00000000       0x1c CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_WriteMultiple
+                0x00000000       0x1e CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_ReadMultiple
+                0x00000000       0x40 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_TransferMultiple
+                0x00000000       0x2a CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_ChipSelect
+                0x00000000       0x34 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text.SPI_DeInit
+                0x00000000        0xe CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .data.cs_pins  0x00000000        0x2 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .rodata        0x00000000        0x3 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_info    0x00000000     0x1516 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_abbrev  0x00000000      0x3c1 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_loclists
+                0x00000000      0x832 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_aranges
+                0x00000000       0x78 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_rnglists
+                0x00000000       0x8d CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_line    0x00000000      0x95a CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_str     0x00000000      0xcea CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .debug_frame   0x00000000      0x148 CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_send_command
+                0x00000000       0x18 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_update_display
+                0x00000000       0x74 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_clear
+                0x00000000        0xe CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_init
+                0x00000000       0x3c CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_draw_pixel
+                0x00000000       0x34 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_draw_char
+                0x00000000       0x70 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .text.ssd1306_draw_string
+                0x00000000       0x24 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .rodata.ssd1306_init_commands
+                0x00000000       0x19 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .rodata.font_5x7
+                0x00000000      0x1db CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .data.i2c_cfg  0x00000000        0x8 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_info    0x00000000      0x8ff CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_abbrev  0x00000000      0x24b CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_loclists
+                0x00000000      0x314 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_aranges
+                0x00000000       0x50 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_rnglists
+                0x00000000       0x5b CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_line    0x00000000      0x3c9 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_str     0x00000000      0x7e5 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .debug_frame   0x00000000       0xdc CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
  .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
  .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
  .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
@@ -3636,6 +3792,96 @@ Discarded input sections
  .debug_frame   0x00000000      0x244 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/lib/lwip/src/apps/lwiperf/lwiperf.c.obj
  .ARM.attributes
                 0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/lib/lwip/src/apps/lwiperf/lwiperf.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_unreset
+                0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_write_blocking_internal
+                0x00000000      0x158 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_read_blocking_internal
+                0x00000000       0xee CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_deinit
+                0x00000000       0x20 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .rodata.i2c_set_baudrate.str1.4
+                0x00000000       0x60 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_set_baudrate
+                0x00000000       0xf0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_init
+                0x00000000       0x54 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_set_slave_mode
+                0x00000000       0x4c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_write_blocking
+                0x00000000       0x18 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_write_blocking_until
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_write_timeout_per_char_us
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_read_blocking
+                0x00000000       0x18 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_read_blocking_until
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text.i2c_read_timeout_per_char_us
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .rodata.__func__.0
+                0x00000000       0x11 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .data.i2c1_inst
+                0x00000000        0x8 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .data.i2c0_inst
+                0x00000000        0x8 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_info    0x00000000     0x19f4 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_abbrev  0x00000000      0x49a CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_loclists
+                0x00000000      0xd9c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_aranges
+                0x00000000       0x80 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_rnglists
+                0x00000000       0x93 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_line    0x00000000      0xc00 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_str     0x00000000      0xfbe CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .debug_frame   0x00000000      0x1bc CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .text.spi_unreset
+                0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .text.spi_deinit
+                0x00000000       0x38 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .text.spi_set_baudrate
+                0x00000000       0xb4 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .text.spi_init
+                0x00000000       0x70 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .text.spi_get_baudrate
+                0x00000000       0x1e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_write_read_blocking
+                0x00000000       0x42 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_write_blocking
+                0x00000000       0x3a CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_read_blocking
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_write16_read16_blocking
+                0x00000000       0x42 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_write16_blocking
+                0x00000000       0x3c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .time_critical.spi_read16_blocking
+                0x00000000       0x3e CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_info    0x00000000     0x132a CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_abbrev  0x00000000      0x36d CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_loclists
+                0x00000000      0x74a CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_aranges
+                0x00000000       0x70 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_rnglists
+                0x00000000       0x68 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_line    0x00000000      0xbfc CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_str     0x00000000      0x73c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .debug_frame   0x00000000      0x144 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
  .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/MemMang/heap_4.c.obj
  .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/MemMang/heap_4.c.obj
  .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/MemMang/heap_4.c.obj
@@ -4127,9 +4373,9 @@ Discarded input sections
                 0x00000000        0x8 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .bss.lockout_victim_initialized
                 0x00000000        0x2 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
- .text          0x00000000        0x0 /tmp/ccnNiyu4.o
- .data          0x00000000        0x0 /tmp/ccnNiyu4.o
- .bss           0x00000000        0x0 /tmp/ccnNiyu4.o
+ .text          0x00000000        0x0 /tmp/ccipAB2Z.o
+ .data          0x00000000        0x0 /tmp/ccipAB2Z.o
+ .bss           0x00000000        0x0 /tmp/ccipAB2Z.o
  .data          0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x00000000        0x0 /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x00000000       0x60 /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(libc_a-strncpy.o)
@@ -4961,7 +5207,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
 .boot2          0x10000000      0x100
                 0x10000000                        __boot2_start__ = .
  *(.boot2)
- .boot2         0x10000000      0x100 /tmp/ccnNiyu4.o
+ .boot2         0x10000000      0x100 /tmp/ccipAB2Z.o
                 0x10000100                        __boot2_end__ = .
                 0x00000001                        ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -8869,6 +9115,10 @@ LOAD CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
 LOAD CMakeFiles/moduri.dir/WiFi/Source/WiFi_Init.c.obj
 LOAD CMakeFiles/moduri.dir/WiFi/Source/WiFi_main.c.obj
 LOAD CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
+LOAD CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.obj
+LOAD CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.obj
+LOAD CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.obj
+LOAD CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2040/pico_platform/platform.c.obj
@@ -9032,6 +9282,8 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_clib
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/lib/lwip/src/apps/lwiperf/lwiperf.c.obj
+LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.obj
+LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/MemMang/heap_4.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/port.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/croutine.c.obj
@@ -9042,7 +9294,7 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/stream_buffer.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/tasks.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/timers.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
-LOAD /tmp/ccnNiyu4.o
+LOAD /tmp/ccipAB2Z.o
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/13.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -9251,7 +9503,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x00000f94       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .ARM.attributes
-                0x00000fc0       0x22 /tmp/ccnNiyu4.o
+                0x00000fc0       0x22 /tmp/ccipAB2Z.o
  .ARM.attributes
                 0x00000fe2       0x1e /usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes
