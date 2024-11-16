@@ -29,63 +29,134 @@
 #define _LWIPOPTS_EXAMPLE_COMMONH_H
 
 
-// Common settings used in most of the pico_w examples
-// (see https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html for details)
+/* Common settings used in most of the pico_w examples.
+ * For detailed explanations, refer to the official lwIP documentation:
+ * https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html
+ */
 
-// allow override in some examples
+/* Allow override in some examples. Determines if the lwIP stack runs without an operating system (1) 
+ * or with an OS (0). */
 #ifndef NO_SYS
 #define NO_SYS                      0
 #endif
 
-// allow override in some examples
+/* Allow override in some examples. Enables lwIP socket API (1). */
 #ifndef LWIP_SOCKET
 #define LWIP_SOCKET                 1
 #endif
+
 #if PICO_CYW43_ARCH_POLL
+/* Use system's malloc for memory allocation if polling is enabled. */
 #define MEM_LIBC_MALLOC             1
 #else
-// MEM_LIBC_MALLOC is incompatible with non polling versions
+/* Disable system's malloc for non-polling configurations. */
 #define MEM_LIBC_MALLOC             0
 #endif
+
+/* Memory alignment for the lwIP stack. Usually set to match the system's architecture. */
 #define MEM_ALIGNMENT               4
+
+/* Size of the heap for memory allocation (in bytes). Adjust based on application needs. */
 #define MEM_SIZE                    4000
+
+/* Number of TCP segments that can be queued. Increase for more simultaneous TCP connections. */
 #define MEMP_NUM_TCP_SEG            32
+
+/* Number of entries in the ARP queue. Increase for high ARP traffic environments. */
 #define MEMP_NUM_ARP_QUEUE          10
+
+/* Number of buffers in the packet buffer pool. Adjust based on expected network traffic. */
 #define PBUF_POOL_SIZE              24
+
+/* Enable ARP functionality (1). Required for Ethernet and IPv4. */
 #define LWIP_ARP                    1
+
+/* Enable Ethernet support (1). */
 #define LWIP_ETHERNET               1
+
+/* Enable ICMP (Internet Control Message Protocol) support (1). */
 #define LWIP_ICMP                   1
+
+/* Enable raw API support (1) for custom low-level protocol handling. */
 #define LWIP_RAW                    1
+
+/* TCP receive window size in bytes. Increase for better throughput. */
 #define TCP_WND                     (8 * TCP_MSS)
+
+/* Maximum segment size for TCP. */
 #define TCP_MSS                     1460
+
+/* Size of the TCP send buffer in bytes. Increase for larger TCP transmissions. */
 #define TCP_SND_BUF                 (8 * TCP_MSS)
+
+/* Length of the TCP send queue. Determines how many segments can be queued for sending. */
 #define TCP_SND_QUEUELEN            ((4 * (TCP_SND_BUF) + (TCP_MSS - 1)) / (TCP_MSS))
+
+/* Enable callback for network interface status changes (1). */
 #define LWIP_NETIF_STATUS_CALLBACK  1
+
+/* Enable callback for link status changes on network interfaces (1). */
 #define LWIP_NETIF_LINK_CALLBACK    1
+
+/* Enable hostname support for network interfaces (1). */
 #define LWIP_NETIF_HOSTNAME         1
+
+/* Disable Netconn API (0) as it's not used in this configuration. */
 #define LWIP_NETCONN                0
+
+/* Disable memory usage statistics (0). */
 #define MEM_STATS                   0
+
+/* Disable system statistics (0). */
 #define SYS_STATS                   0
+
+/* Disable memory pool statistics (0). */
 #define MEMP_STATS                  0
+
+/* Disable link statistics (0). */
 #define LINK_STATS                  0
+
+/* Padding added to Ethernet frames. Uncomment and set as needed. */
 // #define ETH_PAD_SIZE                2
+
+/* Select checksum algorithm (3 = fastest option on most systems). */
 #define LWIP_CHKSUM_ALGORITHM       3
+
+/* Enable DHCP (Dynamic Host Configuration Protocol) support (1). */
 #define LWIP_DHCP                   1
+
+/* Enable IPv4 support (1). */
 #define LWIP_IPV4                   1
+
+/* Enable TCP support (1). */
 #define LWIP_TCP                    1
+
+/* Enable UDP support (1). */
 #define LWIP_UDP                    1
+
+/* Enable DNS (Domain Name System) support (1). */
 #define LWIP_DNS                    1
+
+/* Enable TCP keepalive mechanism (1). */
 #define LWIP_TCP_KEEPALIVE          1
+
+/* Optimize for single-buffer transmissions (1). */
 #define LWIP_NETIF_TX_SINGLE_PBUF   1
+
+/* Disable ARP check during DHCP address assignment (0). */
 #define DHCP_DOES_ARP_CHECK         0
+
+/* Disable ACD (Address Conflict Detection) checks for DHCP (0). */
 #define LWIP_DHCP_DOES_ACD_CHECK    0
 
 #ifndef NDEBUG
+/* Enable debugging and statistics when not in release mode. */
 #define LWIP_DEBUG                  1
 #define LWIP_STATS                  1
 #define LWIP_STATS_DISPLAY          1
 #endif
 
+/* Debug settings: disable debugging for various lwIP components. */
 #define ETHARP_DEBUG                LWIP_DBG_OFF
 #define NETIF_DEBUG                 LWIP_DBG_OFF
 #define PBUF_DEBUG                  LWIP_DBG_OFF
@@ -116,17 +187,31 @@
 #define DHCP_DEBUG                  LWIP_DBG_OFF
 
 #if !NO_SYS
+/* Stack size for the tcpip_thread task. */
 #define TCPIP_THREAD_STACKSIZE 1024
+
+/* Default stack size for other lwIP threads. */
 #define DEFAULT_THREAD_STACKSIZE 1024
+
+/* Mailbox size for raw protocol receive operations. */
 #define DEFAULT_RAW_RECVMBOX_SIZE 8
+
+/* Mailbox size for UDP receive operations. */
 #define DEFAULT_UDP_RECVMBOX_SIZE 8
+
+/* Mailbox size for TCP receive operations. */
 #define DEFAULT_TCP_RECVMBOX_SIZE 8
+
+/* Mailbox size for the tcpip_thread task. */
 #define TCPIP_MBOX_SIZE 8
+
+/* Use system-provided timeval structure (0). */
 #define LWIP_TIMEVAL_PRIVATE 0
-// not necessary, can be done either way
+
+/* Enable core locking for tcpip_thread input. */
 #define LWIP_TCPIP_CORE_LOCKING_INPUT 1
 
-// ping_thread sets socket receive timeout, so enable this feature
+/* Enable socket receive timeout feature. */
 #define LWIP_SO_RCVTIMEO 1
 #endif
 
