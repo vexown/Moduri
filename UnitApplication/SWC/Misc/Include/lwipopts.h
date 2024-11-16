@@ -188,7 +188,7 @@
 
 #if !NO_SYS
 /* Stack size for the tcpip_thread task. */
-#define TCPIP_THREAD_STACKSIZE 1024
+#define TCPIP_THREAD_STACKSIZE 2048
 
 /* Default stack size for other lwIP threads. */
 #define DEFAULT_THREAD_STACKSIZE 1024
