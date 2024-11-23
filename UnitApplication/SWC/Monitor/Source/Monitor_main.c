@@ -91,7 +91,7 @@ void Monitor_MainFunction(void)
     prevTotalRunTime = totalRunTime;
     
     /* If WiFi State Machine is in Monitoring mode send stats via TCP, otherwise simply LOG them */
-    if(ulTaskNotifyTake(pdTRUE, NO_DELAY) == pdFALSE) //clear Notification on read, move on immediately if there is no Notifications  
+    if(ulTaskNotifyTake(pdTRUE, NO_TIMEOUT) == pdFALSE) //clear Notification on read, move on immediately if there is no Notifications  
     {
         LOG("\n=== System Statistics ===\n");
         LOG("Available Heap Space (sum of free blocks): %u bytes\n",      stats.heap_stats.xAvailableHeapSpaceInBytes);

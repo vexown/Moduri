@@ -208,7 +208,7 @@ err_t tcp_client_send(const char *data, uint16_t length) {
 void tcp_client_process_recv_message(uint8_t *received_command) 
 {
     // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_DELAY) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
     {
         // Access the receive buffer
         uint8_t *buffer = clientGlobal->receive_buffer;
@@ -530,7 +530,7 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
     }
 
     // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_DELAY) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
     {
         // Copy received data to our buffer
         memcpy(client->receive_buffer, p->payload, p->tot_len);

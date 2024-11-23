@@ -183,7 +183,7 @@ void OS_start( void )
 		}
 
 		/* Start the Alive Timer */
-		aliveTimerStarted = xTimerStart(aliveTimer, NO_DELAY); //don't wait for space in the timer command queue, if there is no space we throw an error
+		aliveTimerStarted = xTimerStart(aliveTimer, NO_TIMEOUT); //don't wait for space in the timer command queue, if there is no space we throw an error
 
 		/* Check if the Software Timers have successfully started */
 		if(aliveTimerStarted == pdPASS)
