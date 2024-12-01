@@ -1,2 +1,3 @@
 build/
 **/cmake-*/
+output/binary_analysis

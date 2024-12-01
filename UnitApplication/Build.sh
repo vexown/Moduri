@@ -59,6 +59,7 @@ echo "Copying output files..."
 cp -v ./SWC/moduri.elf     ../output
 cp -v ./SWC/moduri.elf.map ../output
 cp -v ./SWC/moduri.uf2     ../output
+cp -v ./SWC/moduri.bin     ../output
 
 echo "Done"
 
