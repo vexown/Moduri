@@ -138,7 +138,7 @@ extern unsigned long Monitor_getRuntimeCounter(void);
 #define configCHECK_FOR_STACK_OVERFLOW          0
 
 /* Set to 1 to enable a hook function that is called if malloc fails. */
-#define configUSE_MALLOC_FAILED_HOOK            0
+#define configUSE_MALLOC_FAILED_HOOK            1
 
 /* Set to 1 to enable a hook function that is called during the start-up of daemon tasks. */
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
