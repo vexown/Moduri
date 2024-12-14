@@ -50,4 +50,30 @@ void CriticalErrorHandler(uint8_t moduleId, uint8_t errorId)
     }
 }
 
+/* 
+ * Function: vAssertCalled 
+ * 
+ * Description: Custom function to be called with configASSERT macro to log errors in terminal.
+ * 
+ * Parameters:
+ *   - *pcFile - pointer to the source file in which the assert was triggered
+ *   - ulLine -  line number on which the assert was triggered in the mentioned source file
+ * 
+ * Returns: void
+ */
+void vAssertCalled( const char *pcFile, uint32_t ulLine )
+{
+    /* Inside this function, pcFile holds the name of the source file that
+    contains the line that detected the error, and ulLine holds the line
+    number in the source file. The pcFile and ulLine values can be printed
+    out, or otherwise recorded, before the following infinite loop is
+    entered. (TODO, for now just printing but consider other ways of sending/storing this error info) */
+    printf("Assertion failed in file: %s at line: %u\n", pcFile, ulLine);
+
+    /* Disable interrupts so the tick interrupt stops executing, then sit in a
+    loop so execution does not move past the line that failed the assertion. */
+    taskDISABLE_INTERRUPTS();
+    for( ;; );
+}
+
 

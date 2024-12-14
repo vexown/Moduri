@@ -212,9 +212,9 @@ extern unsigned long Monitor_getRuntimeCounter(void);
 /* Set to 1 to support time interoperability with the Pico SDK. */
 #define configSUPPORT_PICO_TIME_INTEROP         1
 
-/* Define to trap errors during development. */
-#include <assert.h>
-#define configASSERT(x)                         assert(x)
+/* Definition of the configASSERT macro which provides custom implementation of runtime assertions, similar to assert() in C */
+extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
+#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
 
 /* Set to 1 to include the API function, or 0 to exclude it. */
 
