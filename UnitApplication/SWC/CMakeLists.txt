@@ -35,6 +35,7 @@ target_link_libraries(moduri
                         pico_stdlib
                         pico_lwip_iperf
                         hardware_i2c
+                        hardware_adc
                         hardware_spi
                         FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
                         )

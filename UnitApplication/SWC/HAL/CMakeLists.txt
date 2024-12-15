@@ -7,6 +7,7 @@ set(HAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/I2C_HAL.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/SPI_HAL.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/SSD1306_HAL.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/ADC_HAL.c
     )
 
 # Define the path to the include directory for HAL

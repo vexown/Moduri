@@ -391,6 +391,33 @@ Discarded input sections
  .debug_frame   0x00000000       0xdc CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.o
  .ARM.attributes
                 0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.o
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .text.is_valid_channel
+                0x00000000        0xc CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .text.ADC_Init
+                0x00000000       0x34 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .text.ADC_Read
+                0x00000000       0x50 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .text.ADC_ReadVoltage
+                0x00000000       0x6c CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .text.ADC_ReadTemperature
+                0x00000000       0x8c CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_info    0x00000000      0x874 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_abbrev  0x00000000      0x1eb CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_loclists
+                0x00000000      0x395 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_aranges
+                0x00000000       0x40 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_rnglists
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_line    0x00000000      0x5c7 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_str     0x00000000      0x3af CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .debug_frame   0x00000000       0x88 CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
  .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
@@ -3903,6 +3930,25 @@ Discarded input sections
  .debug_frame   0x00000000      0x1f4 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.o
  .ARM.attributes
                 0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.o
+ .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .text.adc_init
+                0x00000000       0x34 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_info    0x00000000      0x41c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_abbrev  0x00000000      0x14b CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_loclists
+                0x00000000       0x98 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_aranges
+                0x00000000       0x20 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_rnglists
+                0x00000000       0x13 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_line    0x00000000      0x33c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_str     0x00000000      0x413 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .comment       0x00000000       0x27 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .debug_frame   0x00000000       0x20 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
+ .ARM.attributes
+                0x00000000       0x2c CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
  .text          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.o
  .data          0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.o
  .bss           0x00000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.o
@@ -8803,6 +8849,7 @@ LOAD CMakeFiles/moduri.dir/HAL/Source/GPIO_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/I2C_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/SPI_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.o
+LOAD CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2040/pico_platform/platform.c.o
@@ -8969,6 +9016,7 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_stdi
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/lib/lwip/src/apps/lwiperf/lwiperf.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_i2c/i2c.c.o
+LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_adc/adc.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/pico-sdk/src/rp2_common/hardware_spi/spi.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/MemMang/heap_4.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/Repos/FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/port.c.o
