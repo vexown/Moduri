@@ -263,7 +263,7 @@ static void networkTask(__unused void *taskParams)
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
 
-	if(connectToWifi() == false)
+	if(setupWifiAccessPoint() == false)
 	{
 		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WIFI_DID_NOT_CONNECT);
 	}
