@@ -25,4 +25,7 @@ bool connectToWifi(void);
 bool setupWifiAccessPoint(void);
 void WiFi_MainFunction(void);
 
+/* Define this if Pico shall work as TCP server, otherwise comment out this line */
+#define PICO_AS_TCP_SERVER
+
 #endif

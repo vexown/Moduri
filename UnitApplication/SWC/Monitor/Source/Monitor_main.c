@@ -22,6 +22,7 @@
 
 /* WiFi includes */
 #include "WiFi_TCP.h"
+#include "WiFi_Common.h"
 
 /* OS includes */
 #include "OS_manager.h"
@@ -130,6 +131,7 @@ void Monitor_MainFunction(void)
         
         LOG("\n");
     }
+#ifndef PICO_AS_TCP_SERVER //for now supported only as TCP client
     else /* Notification was received - send Monitor data over TCP */
     {
         char buffer[256];
@@ -193,6 +195,8 @@ void Monitor_MainFunction(void)
         snprintf(buffer, sizeof(buffer), "\n");
         tcp_client_send(buffer, strlen(buffer));
     }
+#endif
+
 }
 
 /* 

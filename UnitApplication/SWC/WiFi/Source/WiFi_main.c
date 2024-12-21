@@ -55,8 +55,11 @@ typedef enum {
 /*******************************************************************************/
 
 /* WiFi Communication Type */
-static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communication type is TCP */
-
+#ifndef PICO_AS_TCP_SERVER
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* select either TCP or UDP */
+#else
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* Force TCP communication type when setting up Pico as TCP server */
+#endif
 /* Current Communication State */
 static WiFiStateType WiFiState = INIT; 
 
@@ -167,6 +170,11 @@ static void WiFi_ListenState(void)
 {
     uint8_t received_command = PICO_DO_NOTHING;
 
+#ifdef PICO_AS_TCP_SERVER
+    tcp_server_process_recv_message(&received_command);
+    if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
+
+#else /* defaults to Pico as TCP client */
     if(TransportLayer == TCP_COMMUNICATION)
     {
         tcp_client_process_recv_message(&received_command);
@@ -181,6 +189,7 @@ static void WiFi_ListenState(void)
     {
         LOG("Communication Type not supported\n");
     }
+#endif
 }
 
 /* 
@@ -202,6 +211,16 @@ static void WiFi_ActiveState(void)
     uint8_t received_command = PICO_DO_NOTHING;
     const char *message = "Yo from Pico W!";
 
+#ifdef PICO_AS_TCP_SERVER
+        /************** RX **************/
+        /* Handle any received messages */
+        tcp_server_process_recv_message(&received_command);
+        //TODO - WiFi_ProcessCommand(received_command); 
+
+         /************** TX **************/
+        /* Send a message (for now just a test message) */
+        //TODO - tcp_server_send(message, strlen(message));
+#else /* defaults to Pico as TCP client */
     if(TransportLayer == TCP_COMMUNICATION)
     {
         /************** RX **************/
@@ -228,6 +247,7 @@ static void WiFi_ActiveState(void)
     {
         LOG("Communication Type not supported\n");
     }
+#endif
 }
 
 /* 
@@ -246,6 +266,9 @@ static void WiFi_MonitorState(void)
 {
     uint8_t received_command = PICO_DO_NOTHING;
 
+#ifdef PICO_AS_TCP_SERVER
+
+#else /* defaults to Pico as TCP client */
     if(TransportLayer == TCP_COMMUNICATION)
     {
         /************** RX **************/
@@ -265,6 +288,7 @@ static void WiFi_MonitorState(void)
     {
         LOG("Communication Type not supported\n");
     }
+#endif
 }
 
 /* 
