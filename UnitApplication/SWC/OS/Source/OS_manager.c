@@ -76,7 +76,7 @@
 	- pdTICKS_TO_MS(TimeInTicks):  (TimeInTicks * 1000 ) / (configTICK_RATE_HZ)
 */
 /* Task periods */
-#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(5000)  //5s
+#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(500)  //0.5s
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Timer periods */

@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
+/* HAL includes */
+#include "ADC_HAL.h"
+
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
@@ -62,5 +65,10 @@ int main(void)
 static void setupHardware(void)
 {
     stdio_init_all();
+
+    /* Initialize all 3 ADC0-2 channels */
+    ADC_Init(0);
+    ADC_Init(1);
+    ADC_Init(2);
 }
 

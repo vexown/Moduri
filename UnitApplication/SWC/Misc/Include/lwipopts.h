@@ -149,7 +149,7 @@
 /* Disable ACD (Address Conflict Detection) checks for DHCP (0). */
 #define LWIP_DHCP_DOES_ACD_CHECK    0
 
-#ifndef NDEBUG
+#ifdef DEBUG_BUILD
 /* Enable debugging and statistics when not in release mode. */
 #define LWIP_DEBUG                  1
 #define LWIP_STATS                  1

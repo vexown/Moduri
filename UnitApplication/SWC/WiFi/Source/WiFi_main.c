@@ -9,6 +9,7 @@
 
 /* Standard includes. */
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -28,9 +29,14 @@
 /* Misc includes */
 #include "Common.h"
 
+/* HAL includes */
+#include "ADC_HAL.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
+
+#define VOLTAGE_BUFFER_SIZE 32  // Buffer size for the voltage string
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
@@ -47,7 +53,8 @@ typedef enum {
     INIT = 0,
     LISTEN = 1,
     ACTIVE_SEND_AND_RECEIVE = 2,
-    MONITOR = 3
+    MONITOR = 3,
+    MEASURE = 4
 } WiFiStateType;
 
 /*******************************************************************************/
@@ -68,6 +75,7 @@ static void WiFi_ListenState(void);
 static void WiFi_ActiveState(void);
 static void WiFi_MonitorState(void);
 static void WiFi_InitCommunication(void);
+static void WiFi_MeasureVoltage_State(void);
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -98,6 +106,9 @@ void WiFi_MainFunction(void)
             break;
         case MONITOR:
             WiFi_MonitorState();
+            break;
+        case MEASURE:
+            WiFi_MeasureVoltage_State();
             break;
         default: /* INIT */
             WiFi_InitCommunication();
@@ -142,6 +153,10 @@ static void WiFi_ProcessCommand(uint8_t command)
         case PICO_TRANSITION_TO_MONITOR_MODE:
             LOG("Transitioning to Monitor Mode...\n");
             WiFiState = MONITOR;
+            break;
+        case PICO_TRANSITION_TO_MEASURE_MODE:
+            LOG("Transitioning to Measure Mode...\n");
+            WiFiState = MEASURE;
             break;
         default:
             LOG("Command not supported \n");
@@ -209,7 +224,7 @@ static void WiFi_ActiveState(void)
         tcp_client_process_recv_message(&received_command);
         WiFi_ProcessCommand(received_command); 
 
-         /************** TX **************/
+        /************** TX **************/
         /* Send a message (for now just a test message) */
         tcp_client_send(message, strlen(message));
     }
@@ -308,7 +323,91 @@ static void WiFi_InitCommunication(void)
     }
 }
 
+/* 
+ * Function: WiFi_MeasureVoltage_State
+ * 
+ * Description: State in which the Pico W measures the voltage on the ADC channels and sends the data to the Central App.
+ *              This function was created for the purpose of the 2024 Christmas Gift Box project, and is not for general use.
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ *
+ */
+static void WiFi_MeasureVoltage_State(void)
+{
+    uint8_t received_command = PICO_DO_NOTHING;
 
+    if(TransportLayer == TCP_COMMUNICATION)
+    {
+        /************** RX **************/
+        /* Handle any received messages */
+        tcp_client_process_recv_message(&received_command);
+        WiFi_ProcessCommand(received_command); 
+
+        /************** TX **************/
+        /* Variables related to voltage */
+        float voltage = 0.0;
+        char voltage_message[VOLTAGE_BUFFER_SIZE * 3] = {0}; // 3 channels
+
+        /* Variables related to sensor and box lid status */
+        bool all_below_threshold = true;
+
+        /* Variables related to timing of the sensor detection*/
+        static uint32_t holdCount = 0; // Num of cycles with voltage below threshold. 1 cycle = 0.5s (hold for 5s)
+
+        /* Read ADC Channels 0-3 */
+        for (int channel = 0; channel < 3; channel++) 
+        {
+            (void)ADC_ReadVoltage(channel, &voltage);
+#ifdef DEBUG_BUILD
+            char single_voltage_message[VOLTAGE_BUFFER_SIZE];
+            snprintf(single_voltage_message, VOLTAGE_BUFFER_SIZE, "Ch%d: %.4f V ", channel, voltage);
+            strncat(voltage_message, single_voltage_message, VOLTAGE_BUFFER_SIZE);
+#endif
+            if (voltage >= 1.1) 
+            {
+                all_below_threshold = false;
+                holdCount = 0;
+            }
+        }
+
+#ifdef DEBUG_BUILD
+        tcp_client_send(voltage_message, strlen(voltage_message));
+#endif
+        /* Check if all sensors are below the threshold */
+        if (all_below_threshold)
+        {
+            if(holdCount < 10)
+            {
+                holdCount++;
+            }
+            else
+            {   /* Send "open" message if all sensors are held below the threshold for at least 5s (10cycles at 0.5s) */
+                const char *open_message = "open";
+                tcp_client_send(open_message, strlen(open_message));
+
+                /* Reset the hold count */
+                holdCount = 0;
+            }
+        }
+        else
+        {  /* Send "closed" message if at least one sensor is above the threshold */
+            const char *closed_message = "closed";
+            tcp_client_send(closed_message, strlen(closed_message));
+            holdCount = 0;
+        }
+    }
+    else if(TransportLayer == UDP_COMMUNICATION)
+    {
+        /* Voltage measurements supported only over TCP for now */
+    }
+    else
+    {
+        LOG("Communication Type not supported\n");
+    }
+}
 
 
 

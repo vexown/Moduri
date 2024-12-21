@@ -19,6 +19,7 @@
 #define PICO_TRANSITION_TO_ACTIVE_MODE  1
 #define PICO_TRANSITION_TO_LISTEN_MODE  2
 #define PICO_TRANSITION_TO_MONITOR_MODE 3
+#define PICO_TRANSITION_TO_MEASURE_MODE 4
 
 /* Non-specific functions */
 bool connectToWifi(void);
