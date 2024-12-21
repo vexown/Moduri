@@ -212,14 +212,14 @@ static void WiFi_ActiveState(void)
     const char *message = "Yo from Pico W!";
 
 #ifdef PICO_AS_TCP_SERVER
-        /************** RX **************/
-        /* Handle any received messages */
-        tcp_server_process_recv_message(&received_command);
-        //TODO - WiFi_ProcessCommand(received_command); 
+    /************** RX **************/
+    /* Handle any received messages */
+    tcp_server_process_recv_message(&received_command);
+    WiFi_ProcessCommand(received_command); 
 
-         /************** TX **************/
-        /* Send a message (for now just a test message) */
-        //TODO - tcp_server_send(message, strlen(message));
+    /************** TX **************/
+    /* Send a message (for now just a test message) */
+    (void)tcp_server_send(message, strlen(message));
 #else /* defaults to Pico as TCP client */
     if(TransportLayer == TCP_COMMUNICATION)
     {
@@ -267,7 +267,14 @@ static void WiFi_MonitorState(void)
     uint8_t received_command = PICO_DO_NOTHING;
 
 #ifdef PICO_AS_TCP_SERVER
+    /************** RX **************/
+    /* Handle any received messages */
+    tcp_server_process_recv_message(&received_command);
+    WiFi_ProcessCommand(received_command); 
 
+    /************** TX **************/
+    /* Signal Monitor Task to send data */
+    //TODO (currently only supported with TCP client): xTaskNotifyGive(monitorTaskHandle);
 #else /* defaults to Pico as TCP client */
     if(TransportLayer == TCP_COMMUNICATION)
     {

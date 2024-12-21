@@ -194,6 +194,49 @@ void tcp_server_process_recv_message(uint8_t *received_command)
     }
 }
 
+/**
+ * Function: tcp_server_send
+ * 
+ * Description: Sends a message to the connected TCP client.
+ * 
+ * Parameters:
+ *  - pcb: Pointer to the tcp_pcb structure representing the client connection.
+ *  - message: Pointer to the message to be sent.
+ *  - length: Length of the message to be sent.
+ * 
+ * Returns: err_t indicating the result of the send operation.
+ */
+err_t tcp_server_send(const char *message, uint16_t length)
+{
+    err_t err;
+
+    struct tcp_pcb *pcb = tcpServerGlobal->client_pcb;
+
+    /* Check if pcb is not NULL */
+    if (pcb == NULL)
+    {
+        LOG("No client connected\n");
+        return ERR_CONN;
+    }
+
+    /* Send the message */
+    err = tcp_write(pcb, message, length, TCP_WRITE_FLAG_COPY);
+    if (err != ERR_OK) 
+    {
+        LOG("Failed to send message: %d\n", err);
+        return err;
+    }
+
+    /* Ensure the data is sent immediately */
+    err = tcp_output(pcb);
+    if (err != ERR_OK) 
+    {
+        LOG("Failed to output message: %d\n", err);
+    }
+
+    return err;
+}
+
 #else
 /* 
  * Function: start_TCP_client
