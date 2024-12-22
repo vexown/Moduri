@@ -28,6 +28,9 @@
 /* Misc includes */
 #include "Common.h"
 
+/* HAL includes */
+#include "GPIO_HAL.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
@@ -47,7 +50,9 @@ typedef enum {
     INIT = 0,
     LISTEN = 1,
     ACTIVE_SEND_AND_RECEIVE = 2,
-    MONITOR = 3
+    MONITOR = 3,
+    LID_OPEN = 4,
+    LID_CLOSED = 5,
 } WiFiStateType;
 
 /*******************************************************************************/
@@ -71,6 +76,8 @@ static void WiFi_ListenState(void);
 static void WiFi_ActiveState(void);
 static void WiFi_MonitorState(void);
 static void WiFi_InitCommunication(void);
+static void Wifi_LidOpen_State(void);
+static void Wifi_LidClosed_State(void);
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -101,6 +108,12 @@ void WiFi_MainFunction(void)
             break;
         case MONITOR:
             WiFi_MonitorState();
+            break;
+        case LID_OPEN:
+            Wifi_LidOpen_State();
+            break;
+        case LID_CLOSED:
+            Wifi_LidClosed_State();
             break;
         default: /* INIT */
             WiFi_InitCommunication();
@@ -145,6 +158,14 @@ static void WiFi_ProcessCommand(uint8_t command)
         case PICO_TRANSITION_TO_MONITOR_MODE:
             LOG("Transitioning to Monitor Mode...\n");
             WiFiState = MONITOR;
+            break;
+        case PICO_TRANSITION_TO_LID_OPEN_MODE:
+            LOG("Transitioning to Lid Open Mode...\n");
+            WiFiState = LID_OPEN;
+            break;
+        case PICO_TRANSITION_TO_LID_CLOSED_MODE:
+            LOG("Transitioning to Lid Closed Mode...\n");
+            WiFiState = LID_CLOSED;
             break;
         default:
             LOG("Command not supported \n");
@@ -339,7 +360,71 @@ static void WiFi_InitCommunication(void)
     }
 }
 
+/* 
+ * Function: Wifi_LidOpen_State
+ * 
+ * Description: State in which the Pico W controls the motor that opens the box lid.
+ * 
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ *
+ */
+static void Wifi_LidOpen_State(void)
+{
+    uint8_t received_command = PICO_DO_NOTHING;
+
+#ifdef PICO_AS_TCP_SERVER
+    /************** RX **************/
+    /* Open the Box Lid */
 
 
+    /* Handle any received messages */
+    tcp_server_process_recv_message(&received_command);
+    WiFi_ProcessCommand(received_command); 
 
+    /************** TX **************/
+    //nothing to send for now
+    
+#else /* defaults to Pico as TCP client */
+    /* This state only supported with Pico as TCP server */
+    WiFiState = LISTEN; // leave this state so to not get stuck
+#endif
+}
+
+/* 
+ * Function: Wifi_LidClosed_State
+ * 
+ * Description: State in which the Pico W controls the motor that closes the box lid.
+ * 
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ *
+ */
+static void Wifi_LidClosed_State(void)
+{
+    uint8_t received_command = PICO_DO_NOTHING;
+
+#ifdef PICO_AS_TCP_SERVER
+    /************** RX **************/
+    /* Close the Box Lid */
+
+
+    /* Handle any received messages */
+    tcp_server_process_recv_message(&received_command);
+    WiFi_ProcessCommand(received_command); 
+
+    /************** TX **************/
+    //nothing to send for now
+    
+#else /* defaults to Pico as TCP client */
+    /* This state only supported with Pico as TCP server */
+    WiFiState = LISTEN; // leave this state so to not get stuck
+#endif
+}
 

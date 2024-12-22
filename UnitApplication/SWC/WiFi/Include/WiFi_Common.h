@@ -14,11 +14,20 @@
 #define UDP_CLIENT_PORT             5001
 #define UDP_RECV_BUFFER_SIZE        1024
 
+#define GPIO_LED            6
+#define GPIO_END_SWTICH     28
+#define GPIO_MOTOR_UP       21
+#define GPIO_MOTOR_DOWN     22
+#define CLOSING_TIME        50
+#define OPENING_TIME        1500      
+
 /* Commands from PC to Pico */
-#define PICO_DO_NOTHING                 0
-#define PICO_TRANSITION_TO_ACTIVE_MODE  1
-#define PICO_TRANSITION_TO_LISTEN_MODE  2
-#define PICO_TRANSITION_TO_MONITOR_MODE 3
+#define PICO_DO_NOTHING                     0
+#define PICO_TRANSITION_TO_ACTIVE_MODE      1
+#define PICO_TRANSITION_TO_LISTEN_MODE      2
+#define PICO_TRANSITION_TO_MONITOR_MODE     3
+#define PICO_TRANSITION_TO_LID_OPEN_MODE    4
+#define PICO_TRANSITION_TO_LID_CLOSED_MODE  5
 
 /* Non-specific functions */
 bool connectToWifi(void);
