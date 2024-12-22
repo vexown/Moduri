@@ -15,7 +15,7 @@
 #define UDP_RECV_BUFFER_SIZE        1024
 
 #define GPIO_LED            6
-#define GPIO_END_SWTICH     28
+#define GPIO_END_SWITCH     28
 #define GPIO_MOTOR_UP       21
 #define GPIO_MOTOR_DOWN     22
 #define CLOSING_TIME        50

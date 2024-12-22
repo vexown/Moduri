@@ -12,10 +12,14 @@
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 /* SDK includes */
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
+#include "hardware/irq.h"
+#include "hardware/gpio.h"
 
 /* WiFi includes */
 #include "WiFi_UDP.h"
@@ -120,6 +124,33 @@ void WiFi_MainFunction(void)
             break;
     }
 }
+
+/* 
+ * Function: end_switch_irq_handler
+ * 
+ * Description: Interrupt handler for the end switch GPIO pin.
+ * 
+ * Parameters:
+ *   - gpio: GPIO pin number
+ *   - events: Event type
+ * 
+ * Returns: void
+ */
+void end_switch_irq_handler(uint gpio, uint32_t events)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    if (gpio == GPIO_END_SWITCH)
+    {
+        GPIO_Toggle(GPIO_LED);
+        // Notify the task
+        vTaskNotifyGiveFromISR(networkTaskHandle, &xHigherPriorityTaskWoken);
+    }
+
+    // Force a context switch if needed
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 
 /*******************************************************************************/
 /*                          STATIC FUNCTION DEFINITIONS                        */
@@ -231,11 +262,42 @@ static void WiFi_ActiveState(void)
 {
     uint8_t received_command = PICO_DO_NOTHING;
     const char *message = "Yo from Pico W!";
+    const char *message_not_allowed = "Transition not allowed";
 
 #ifdef PICO_AS_TCP_SERVER
     /************** RX **************/
     /* Handle any received messages */
     tcp_server_process_recv_message(&received_command);
+
+    if(received_command == PICO_TRANSITION_TO_LID_OPEN_MODE)
+    {
+        // Lock the mutex
+        if (xSemaphoreTake(lidMutex, portMAX_DELAY) == pdTRUE)
+        {
+            if(lid_open_global == true)
+            {
+                received_command = PICO_DO_NOTHING; //transition not allowed, lid is already open
+                (void)tcp_server_send(message_not_allowed, strlen(message_not_allowed));
+            }
+            // Unlock the mutex
+            xSemaphoreGive(lidMutex);
+        }
+    }
+    else if(received_command == PICO_TRANSITION_TO_LID_CLOSED_MODE)
+    {
+        // Lock the mutex
+        if (xSemaphoreTake(lidMutex, portMAX_DELAY) == pdTRUE)
+        {
+            if(lid_open_global == false)
+            {
+                received_command = PICO_DO_NOTHING; //transition not allowed, lid is already closed
+                (void)tcp_server_send(message_not_allowed, strlen(message_not_allowed));
+            }
+            // Unlock the mutex
+            xSemaphoreGive(lidMutex);
+        }
+    }
+
     WiFi_ProcessCommand(received_command); 
 
     /************** TX **************/
@@ -378,11 +440,44 @@ static void Wifi_LidOpen_State(void)
 
 #ifdef PICO_AS_TCP_SERVER
     /************** RX **************/
+    xTimerReset(aliveTimer, portMAX_DELAY); // Reset the Alive Timer (which is acting as a watchdog for the lid)
+
+    // Clear any previously pending notifications
+    xTaskNotifyStateClear(NULL);
+    ulTaskNotifyValueClear(NULL, 0xFFFFFFFF);
+
     /* Open the Box Lid */
+    GPIO_Set(GPIO_MOTOR_UP);
 
+    /* Wait to receive a notification sent directly to this task from the
+    interrupt service routine. */
+    uint32_t ulEventsToProcess = ulTaskNotifyTake( pdTRUE, portMAX_DELAY);
 
-    /* Handle any received messages */
-    tcp_server_process_recv_message(&received_command);
+    if( ulEventsToProcess != 0 )
+    {
+        /* To get here at least one event must have occurred. Clear it to indicate it has been processed */
+        ulEventsToProcess = 0;
+
+        vTaskDelay(pdMS_TO_TICKS(OPENING_TIME)); // Open the lid fully
+        GPIO_Clear(GPIO_MOTOR_UP);
+    }
+    else
+    {
+        LOG("Notification not received\n");
+        GPIO_Clear(GPIO_MOTOR_UP);
+        GPIO_Toggle(GPIO_LED); // Turn on the LED to indicate an error
+    }
+
+    // Lock the mutex
+    if (xSemaphoreTake(lidMutex, portMAX_DELAY) == pdTRUE)
+    {
+        lid_open_global = true;
+
+        // Unlock the mutex
+        xSemaphoreGive(lidMutex);
+    }
+
+    received_command = PICO_TRANSITION_TO_ACTIVE_MODE; //once the lid is open, transition back to active mode
     WiFi_ProcessCommand(received_command); 
 
     /************** TX **************/
@@ -412,11 +507,43 @@ static void Wifi_LidClosed_State(void)
 
 #ifdef PICO_AS_TCP_SERVER
     /************** RX **************/
+    xTimerReset(aliveTimer, portMAX_DELAY); // Reset the Alive Timer (which is acting as a watchdog for the lid)
+
+    // Clear any previously pending notifications
+    xTaskNotifyStateClear(NULL);
+    ulTaskNotifyValueClear(NULL, 0xFFFFFFFF);
+
     /* Close the Box Lid */
+    GPIO_Set(GPIO_MOTOR_DOWN);
 
+    /* Wait to receive a notification sent directly to this task from the
+    interrupt service routine. */
+    uint32_t ulEventsToProcess = ulTaskNotifyTake( pdTRUE, portMAX_DELAY);
 
-    /* Handle any received messages */
-    tcp_server_process_recv_message(&received_command);
+    if( ulEventsToProcess != 0 )
+    {
+        /* To get here at least one event must have occurred. Clear it to indicate it has been processed */
+        ulEventsToProcess = 0;
+        vTaskDelay(pdMS_TO_TICKS(CLOSING_TIME)); // Wait for the lid to fully close (experimentally determined)
+        GPIO_Clear(GPIO_MOTOR_DOWN);
+    }
+    else
+    {
+        LOG("Notification not received\n");
+        GPIO_Clear(GPIO_MOTOR_DOWN);
+        GPIO_Toggle(GPIO_LED); // Turn on the LED to indicate an error
+    }
+
+    // Lock the mutex
+    if (xSemaphoreTake(lidMutex, portMAX_DELAY) == pdTRUE)
+    {
+        lid_open_global = false;
+        
+        // Unlock the mutex
+        xSemaphoreGive(lidMutex);
+    }
+
+    received_command = PICO_TRANSITION_TO_ACTIVE_MODE; //once the lid is closed, transition back to active mode
     WiFi_ProcessCommand(received_command); 
 
     /************** TX **************/

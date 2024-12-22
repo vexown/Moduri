@@ -3,6 +3,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
+#include "timers.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -16,5 +18,9 @@
 /*                             GLOBAL VARIABLES                                */
 /*******************************************************************************/
 extern TaskHandle_t monitorTaskHandle;
+extern TaskHandle_t networkTaskHandle;
+extern SemaphoreHandle_t lidMutex;
+extern TimerHandle_t aliveTimer;
+extern bool lid_open_global;
 
 #endif

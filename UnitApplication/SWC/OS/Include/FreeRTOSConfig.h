@@ -169,6 +169,9 @@ extern unsigned long Monitor_getRuntimeCounter(void);
 /* Set to 1 to enable software timers. */
 #define configUSE_TIMERS                        1
 
+/* Set to 1 to enable Task Notifications */
+#define configUSE_TASK_NOTIFICATIONS            1
+
 /* Priority of the timer task. This should be lower than the highest priority task. */
 #define configTIMER_TASK_PRIORITY               ( configMAX_PRIORITIES - 1 )
 

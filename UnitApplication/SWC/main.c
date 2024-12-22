@@ -11,12 +11,19 @@
 /* Library includes. */
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/irq.h"
+#include "hardware/gpio.h"
 
 /* HAL includes */
 #include "GPIO_HAL.h"
 
 /* Common includes */
 #include "WiFi_Common.h"
+
+/*******************************************************************************/
+/*                             GLOBAL VARIABLES                                */
+/*******************************************************************************/
+bool lid_open_global = false;
 
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DECLARATIONS                         */
@@ -38,6 +45,9 @@ static void close_lid(void);
 
 /* Function to flash the LED */
 static void flash_led(int times, int delay_ms);
+
+/* Interrupt handler for GPIO28 */
+extern void end_switch_irq_handler(uint gpio, uint32_t events);
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -80,18 +90,18 @@ static void setupHardware(void)
     stdio_init_all();
 
     // Initialize end switch pin as input with pull-up
-    GPIO_Init(GPIO_END_SWTICH, GPIO_INPUT, GPIO_PULL_UP);
+    GPIO_Init(GPIO_END_SWITCH, GPIO_INPUT, GPIO_PULL_UP);
     GPIO_Init(GPIO_LED, GPIO_OUTPUT, GPIO_PULL_DOWN);
     GPIO_Init(GPIO_MOTOR_UP, GPIO_OUTPUT, GPIO_PULL_DOWN);
     GPIO_Init(GPIO_MOTOR_DOWN, GPIO_OUTPUT, GPIO_PULL_DOWN);
 
-    //Set initial states of the pins
+    // Set initial states of the pins
     GPIO_Clear(GPIO_LED);
     GPIO_Clear(GPIO_MOTOR_UP);
     GPIO_Clear(GPIO_MOTOR_DOWN);
 
     GPIO_State button_state;
-    GPIO_Read(GPIO_END_SWTICH, &button_state);
+    GPIO_Read(GPIO_END_SWITCH, &button_state);
 
     /* During startup, let's check if the lid is closed or open and test the mechanism
        This way we know the opening and closing works and we end up in a known starting state */
@@ -109,6 +119,10 @@ static void setupHardware(void)
         close_lid();
     }
 
+    lid_open_global = false; // we establish a known state at the beginning, the lid is closed.
+
+    // Set up interrupt for GPIO28 (End Switch) on both falling edge (lid closed) and rising edge (lid open)
+    gpio_set_irq_enabled_with_callback(GPIO_END_SWITCH, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &end_switch_irq_handler);
 }
 
 /* 
@@ -124,12 +138,12 @@ static void setupHardware(void)
 static void open_lid(void)
 {
     GPIO_State button_state;
-    GPIO_Read(GPIO_END_SWTICH, &button_state);
+    GPIO_Read(GPIO_END_SWITCH, &button_state);
 
     GPIO_Set(GPIO_MOTOR_UP);
     while(button_state == GPIO_LOW) // Move the lid up until the end switch is released
     {
-        GPIO_Read(GPIO_END_SWTICH, &button_state);
+        GPIO_Read(GPIO_END_SWITCH, &button_state);
     }
     sleep_ms(OPENING_TIME); // Open the lid fully
     GPIO_Clear(GPIO_MOTOR_UP);
@@ -148,12 +162,12 @@ static void open_lid(void)
 static void close_lid(void)
 {
     GPIO_State button_state;
-    GPIO_Read(GPIO_END_SWTICH, &button_state);
+    GPIO_Read(GPIO_END_SWITCH, &button_state);
 
     GPIO_Set(GPIO_MOTOR_DOWN);
     while(button_state == GPIO_HIGH) // Move the lid down until the end switch is pressed
     {
-        GPIO_Read(GPIO_END_SWTICH, &button_state);
+        GPIO_Read(GPIO_END_SWITCH, &button_state);
     }
     sleep_ms(CLOSING_TIME); // Wait for the lid to fully close (experimentally determined)
     GPIO_Clear(GPIO_MOTOR_DOWN);

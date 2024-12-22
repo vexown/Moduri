@@ -27,7 +27,7 @@ message("########## TOP CMakeLists.txt - start ##########")
 # Specify build type
 #     debug build   - use DEBUG_BUILD
 #     release build - use RELEASE_BUILD
-add_compile_definitions(DEBUG_BUILD)
+add_compile_definitions(RELEASE_BUILD)
 
 # Specify parameters for pico-sdk
 set(PICO_BOARD pico_w)

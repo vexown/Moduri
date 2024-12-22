@@ -63,6 +63,9 @@
 /* Misc includes */
 #include "Common.h"
 
+/* HAL Includes */
+#include "GPIO_HAL.h"
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
@@ -76,11 +79,11 @@
 	- pdTICKS_TO_MS(TimeInTicks):  (TimeInTicks * 1000 ) / (configTICK_RATE_HZ)
 */
 /* Task periods */
-#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(5000)  //5s
+#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(500)  //500ms
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Timer periods */
-#define ALIVE_TIMER_PERIOD                  pdMS_TO_TICKS(500) //500ms
+#define ALIVE_TIMER_PERIOD                  pdMS_TO_TICKS(2000)  //2s
 
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) 
@@ -115,6 +118,10 @@ static void aliveTimerCallback(TimerHandle_t xTimer);
 /*                             GLOBAL VARIABLES                                */
 /*******************************************************************************/
 TaskHandle_t monitorTaskHandle = NULL;
+TaskHandle_t networkTaskHandle = NULL;
+
+SemaphoreHandle_t lidMutex;
+TimerHandle_t aliveTimer;
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -133,7 +140,6 @@ void OS_start( void )
 {
 	const char *rtos_type;
 	BaseType_t taskCreationStatus[NUM_OF_TASKS_TO_CREATE];
-	TimerHandle_t aliveTimer;
 	BaseType_t aliveTimerStarted;
 
     /** Check if we're running FreeRTOS on single core or both RP2040 cores:
@@ -148,6 +154,9 @@ void OS_start( void )
 #endif
 
 	LOG("Setting up the RTOS configuration... \n");
+
+	/* Create the Mutex for the Lid */
+	lidMutex = xSemaphoreCreateMutex();
 
 	/* Create the Software Timers. These use System Tick as time base. They are handled in a dedicated Timer Service task (aka Daemon Task) */
 	/* "Alive" Timer which is used to toggle the on-board LED to show the system is not stuck (is alive) */
@@ -166,7 +175,7 @@ void OS_start( void )
 											STACK_2048_BYTES,		 	/* The size of the stack to allocate to the task (in words) */
 											NULL, 						/* The parameter passed to the task - not used in this case. */
 											NETWORK_TASK_PRIORITY, 		/* The priority assigned to the task. */
-											NULL );						/* The task handle, if not needed put NULL */
+											&networkTaskHandle );		/* The task handle, if not needed put NULL */
 		taskCreationStatus[1] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY , &monitorTaskHandle);
 
 		/* Check if the tasks were created successfully */
@@ -302,6 +311,18 @@ static void aliveTimerCallback(TimerHandle_t xTimer)
 	/* Toggle the LED State */
 	state_LED = !state_LED;
 	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, state_LED); //Set a GPIO pin on the wireless chip to a given value (LED pin in this case) 
+
+	/* "Watchdog" behavior for the box lid */
+	GPIO_State monitorUpState, monitorDownState;
+	GPIO_Read(GPIO_MOTOR_UP, &monitorUpState);
+	GPIO_Read(GPIO_MOTOR_DOWN, &monitorDownState);
+
+	if(monitorUpState == GPIO_HIGH || monitorDownState == GPIO_HIGH)
+	{
+		/* If the motor is still running, stop it */
+		GPIO_Clear(GPIO_MOTOR_UP);
+		GPIO_Clear(GPIO_MOTOR_DOWN);
+	}
 }
 
 

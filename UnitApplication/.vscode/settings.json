@@ -27,6 +27,7 @@
         "wifi_common.h": "c",
         "wifi_transmit.h": "c",
         "wifi_tcp.h": "c",
-        "wifi_credentials.h": "c"
+        "wifi_credentials.h": "c",
+        "os_manager.h": "c"
     }
 }
