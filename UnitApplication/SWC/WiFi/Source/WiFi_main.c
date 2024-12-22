@@ -142,7 +142,6 @@ void end_switch_irq_handler(uint gpio, uint32_t events)
 
     if (gpio == GPIO_END_SWITCH)
     {
-        GPIO_Toggle(GPIO_LED);
         // Notify the task
         vTaskNotifyGiveFromISR(networkTaskHandle, &xHigherPriorityTaskWoken);
     }
@@ -459,6 +458,7 @@ static void Wifi_LidOpen_State(void)
         ulEventsToProcess = 0;
 
         vTaskDelay(pdMS_TO_TICKS(OPENING_TIME)); // Open the lid fully
+        GPIO_Set(GPIO_LED); // Turn on the LED when lid is open
         GPIO_Clear(GPIO_MOTOR_UP);
     }
     else
@@ -525,6 +525,7 @@ static void Wifi_LidClosed_State(void)
         /* To get here at least one event must have occurred. Clear it to indicate it has been processed */
         ulEventsToProcess = 0;
         vTaskDelay(pdMS_TO_TICKS(CLOSING_TIME)); // Wait for the lid to fully close (experimentally determined)
+        GPIO_Clear(GPIO_LED); // Turn off the LED when lid is closed
         GPIO_Clear(GPIO_MOTOR_DOWN);
     }
     else

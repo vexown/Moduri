@@ -105,7 +105,8 @@ bool connectToWifi(void)
 bool setupWifiAccessPoint(void)
 {
     bool status = false;
-    const char* ssid_local="MainBox";
+    const char* ssid_local = "MainBox";
+    const char* pass_local = "kekkekkek"; //THIS IS NOT A SECRET, ONLY FOR TESTING 
 
     /* Initializes the cyw43_driver code and initializes the lwIP stack */
     if (cyw43_arch_init()) 
@@ -118,8 +119,8 @@ bool setupWifiAccessPoint(void)
         status = true;
     }
 
-    /* Enables Wi-Fi in Access Point (AP) mode without a password */
-    cyw43_arch_enable_ap_mode(ssid_local, "", CYW43_AUTH_OPEN);
+    /* Enables Wi-Fi in Access Point (AP) mode with WPA2 security */
+    cyw43_arch_enable_ap_mode(ssid_local, pass_local, CYW43_AUTH_WPA2_AES_PSK);
     
     configStaticIP();
 
