@@ -672,8 +672,7 @@ bool send_http_get_request(const char *host, const char *path) {
     char http_request[256];
     int len = snprintf(http_request, sizeof(http_request),
         "GET %s HTTP/1.1\r\n"
-        "Host: %s\r\n"
-        "Connection: close\r\n\r\n",
+        "Host: %s\r\n\r\n",
         path, host);
 
     if (len < 0 || len >= sizeof(http_request)) {

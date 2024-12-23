@@ -226,23 +226,13 @@ static void WiFi_ActiveState(void)
         /************** RX **************/
         /* Handle any received messages */
         tcp_client_process_recv_message(&received_command);
+
+        /* Force the Pico to transition to Measure Mode */
+        received_command = PICO_TRANSITION_TO_MEASURE_MODE;
+
         WiFi_ProcessCommand(received_command); 
 
         /************** TX **************/
-        /* Send a message (for now just a test message) */
-        const char *server_host = PICO_W_AP_TCP_SERVER_ADDRESS;
-        const char *path = "/ledtest?led=0";
-
-        static bool ledOn = false;
-
-        if(!ledOn)
-        {
-            // Send HTTP GET request
-            if(send_http_get_request(server_host, path))
-            {
-                ledOn = true;
-            }
-        }
 
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -364,6 +354,11 @@ static void WiFi_MeasureVoltage_State(void)
         WiFi_ProcessCommand(received_command); 
 
         /************** TX **************/
+        /* Variables related to the HTTP GET request */
+        const char *server_host = PICO_W_AP_TCP_SERVER_ADDRESS;
+        const char *pathON = "/ledtest?led=1";
+        const char *pathOFF = "/ledtest?led=0";
+
         /* Variables related to voltage */
         float voltage = 0.0;
         char voltage_message[VOLTAGE_BUFFER_SIZE * 3] = {0}; // 3 channels
@@ -402,8 +397,8 @@ static void WiFi_MeasureVoltage_State(void)
             }
             else
             {   /* Send "open" message if all sensors are held below the threshold for at least 5s (10cycles at 0.5s) */
-                const char *open_message = "open";
-                tcp_client_send(open_message, strlen(open_message));
+                /* Send HTTP GET request to open the box */
+                send_http_get_request(server_host, pathON);
 
                 /* Reset the hold count */
                 holdCount = 0;
@@ -411,8 +406,8 @@ static void WiFi_MeasureVoltage_State(void)
         }
         else
         {  /* Send "closed" message if at least one sensor is above the threshold */
-            const char *closed_message = "closed";
-            tcp_client_send(closed_message, strlen(closed_message));
+            /* Send HTTP GET request to close the box */
+            send_http_get_request(server_host, pathOFF);
             holdCount = 0;
         }
     }
