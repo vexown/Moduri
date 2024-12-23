@@ -2897,9 +2897,9 @@ Discarded input sections
                 0x0000000000000000        0x8 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
  .rodata.__bi_87.1
                 0x0000000000000000        0xc CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
- .text          0x0000000000000000        0x0 /tmp/ccGrJjaa.o
- .data          0x0000000000000000        0x0 /tmp/ccGrJjaa.o
- .bss           0x0000000000000000        0x0 /tmp/ccGrJjaa.o
+ .text          0x0000000000000000        0x0 /tmp/ccEA3jNW.o
+ .data          0x0000000000000000        0x0 /tmp/ccEA3jNW.o
+ .bss           0x0000000000000000        0x0 /tmp/ccEA3jNW.o
  .data          0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x0000000000000000       0x10 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-atexit.o)
@@ -3342,7 +3342,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
 .boot2          0x0000000010000000      0x100
                 0x0000000010000000                __boot2_start__ = .
  *(.boot2)
- .boot2         0x0000000010000000      0x100 /tmp/ccGrJjaa.o
+ .boot2         0x0000000010000000      0x100 /tmp/ccEA3jNW.o
                 0x0000000010000100                __boot2_end__ = .
                 0x0000000000000001                ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -3452,8 +3452,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
  .text.open_lid
                 0x00000000100009ac       0x40 CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
  .text.close_lid
-                0x00000000100009ec       0x3a CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
- *fill*         0x0000000010000a26        0x2 
+                0x00000000100009ec       0x3c CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
  .text.setupHardware
                 0x0000000010000a28       0x8c CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
  .text.main     0x0000000010000ab4      0x128 CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
@@ -6964,7 +6963,7 @@ LOAD CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/sr
 LOAD CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.obj
 LOAD CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj
 LOAD CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
-LOAD /tmp/ccGrJjaa.o
+LOAD /tmp/ccEA3jNW.o
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -7145,7 +7144,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x0000000000000d38       0x2c CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
  .ARM.attributes
-                0x0000000000000d64       0x22 /tmp/ccGrJjaa.o
+                0x0000000000000d64       0x22 /tmp/ccEA3jNW.o
  .ARM.attributes
                 0x0000000000000d86       0x1e /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes
@@ -7374,135 +7373,135 @@ LOAD linker stubs
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fclose.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtend.o
 
-.debug_info     0x0000000000000000    0x75576
- .debug_info    0x0000000000000000     0x361c CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
- .debug_info    0x000000000000361c     0x14a7 CMakeFiles/picow_access_point_background.dir/dhcpserver/dhcpserver.c.obj
- .debug_info    0x0000000000004ac3      0xae9 CMakeFiles/picow_access_point_background.dir/dnsserver/dnsserver.c.obj
- .debug_info    0x00000000000055ac      0xb27 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_nosys.c.obj
- .debug_info    0x00000000000060d3      0x939 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
- .debug_info    0x0000000000006a0c      0x19c CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
- .debug_info    0x0000000000006ba8     0x13c7 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
- .debug_info    0x0000000000007f6f      0x24b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj
- .debug_info    0x00000000000081ba      0xfbf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
- .debug_info    0x0000000000009179      0x6ba CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
- .debug_info    0x0000000000009833      0x3f1 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.obj
- .debug_info    0x0000000000009c24      0x2d2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.obj
- .debug_info    0x0000000000009ef6      0x301 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.obj
- .debug_info    0x000000000000a1f7     0x14ca CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.obj
- .debug_info    0x000000000000b6c1     0x1d26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- .debug_info    0x000000000000d3e7     0x1fc2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- .debug_info    0x000000000000f3a9     0x1234 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/sem.c.obj
- .debug_info    0x00000000000105dd      0x1a4 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.obj
- .debug_info    0x0000000000010781     0x1f37 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
- .debug_info    0x00000000000126b8     0x336f CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- .debug_info    0x0000000000015a27     0x194a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.obj
- .debug_info    0x0000000000017371      0x64b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.obj
- .debug_info    0x00000000000179bc      0x2ac CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.obj
- .debug_info    0x0000000000017c68      0x1c9 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.obj
- .debug_info    0x0000000000017e31      0x153 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/init.c.obj
- .debug_info    0x0000000000017f84      0x507 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/def.c.obj
- .debug_info    0x000000000001848b     0x17bf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
- .debug_info    0x0000000000019c4a      0x86b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/inet_chksum.c.obj
- .debug_info    0x000000000001a4b5      0x549 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ip.c.obj
- .debug_info    0x000000000001a9fe      0x9b0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- .debug_info    0x000000000001b3ae      0x836 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
- .debug_info    0x000000000001bbe4     0x1243 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
- .debug_info    0x000000000001ce27     0x2372 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- .debug_info    0x000000000001f199      0xeca CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/raw.c.obj
- .debug_info    0x0000000000020063      0x4a0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/stats.c.obj
- .debug_info    0x0000000000020503     0x2ce5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- .debug_info    0x00000000000231e8     0x22ec CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- .debug_info    0x00000000000254d4     0x2d38 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- .debug_info    0x000000000002820c      0xefd CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
- .debug_info    0x0000000000029109     0x1622 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- .debug_info    0x000000000002a72b     0x2cbf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- .debug_info    0x000000000002d3ea     0x17e5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
- .debug_info    0x000000000002ebcf      0xda2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
- .debug_info    0x000000000002f971     0x13ec CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
- .debug_info    0x0000000000030d5d      0xfc8 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4.c.obj
- .debug_info    0x0000000000031d25      0x815 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
- .debug_info    0x000000000003253a      0x9ab CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
- .debug_info    0x0000000000032ee5     0x1e41 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch.c.obj
- .debug_info    0x0000000000034d26      0x936 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c.obj
- .debug_info    0x000000000003565c     0x5dc7 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c.obj
- .debug_info    0x000000000003b423     0x5be8 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_ll.c.obj
- .debug_info    0x000000000004100b      0xe0b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_lwip.c.obj
- .debug_info    0x0000000000041e16     0x2b2a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_ctrl.c.obj
- .debug_info    0x0000000000044940     0x2a32 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj
- .debug_info    0x0000000000047372      0xad3 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj
- .debug_info    0x0000000000047e45     0x229c CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_driver/cyw43_driver.c.obj
- .debug_info    0x000000000004a0e1     0x18d0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_threadsafe_background.c.obj
- .debug_info    0x000000000004b9b1     0x1303 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.obj
- .debug_info    0x000000000004ccb4      0x1a6 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.obj
- .debug_info    0x000000000004ce5a      0x7cc CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.obj
- .debug_info    0x000000000004d626      0x6e5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.obj
- .debug_info    0x000000000004dd0b       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S.obj
- .debug_info    0x000000000004dd2d       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_divider/divider_hardware.S.obj
- .debug_info    0x000000000004dd4f       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_rp2040.S.obj
- .debug_info    0x000000000004dd71      0x2dd CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_init_rom_rp2040.c.obj
- .debug_info    0x000000000004e04e       0x26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_v1_rom_shim_rp2040.S.obj
- .debug_info    0x000000000004e074       0x26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S.obj
- .debug_info    0x000000000004e09a       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S.obj
- .debug_info    0x000000000004e0bc      0x2b2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c.obj
- .debug_info    0x000000000004e36e      0x332 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_malloc/malloc.c.obj
- .debug_info    0x000000000004e6a0       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj
- .debug_info    0x000000000004e6c2      0x29a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.obj
- .debug_info    0x000000000004e95c     0x1a46 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.obj
- .debug_info    0x00000000000503a2       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.obj
- .debug_info    0x00000000000503c4      0xbb4 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.obj
- .debug_info    0x0000000000050f78     0x1520 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj
- .debug_info    0x0000000000052498     0x1408 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
- .debug_info    0x00000000000538a0       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
- .debug_info    0x00000000000538c6      0x96a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-calloc.o)
- .debug_info    0x0000000000054230      0xa81 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-callocr.o)
- .debug_info    0x0000000000054cb1       0xb8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-ctype_.o)
- .debug_info    0x0000000000054d69      0x92a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-impure.o)
- .debug_info    0x0000000000055693      0x998 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-malloc.o)
- .debug_info    0x000000000005602b      0xe80 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mallocr.o)
- .debug_info    0x0000000000056eab      0x138 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-memcmp.o)
- .debug_info    0x0000000000056fe3      0x152 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-memmove.o)
- .debug_info    0x0000000000057135      0x942 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mlock.o)
- .debug_info    0x0000000000057a77      0xd6f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-reallocr.o)
- .debug_info    0x00000000000587e6      0x98e /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sbrkr.o)
- .debug_info    0x0000000000059174      0xaba /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sscanf.o)
- .debug_info    0x0000000000059c2e      0xc27 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-stdio.o)
- .debug_info    0x000000000005a855      0x13a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strchr.o)
- .debug_info    0x000000000005a98f       0xee /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strlen-stub.o)
- .debug_info    0x000000000005aa7d      0x110 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strncmp.o)
- .debug_info    0x000000000005ab8d     0x108d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtol.o)
- .debug_info    0x000000000005bc1a     0x17aa /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-svfscanf.o)
- .debug_info    0x000000000005d3c4      0x9c0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-writer.o)
- .debug_info    0x000000000005dd84      0x96b /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-closer.o)
- .debug_info    0x000000000005e6ef      0x914 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-errno.o)
- .debug_info    0x000000000005f003      0xce5 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-freer.o)
- .debug_info    0x000000000005fce8       0xc8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-iswspace.o)
- .debug_info    0x000000000005fdb0      0xbba /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-iswspace_l.o)
- .debug_info    0x000000000006096a      0xe04 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-locale.o)
- .debug_info    0x000000000006176e      0xc3e /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-localeconv.o)
- .debug_info    0x00000000000623ac      0x9a1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-lseekr.o)
- .debug_info    0x0000000000062d4d      0xd61 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mbrtowc.o)
- .debug_info    0x0000000000063aae      0xccd /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mbtowc_r.o)
- .debug_info    0x000000000006477b      0x9b9 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-readr.o)
- .debug_info    0x0000000000065134      0xbe1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-reent.o)
- .debug_info    0x0000000000065d15      0x117 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sccl.o)
- .debug_info    0x0000000000065e2c       0xce /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sf_nan.o)
- .debug_info    0x0000000000065efa       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strcmp.o)
- .debug_info    0x0000000000065f20     0x1ed0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtod.o)
- .debug_info    0x0000000000067df0      0xeea /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoll.o)
- .debug_info    0x0000000000068cda      0xee8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoul.o)
- .debug_info    0x0000000000069bc2      0xef3 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoull.o)
- .debug_info    0x000000000006aab5     0x1bc9 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-svfiscanf.o)
- .debug_info    0x000000000006c67e      0xb0a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-ungetc.o)
- .debug_info    0x000000000006d188      0xc89 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-wctomb_r.o)
- .debug_info    0x000000000006de11      0xbfb /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fflush.o)
- .debug_info    0x000000000006ea0c      0xf72 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-findfp.o)
- .debug_info    0x000000000006f97e      0xa66 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fwalk.o)
- .debug_info    0x00000000000703e4     0x147f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-gdtoa-gethex.o)
- .debug_info    0x0000000000071863      0x3f0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-gdtoa-hexnan.o)
- .debug_info    0x0000000000071c53      0xc48 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-lnumeric.o)
- .debug_info    0x000000000007289b     0x20bc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mprec.o)
- .debug_info    0x0000000000074957       0xd2 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-s_nan.o)
- .debug_info    0x0000000000074a29      0xb4d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fclose.o)
+.debug_info     0x0000000000000000    0x75577
+ .debug_info    0x0000000000000000     0x361d CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj
+ .debug_info    0x000000000000361d     0x14a7 CMakeFiles/picow_access_point_background.dir/dhcpserver/dhcpserver.c.obj
+ .debug_info    0x0000000000004ac4      0xae9 CMakeFiles/picow_access_point_background.dir/dnsserver/dnsserver.c.obj
+ .debug_info    0x00000000000055ad      0xb27 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_nosys.c.obj
+ .debug_info    0x00000000000060d4      0x939 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
+ .debug_info    0x0000000000006a0d      0x19c CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
+ .debug_info    0x0000000000006ba9     0x13c7 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
+ .debug_info    0x0000000000007f70      0x24b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.obj
+ .debug_info    0x00000000000081bb      0xfbf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
+ .debug_info    0x000000000000917a      0x6ba CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
+ .debug_info    0x0000000000009834      0x3f1 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.obj
+ .debug_info    0x0000000000009c25      0x2d2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.obj
+ .debug_info    0x0000000000009ef7      0x301 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.obj
+ .debug_info    0x000000000000a1f8     0x14ca CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.obj
+ .debug_info    0x000000000000b6c2     0x1d26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ .debug_info    0x000000000000d3e8     0x1fc2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ .debug_info    0x000000000000f3aa     0x1234 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/sem.c.obj
+ .debug_info    0x00000000000105de      0x1a4 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.obj
+ .debug_info    0x0000000000010782     0x1f37 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+ .debug_info    0x00000000000126b9     0x336f CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ .debug_info    0x0000000000015a28     0x194a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.obj
+ .debug_info    0x0000000000017372      0x64b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.obj
+ .debug_info    0x00000000000179bd      0x2ac CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.obj
+ .debug_info    0x0000000000017c69      0x1c9 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.obj
+ .debug_info    0x0000000000017e32      0x153 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/init.c.obj
+ .debug_info    0x0000000000017f85      0x507 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/def.c.obj
+ .debug_info    0x000000000001848c     0x17bf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
+ .debug_info    0x0000000000019c4b      0x86b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/inet_chksum.c.obj
+ .debug_info    0x000000000001a4b6      0x549 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ip.c.obj
+ .debug_info    0x000000000001a9ff      0x9b0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ .debug_info    0x000000000001b3af      0x836 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+ .debug_info    0x000000000001bbe5     0x1243 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+ .debug_info    0x000000000001ce28     0x2372 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ .debug_info    0x000000000001f19a      0xeca CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/raw.c.obj
+ .debug_info    0x0000000000020064      0x4a0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/stats.c.obj
+ .debug_info    0x0000000000020504     0x2ce5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ .debug_info    0x00000000000231e9     0x22ec CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ .debug_info    0x00000000000254d5     0x2d38 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ .debug_info    0x000000000002820d      0xefd CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
+ .debug_info    0x000000000002910a     0x1622 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ .debug_info    0x000000000002a72c     0x2cbf CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ .debug_info    0x000000000002d3eb     0x17e5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+ .debug_info    0x000000000002ebd0      0xda2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
+ .debug_info    0x000000000002f972     0x13ec CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+ .debug_info    0x0000000000030d5e      0xfc8 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4.c.obj
+ .debug_info    0x0000000000031d26      0x815 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
+ .debug_info    0x000000000003253b      0x9ab CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
+ .debug_info    0x0000000000032ee6     0x1e41 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch.c.obj
+ .debug_info    0x0000000000034d27      0x936 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_arch/cyw43_arch_threadsafe_background.c.obj
+ .debug_info    0x000000000003565d     0x5dc7 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c.obj
+ .debug_info    0x000000000003b424     0x5be8 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_ll.c.obj
+ .debug_info    0x000000000004100c      0xe0b CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_lwip.c.obj
+ .debug_info    0x0000000000041e17     0x2b2a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/lib/cyw43-driver/src/cyw43_ctrl.c.obj
+ .debug_info    0x0000000000044941     0x2a32 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pio/pio.c.obj
+ .debug_info    0x0000000000047373      0xad3 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_dma/dma.c.obj
+ .debug_info    0x0000000000047e46     0x229c CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_cyw43_driver/cyw43_driver.c.obj
+ .debug_info    0x000000000004a0e2     0x18d0 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_threadsafe_background.c.obj
+ .debug_info    0x000000000004b9b2     0x1303 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.obj
+ .debug_info    0x000000000004ccb5      0x1a6 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.obj
+ .debug_info    0x000000000004ce5b      0x7cc CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.obj
+ .debug_info    0x000000000004d627      0x6e5 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.obj
+ .debug_info    0x000000000004dd0c       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S.obj
+ .debug_info    0x000000000004dd2e       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_divider/divider_hardware.S.obj
+ .debug_info    0x000000000004dd50       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_rp2040.S.obj
+ .debug_info    0x000000000004dd72      0x2dd CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_init_rom_rp2040.c.obj
+ .debug_info    0x000000000004e04f       0x26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_v1_rom_shim_rp2040.S.obj
+ .debug_info    0x000000000004e075       0x26 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S.obj
+ .debug_info    0x000000000004e09b       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S.obj
+ .debug_info    0x000000000004e0bd      0x2b2 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c.obj
+ .debug_info    0x000000000004e36f      0x332 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_malloc/malloc.c.obj
+ .debug_info    0x000000000004e6a1       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj
+ .debug_info    0x000000000004e6c3      0x29a CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.obj
+ .debug_info    0x000000000004e95d     0x1a46 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.obj
+ .debug_info    0x00000000000503a3       0x22 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.obj
+ .debug_info    0x00000000000503c5      0xbb4 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.obj
+ .debug_info    0x0000000000050f79     0x1520 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.obj
+ .debug_info    0x0000000000052499     0x1408 CMakeFiles/picow_access_point_background.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj
+ .debug_info    0x00000000000538a1       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x00000000000538c7      0x96a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-calloc.o)
+ .debug_info    0x0000000000054231      0xa81 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-callocr.o)
+ .debug_info    0x0000000000054cb2       0xb8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-ctype_.o)
+ .debug_info    0x0000000000054d6a      0x92a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-impure.o)
+ .debug_info    0x0000000000055694      0x998 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-malloc.o)
+ .debug_info    0x000000000005602c      0xe80 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mallocr.o)
+ .debug_info    0x0000000000056eac      0x138 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-memcmp.o)
+ .debug_info    0x0000000000056fe4      0x152 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-memmove.o)
+ .debug_info    0x0000000000057136      0x942 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mlock.o)
+ .debug_info    0x0000000000057a78      0xd6f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-reallocr.o)
+ .debug_info    0x00000000000587e7      0x98e /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sbrkr.o)
+ .debug_info    0x0000000000059175      0xaba /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sscanf.o)
+ .debug_info    0x0000000000059c2f      0xc27 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-stdio.o)
+ .debug_info    0x000000000005a856      0x13a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strchr.o)
+ .debug_info    0x000000000005a990       0xee /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strlen-stub.o)
+ .debug_info    0x000000000005aa7e      0x110 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strncmp.o)
+ .debug_info    0x000000000005ab8e     0x108d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtol.o)
+ .debug_info    0x000000000005bc1b     0x17aa /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-svfscanf.o)
+ .debug_info    0x000000000005d3c5      0x9c0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-writer.o)
+ .debug_info    0x000000000005dd85      0x96b /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-closer.o)
+ .debug_info    0x000000000005e6f0      0x914 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-errno.o)
+ .debug_info    0x000000000005f004      0xce5 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-freer.o)
+ .debug_info    0x000000000005fce9       0xc8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-iswspace.o)
+ .debug_info    0x000000000005fdb1      0xbba /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-iswspace_l.o)
+ .debug_info    0x000000000006096b      0xe04 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-locale.o)
+ .debug_info    0x000000000006176f      0xc3e /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-localeconv.o)
+ .debug_info    0x00000000000623ad      0x9a1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-lseekr.o)
+ .debug_info    0x0000000000062d4e      0xd61 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mbrtowc.o)
+ .debug_info    0x0000000000063aaf      0xccd /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mbtowc_r.o)
+ .debug_info    0x000000000006477c      0x9b9 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-readr.o)
+ .debug_info    0x0000000000065135      0xbe1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-reent.o)
+ .debug_info    0x0000000000065d16      0x117 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sccl.o)
+ .debug_info    0x0000000000065e2d       0xce /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-sf_nan.o)
+ .debug_info    0x0000000000065efb       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strcmp.o)
+ .debug_info    0x0000000000065f21     0x1ed0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtod.o)
+ .debug_info    0x0000000000067df1      0xeea /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoll.o)
+ .debug_info    0x0000000000068cdb      0xee8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoul.o)
+ .debug_info    0x0000000000069bc3      0xef3 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-strtoull.o)
+ .debug_info    0x000000000006aab6     0x1bc9 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-svfiscanf.o)
+ .debug_info    0x000000000006c67f      0xb0a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-ungetc.o)
+ .debug_info    0x000000000006d189      0xc89 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-wctomb_r.o)
+ .debug_info    0x000000000006de12      0xbfb /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fflush.o)
+ .debug_info    0x000000000006ea0d      0xf72 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-findfp.o)
+ .debug_info    0x000000000006f97f      0xa66 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fwalk.o)
+ .debug_info    0x00000000000703e5     0x147f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-gdtoa-gethex.o)
+ .debug_info    0x0000000000071864      0x3f0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-gdtoa-hexnan.o)
+ .debug_info    0x0000000000071c54      0xc48 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-lnumeric.o)
+ .debug_info    0x000000000007289c     0x20bc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-mprec.o)
+ .debug_info    0x0000000000074958       0xd2 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-s_nan.o)
+ .debug_info    0x0000000000074a2a      0xb4d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-fclose.o)
 
 .debug_abbrev   0x0000000000000000    0x13777
  .debug_abbrev  0x0000000000000000      0x508 CMakeFiles/picow_access_point_background.dir/picow_access_point.c.obj

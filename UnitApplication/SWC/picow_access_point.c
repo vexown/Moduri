@@ -48,8 +48,8 @@
 #define GPIO_END_SWITCH     28
 #define GPIO_MOTOR_UP       21
 #define GPIO_MOTOR_DOWN     22
-#define CLOSING_TIME        50
-#define OPENING_TIME        1500  
+#define CLOSING_TIME        1000
+#define OPENING_TIME        1300  
 
 static bool isOpen = false;
 static bool openTheLid = false;
