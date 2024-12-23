@@ -29,7 +29,7 @@
 /*******************************************************************************/
 
 /* WiFi macros */
-#define WIFI_CONNECTION_TIMEOUT_MS 			(10000) //10s 
+#define WIFI_CONNECTION_TIMEOUT_MS 			(20000) //20s 
 
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                          */
@@ -69,11 +69,15 @@ bool connectToWifi(void)
 
     /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
     cyw43_arch_enable_sta_mode();
+    
+    /* Login info for the Pico W AP */
+    const char* const ssid_picowAP = "picow_test";
+    const char* const pass_picowAP = "password";
 
     /* Attempt to connect to a wireless access point (currently my Tenda WiFi router)
        Blocking until the network is joined, a failure is detected or a timeout occurs */
     LOG("Connecting to Wi-Fi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
+    if (cyw43_arch_wifi_connect_timeout_ms(ssid_picowAP, pass_picowAP, CYW43_AUTH_WPA2_AES_PSK, WIFI_CONNECTION_TIMEOUT_MS)) 
     {
         LOG("failed to connect\n");
     }
@@ -83,7 +87,8 @@ bool connectToWifi(void)
         status = true;
     }
 
-    configStaticIP();
+    /* Not used, IP address is assigned by DHCP on the AP Pico W */
+    //configStaticIP();
 
     return status;
 }

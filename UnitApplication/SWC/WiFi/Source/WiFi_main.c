@@ -185,6 +185,10 @@ static void WiFi_ListenState(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
         tcp_client_process_recv_message(&received_command);
+
+        /* Force the Pico to transition to Active Mode */
+        received_command = PICO_TRANSITION_TO_ACTIVE_MODE;
+
         if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -226,7 +230,20 @@ static void WiFi_ActiveState(void)
 
         /************** TX **************/
         /* Send a message (for now just a test message) */
-        tcp_client_send(message, strlen(message));
+        const char *server_host = PICO_W_AP_TCP_SERVER_ADDRESS;
+        const char *path = "/ledtest?led=0";
+
+        static bool ledOn = false;
+
+        if(!ledOn)
+        {
+            // Send HTTP GET request
+            if(send_http_get_request(server_host, path))
+            {
+                ledOn = true;
+            }
+        }
+
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {

@@ -74,6 +74,7 @@ static void tcp_server_close(tcpServerType *tcpServer);
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 TCP_Client_t* tcp_client_init(void);
+void process_HTTP_response(const uint8_t *buffer, uint16_t length);
 #endif
 
 /*******************************************************************************/
@@ -540,6 +541,9 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
         // Print received data (for testing)
         //LOG("Received: %s\n", client->receive_buffer);
 
+        // Process the HTTP response
+        process_HTTP_response(client->receive_buffer, client->receive_length);
+
         // Release the mutex after finishing with the buffer
         xSemaphoreGive(bufferMutex);
     } 
@@ -636,7 +640,7 @@ TCP_Client_t* tcp_client_init(void) {
     tcp_arg(client->pcb, client);
 
     // Convert server IP string to IP address structure
-    ipaddr_aton(PC_IP_ADDRESS, &server_ip);
+    ipaddr_aton(PICO_W_AP_TCP_SERVER_ADDRESS, &server_ip);
 
     // Connect to server
     err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
@@ -648,6 +652,80 @@ TCP_Client_t* tcp_client_init(void) {
     }
 
     return client;
+}
+
+/**
+ * Function: send_http_get_request
+ * 
+ * Description: Sends an HTTP GET request over the established TCP connection.
+ * 
+ * Parameters:
+ *  - const char *host: The hostname or IP address of the server.
+ *  - const char *path: The path and query string (e.g., "/ledtest?led=1").
+ * 
+ * Returns:
+ *  - bool: True if the request is sent successfully, false otherwise.
+ */
+bool send_http_get_request(const char *host, const char *path) {
+
+    // Formulate the HTTP GET request
+    char http_request[256];
+    int len = snprintf(http_request, sizeof(http_request),
+        "GET %s HTTP/1.1\r\n"
+        "Host: %s\r\n"
+        "Connection: close\r\n\r\n",
+        path, host);
+
+    if (len < 0 || len >= sizeof(http_request)) {
+        LOG("HTTP request string too long or failed to format.\n");
+        return false;
+    }
+
+    // Send the HTTP GET request
+    err_t result = tcp_client_send(http_request, len);
+    if (result != ERR_OK) {
+        LOG("Failed to send HTTP request: %d\n", result);
+        return false;
+    }
+
+    LOG("HTTP request sent successfully:\n%s\n", http_request);
+    return true;
+}
+
+/**
+ * Function: process_HTTP_response
+ * 
+ * Description:
+ *   Parses the received HTTP response and extracts useful information, 
+ *   such as the status code and body.
+ * 
+ * Parameters:
+ *   - const uint8_t *buffer: The received data buffer.
+ *   - uint16_t length: The length of the received data.
+ * 
+ * Returns:
+ *   - void
+ */
+void process_HTTP_response(const uint8_t *buffer, uint16_t length) {
+    LOG("HTTP Response:\n%.*s\n", length, buffer);
+
+    // Example: Extract HTTP status code
+    const char *status_line = (const char *)buffer;
+    if (strncmp(status_line, "HTTP/1.1", 8) == 0) {
+        int status_code;
+        if (sscanf(status_line, "HTTP/1.1 %d", &status_code) == 1) {
+            LOG("HTTP Status Code: %d\n", status_code);
+        } else {
+            LOG("Failed to parse HTTP status code\n");
+        }
+    }
+
+    // Optionally: Parse the response body if needed
+    const char *body = strstr((const char *)buffer, "\r\n\r\n");
+    if (body) {
+        body += 4; // Skip the "\r\n\r\n"
+        LOG("HTTP Body:\n%s\n", body);
+    }
 }
 
 #endif
