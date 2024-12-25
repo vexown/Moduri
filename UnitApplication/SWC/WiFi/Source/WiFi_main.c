@@ -367,7 +367,7 @@ static void WiFi_MeasureVoltage_State(void)
         bool all_below_threshold = true;
 
         /* Variables related to timing of the sensor detection*/
-        static uint32_t holdCount = 0; // Num of cycles with voltage below threshold. 1 cycle = 0.5s (hold for 5s)
+        static uint32_t holdCount = 0; // Num of cycles with voltage below threshold. 1 cycle = 0.5s (hold for 2s)
 
         /* Read ADC Channels 0-3 */
         for (int channel = 0; channel < 3; channel++) 
@@ -391,12 +391,12 @@ static void WiFi_MeasureVoltage_State(void)
         /* Check if all sensors are below the threshold */
         if (all_below_threshold)
         {
-            if(holdCount < 10)
+            if(holdCount < 4)
             {
                 holdCount++;
             }
             else
-            {   /* Send "open" message if all sensors are held below the threshold for at least 5s (10cycles at 0.5s) */
+            {   /* Send "open" message if all sensors are held below the threshold for at least 2s (4cycles at 0.5s) */
                 /* Send HTTP GET request to open the box */
                 send_http_get_request(server_host, pathON);
 
