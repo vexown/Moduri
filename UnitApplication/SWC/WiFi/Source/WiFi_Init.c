@@ -83,7 +83,9 @@ bool connectToWifi(void)
         status = true;
     }
 
+#if (USE_STATIC_IP == ON)
     configStaticIP();
+#endif
 
     return status;
 }
@@ -91,6 +93,7 @@ bool connectToWifi(void)
 /*******************************************************************************/
 /*                          STATIC FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
+#if (USE_STATIC_IP == ON)
 /* 
  * Function: configStaticIP
  * 
@@ -114,4 +117,4 @@ static void configStaticIP(void)
     gateway.addr = ipaddr_addr(GATEWAY_ADDR);
     netif_set_addr(netif, &ipaddr, &netmask, &gateway);
 }
-
+#endif // USE_STATIC_IP

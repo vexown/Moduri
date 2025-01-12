@@ -271,7 +271,7 @@ static void WiFi_MonitorState(void)
  * Function: WiFi_InitCommunication
  * 
  * Description: Initializes the WiFi communication as:
- * - Pico as TCP server (requires PICO_AS_TCP_SERVER macro to be defined)
+ * - Pico as TCP server (requires PICO_W_AS_TCP_SERVER == ON in ModuriConfig.h)
  * - Pico as TCP client (TransportLayer set to TCP_COMMUNICATION)
  * - Pico as UDP server (currently not supported)
  * - Pico as UDP client (TransportLayer set to UDP_COMMUNICATION)
@@ -292,8 +292,8 @@ static void WiFi_InitCommunication(void)
 {
     if(TransportLayer == TCP_COMMUNICATION)
     {
-#ifdef PICO_AS_TCP_SERVER
-        if(start_TCP_server() == true) WiFiState = LISTEN;
+#if (PICO_W_AS_TCP_SERVER == ON)
+        if(start_TCP_server() == true) WiFiState = LISTEN;dassda
 #else /* defaults to Pico as TCP client */
         if(start_TCP_client() == true) WiFiState = LISTEN;
 #endif

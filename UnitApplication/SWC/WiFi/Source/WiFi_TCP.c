@@ -30,6 +30,7 @@
 
 /* WiFi includes */
 #include "WiFi_Common.h"
+#include "WiFi_HTTP.h"
 
 /* Misc includes */
 #include "Common.h"
@@ -65,7 +66,7 @@ static SemaphoreHandle_t bufferMutex;
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
-#ifdef PICO_AS_TCP_SERVER
+#if (PICO_W_AS_TCP_SERVER == ON)
 static bool tcp_server_open(tcpServerType *tcpServer);
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
@@ -80,7 +81,7 @@ TCP_Client_t* tcp_client_init(void);
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
-#ifdef PICO_AS_TCP_SERVER
+#if (PICO_W_AS_TCP_SERVER == ON)
 /* 
  * Function: start_TCP_server
  * 
@@ -260,7 +261,7 @@ void tcp_client_process_recv_message(uint8_t *received_command)
 /*                          STATIC FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
-#ifdef PICO_AS_TCP_SERVER
+#if (PICO_W_AS_TCP_SERVER == ON)
 /* 
  * Function: tcp_server_close
  * 
@@ -540,6 +541,10 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
         // Print received data (for testing)
         //LOG("Received: %s\n", client->receive_buffer);
 
+#if (HTTP_ENABLED == ON)
+        // Process the HTTP response
+        process_HTTP_response(client->receive_buffer, client->receive_length);
+#endif
         // Release the mutex after finishing with the buffer
         xSemaphoreGive(bufferMutex);
     } 
@@ -639,7 +644,11 @@ TCP_Client_t* tcp_client_init(void) {
     ipaddr_aton(PC_IP_ADDRESS, &server_ip);
 
     // Connect to server
+#if (HTTP_ENABLED == ON)
+    err_t err = tcp_connect(client->pcb, &server_ip, TCP_HTTP_PORT, tcp_client_connected_callback);
+#else
     err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
+#endif
     if (err != ERR_OK) {
         LOG("TCP connect failed: %d\n", err);
         tcp_close(client->pcb);

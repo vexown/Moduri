@@ -9,6 +9,7 @@
 #define GATEWAY_ADDR                "192.168.1.1"    //Gateway IP address (in this case the Tenda Wifi router is the gateway so it's its' address)
 #define SERVER_PORT                 (uint16_t)12345  //TODO - server port for testing, later you can think about which one to use permanently
 #define TCP_PORT                    8080
+#define TCP_HTTP_PORT               80
 #define TCP_RECV_BUFFER_SIZE        1024             //in bytes
 #define UDP_SERVER_PORT             5000
 #define UDP_CLIENT_PORT             5001

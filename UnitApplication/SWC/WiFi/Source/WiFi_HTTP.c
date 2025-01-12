@@ -22,7 +22,10 @@
 /*                      GLOBAL FUNCTION DEFINITIONS                            */
 /*******************************************************************************/
 
-
+#if (HTTP_ENABLED == ON)
+#if (PICO_W_AS_TCP_SERVER == ON)
+/* Not handled currently */
+#else
 /**
  * Function: send_http_get_request
  * 
@@ -69,6 +72,7 @@ bool send_http_get_request(const char *host, const char *path)
 
     return true;
 }
+#endif
 
 /**
  * Function: process_HTTP_response
@@ -113,3 +117,5 @@ void process_HTTP_response(const uint8_t *buffer, uint16_t length)
         LOG("HTTP Body:\n%s\n", body);
     }
 }
+
+#endif /* HTTP_ENABLED */
