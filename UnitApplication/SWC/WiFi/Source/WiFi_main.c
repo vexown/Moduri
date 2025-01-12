@@ -293,7 +293,7 @@ static void WiFi_InitCommunication(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
 #if (PICO_W_AS_TCP_SERVER == ON)
-        if(start_TCP_server() == true) WiFiState = LISTEN;dassda
+        if(start_TCP_server() == true) WiFiState = LISTEN;
 #else /* defaults to Pico as TCP client */
         if(start_TCP_client() == true) WiFiState = LISTEN;
 #endif
