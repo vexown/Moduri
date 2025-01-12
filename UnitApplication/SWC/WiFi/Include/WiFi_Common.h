@@ -23,6 +23,7 @@
 
 /* Non-specific functions */
 bool connectToWifi(void);
+bool setupWifiAccessPoint(void);
 void WiFi_MainFunction(void);
 
 #endif

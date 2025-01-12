@@ -263,7 +263,11 @@ static void networkTask(__unused void *taskParams)
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
 
+#if (PICO_AS_ACCESS_POINT == ON)
+	if(setupWifiAccessPoint() == false)
+#else
 	if(connectToWifi() == false)
+#endif
 	{
 		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WIFI_DID_NOT_CONNECT);
 	}
