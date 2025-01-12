@@ -2,7 +2,7 @@
 #define WIFI_COMMON_H
 
 /* Server defines */
-#define PC_IP_ADDRESS               "192.168.1.194"  //My PC's IP address, statically configured in Windows advanced network settings
+#define EXTERNAL_SERVER_IP_ADDRESS  "192.168.4.1"    //Either UDP or TCP external server IP address that we communicate with (e.g PC, another Pico), statically configured on that server
 #define PICO_W_STATIC_IP_ADDRESS    "192.168.1.50"   //Static IP address for the Pico W
 #define NETMASK_ADDR                "255.255.255.0"  //Subnet mask for the network (meaning you can use 192.168.1.1 to 192.168.1.254 for devices 
                                                      //(the 0 address is the network address and 255 is the broadcast address).

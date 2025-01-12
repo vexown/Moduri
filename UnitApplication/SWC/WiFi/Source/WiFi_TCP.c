@@ -641,7 +641,7 @@ TCP_Client_t* tcp_client_init(void) {
     tcp_arg(client->pcb, client);
 
     // Convert server IP string to IP address structure
-    ipaddr_aton(PC_IP_ADDRESS, &server_ip);
+    ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &server_ip);
 
     // Connect to server
 #if (HTTP_ENABLED == ON)

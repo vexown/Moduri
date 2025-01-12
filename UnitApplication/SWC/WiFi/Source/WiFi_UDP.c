@@ -162,7 +162,7 @@ bool start_UDP_client(void)
  * 
  * Description: Sends a UDP message to a pre-defined destination address. The destination 
  * IP address is initialized only once, either by converting a string representation 
- * (`PC_IP_ADDRESS`) to an IP address or by setting it directly to a default value 
+ * (`EXTERNAL_SERVER_IP_ADDRESS`) to an IP address or by setting it directly to a default value 
  * (192.168.1.194) if the conversion fails. Once the destination address is set, the 
  * function calls `udp_send_message` to send the message.
  * 
@@ -185,7 +185,7 @@ bool udp_client_send(const char* message)
     // Initialize the address only once
     if (!addr_initialized) {
         // Try string conversion first
-        if (ipaddr_aton(PC_IP_ADDRESS, &dest_addr) != 1) {
+        if (ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &dest_addr) != 1) {
             // If string conversion fails, use direct method
             IP4_ADDR(&dest_addr, 192, 168, 1, 194);
         }
@@ -195,7 +195,7 @@ bool udp_client_send(const char* message)
     // Send the message
     bool result = udp_send_message(message, &dest_addr);
     if (!result) {
-        LOG("Failed to send UDP message to %s\n", PC_IP_ADDRESS);
+        LOG("Failed to send UDP message to %s\n", EXTERNAL_SERVER_IP_ADDRESS);
     }
     
     return result;

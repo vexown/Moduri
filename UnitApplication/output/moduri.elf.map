@@ -223,7 +223,7 @@ Discarded input sections
  .text.start_UDP_client
                 0x0000000000000000       0x44 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .rodata.udp_client_send.str1.4
-                0x0000000000000000       0x32 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
+                0x0000000000000000       0x2e CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .text.udp_client_send
                 0x0000000000000000       0x54 CMakeFiles/moduri.dir/WiFi/Source/WiFi_UDP.c.obj
  .bss.addr_initialized.1
@@ -4121,9 +4121,9 @@ Discarded input sections
                 0x0000000000000000       0x22 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .rodata.__func__.1
                 0x0000000000000000       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
- .text          0x0000000000000000        0x0 /tmp/ccqJDfS7.o
- .data          0x0000000000000000        0x0 /tmp/ccqJDfS7.o
- .bss           0x0000000000000000        0x0 /tmp/ccqJDfS7.o
+ .text          0x0000000000000000        0x0 /tmp/ccRAMKMc.o
+ .data          0x0000000000000000        0x0 /tmp/ccRAMKMc.o
+ .bss           0x0000000000000000        0x0 /tmp/ccRAMKMc.o
  .data          0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .text          0x0000000000000000       0x10 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg.a(lib_a-atexit.o)
@@ -4596,7 +4596,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
 .boot2          0x0000000010000000      0x100
                 0x0000000010000000                __boot2_start__ = .
  *(.boot2)
- .boot2         0x0000000010000000      0x100 /tmp/ccqJDfS7.o
+ .boot2         0x0000000010000000      0x100 /tmp/ccRAMKMc.o
                 0x0000000010000100                __boot2_end__ = .
                 0x0000000000000001                ASSERT (((__boot2_end__ - __boot2_start__) == 0x100), ERROR: Pico second stage bootloader must be 256 bytes in size)
 
@@ -7045,613 +7045,613 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nof
                 0x000000001001d650       0xb5 CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
  *fill*         0x000000001001d705        0x3 
  .rodata.tcp_client_init.str1.4
-                0x000000001001d708       0x68 CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
+                0x000000001001d708       0x64 CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
  .rodata.start_TCP_client.str1.4
-                0x000000001001d770       0x5f CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
- *fill*         0x000000001001d7cf        0x1 
+                0x000000001001d76c       0x5f CMakeFiles/moduri.dir/WiFi/Source/WiFi_TCP.c.obj
+ *fill*         0x000000001001d7cb        0x1 
  .rodata.connectToWifi.str1.4
-                0x000000001001d7d0       0x86 CMakeFiles/moduri.dir/WiFi/Source/WiFi_Init.c.obj
- *fill*         0x000000001001d856        0x2 
+                0x000000001001d7cc       0x86 CMakeFiles/moduri.dir/WiFi/Source/WiFi_Init.c.obj
+ *fill*         0x000000001001d852        0x2 
  .rodata.WiFi_ProcessCommand.str1.4
-                0x000000001001d858       0x9b CMakeFiles/moduri.dir/WiFi/Source/WiFi_main.c.obj
- *fill*         0x000000001001d8f3        0x1 
+                0x000000001001d854       0x9b CMakeFiles/moduri.dir/WiFi/Source/WiFi_main.c.obj
+ *fill*         0x000000001001d8ef        0x1 
  .rodata.WiFi_ActiveState.str1.4
-                0x000000001001d8f4       0x10 CMakeFiles/moduri.dir/WiFi/Source/WiFi_main.c.obj
+                0x000000001001d8f0       0x10 CMakeFiles/moduri.dir/WiFi/Source/WiFi_main.c.obj
  .rodata.Monitor_MainFunction.str1.4
-                0x000000001001d904      0x2a1 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
- *fill*         0x000000001001dba5        0x3 
+                0x000000001001d900      0x2a1 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
+ *fill*         0x000000001001dba1        0x3 
  .rodata.Monitor_MainFunction
-                0x000000001001dba8       0x28 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
+                0x000000001001dba4       0x28 CMakeFiles/moduri.dir/Monitor/Source/Monitor_main.c.obj
  .rodata.lwip_freertos_init.str1.4
-                0x000000001001dbd0       0x56 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
- *fill*         0x000000001001dc26        0x2 
+                0x000000001001dbcc       0x56 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
+ *fill*         0x000000001001dc22        0x2 
  .rodata.__func__.1
-                0x000000001001dc28       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
- *fill*         0x000000001001dc3b        0x1 
+                0x000000001001dc24       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.obj
+ *fill*         0x000000001001dc37        0x1 
  .rodata.async_context_base_remove_ready_at_time_worker.str1.4
-                0x000000001001dc3c       0x78 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
+                0x000000001001dc38       0x78 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
  .rodata.__func__.0
-                0x000000001001dcb4       0x2f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
- *fill*         0x000000001001dce3        0x1 
+                0x000000001001dcb0       0x2f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.obj
+ *fill*         0x000000001001dcdf        0x1 
  .rodata.panic.str1.4
-                0x000000001001dce4       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
+                0x000000001001dce0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
                                          0x12 (size before relaxing)
  .rodata.panic_unsupported.str1.4
-                0x000000001001dcf4        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
- *fill*         0x000000001001dd02        0x2 
+                0x000000001001dcf0        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.obj
+ *fill*         0x000000001001dcfe        0x2 
  .rodata.dns_send.str1.4
-                0x000000001001dd04       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
+                0x000000001001dd00       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
  .rodata.dns_check_entry.str1.4
-                0x000000001001dd1c       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
- *fill*         0x000000001001dd57        0x1 
+                0x000000001001dd18       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/dns.c.obj
+ *fill*         0x000000001001dd53        0x1 
  .rodata.plug_holes.str1.4
-                0x000000001001dd58       0x7a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- *fill*         0x000000001001ddd2        0x2 
+                0x000000001001dd54       0x7a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ *fill*         0x000000001001ddce        0x2 
  .rodata.mem_init.str1.4
-                0x000000001001ddd4       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- *fill*         0x000000001001ddef        0x1 
+                0x000000001001ddd0       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ *fill*         0x000000001001ddeb        0x1 
  .rodata.mem_free.str1.4
-                0x000000001001ddf0       0x9a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- *fill*         0x000000001001de8a        0x2 
+                0x000000001001ddec       0x9a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ *fill*         0x000000001001de86        0x2 
  .rodata.mem_trim.str1.4
-                0x000000001001de8c       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- *fill*         0x000000001001ded5        0x3 
+                0x000000001001de88       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ *fill*         0x000000001001ded1        0x3 
  .rodata.mem_malloc.str1.4
-                0x000000001001ded8       0x7b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
- *fill*         0x000000001001df53        0x1 
+                0x000000001001ded4       0x7b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/mem.c.obj
+ *fill*         0x000000001001df4f        0x1 
  .rodata.do_memp_malloc_pool.str1.4
-                0x000000001001df54       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
- *fill*         0x000000001001df77        0x1 
+                0x000000001001df50       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+ *fill*         0x000000001001df73        0x1 
  .rodata.do_memp_free_pool.str1.4
-                0x000000001001df78       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001df74       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
  .rodata.memp_malloc.str1.4
-                0x000000001001df98       0x1d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
- *fill*         0x000000001001dfb5        0x3 
+                0x000000001001df94       0x1d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+ *fill*         0x000000001001dfb1        0x3 
  .rodata.memp_free.str1.4
-                0x000000001001dfb8       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
- *fill*         0x000000001001dfd3        0x1 
+                0x000000001001dfb4       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+ *fill*         0x000000001001dfcf        0x1 
  .rodata.str1.4
-                0x000000001001dfd4       0x8c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001dfd0       0x8c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
  .rodata.memp_NETBUF
-                0x000000001001e060       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e060                memp_NETBUF
+                0x000000001001e05c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e05c                memp_NETBUF
  .rodata.memp_NETCONN
-                0x000000001001e070       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e070                memp_NETCONN
+                0x000000001001e06c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e06c                memp_NETCONN
  .rodata.memp_NETDB
-                0x000000001001e080       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e080                memp_NETDB
+                0x000000001001e07c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e07c                memp_NETDB
  .rodata.memp_PBUF
-                0x000000001001e090       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e090                memp_PBUF
+                0x000000001001e08c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e08c                memp_PBUF
  .rodata.memp_PBUF_POOL
-                0x000000001001e0a0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0a0                memp_PBUF_POOL
+                0x000000001001e09c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e09c                memp_PBUF_POOL
  .rodata.memp_RAW_PCB
-                0x000000001001e0b0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0b0                memp_RAW_PCB
+                0x000000001001e0ac       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0ac                memp_RAW_PCB
  .rodata.memp_REASSDATA
-                0x000000001001e0c0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0c0                memp_REASSDATA
+                0x000000001001e0bc       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0bc                memp_REASSDATA
  .rodata.memp_SYS_TIMEOUT
-                0x000000001001e0d0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0d0                memp_SYS_TIMEOUT
+                0x000000001001e0cc       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0cc                memp_SYS_TIMEOUT
  .rodata.memp_TCPIP_MSG_API
-                0x000000001001e0e0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0e0                memp_TCPIP_MSG_API
+                0x000000001001e0dc       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0dc                memp_TCPIP_MSG_API
  .rodata.memp_TCP_PCB
-                0x000000001001e0f0       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e0f0                memp_TCP_PCB
+                0x000000001001e0ec       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0ec                memp_TCP_PCB
  .rodata.memp_TCP_PCB_LISTEN
-                0x000000001001e100       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e100                memp_TCP_PCB_LISTEN
+                0x000000001001e0fc       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e0fc                memp_TCP_PCB_LISTEN
  .rodata.memp_TCP_SEG
-                0x000000001001e110       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e110                memp_TCP_SEG
+                0x000000001001e10c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e10c                memp_TCP_SEG
  .rodata.memp_UDP_PCB
-                0x000000001001e120       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e120                memp_UDP_PCB
+                0x000000001001e11c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e11c                memp_UDP_PCB
  .rodata.memp_pools
-                0x000000001001e130       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
-                0x000000001001e130                memp_pools
+                0x000000001001e12c       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/memp.c.obj
+                0x000000001001e12c                memp_pools
  .rodata.netif_issue_reports.str1.4
-                0x000000001001e164       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
- *fill*         0x000000001001e187        0x1 
+                0x000000001001e160       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+ *fill*         0x000000001001e183        0x1 
  .rodata.netif_do_set_ipaddr.str1.4
-                0x000000001001e188       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+                0x000000001001e184       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
  .rodata.netif_add.str1.4
-                0x000000001001e198       0x82 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
- *fill*         0x000000001001e21a        0x2 
+                0x000000001001e194       0x82 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+ *fill*         0x000000001001e216        0x2 
  .rodata.netif_set_up.str1.4
-                0x000000001001e21c       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+                0x000000001001e218       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
  .rodata.netif_set_down.str1.4
-                0x000000001001e238       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
- *fill*         0x000000001001e256        0x2 
+                0x000000001001e234       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+ *fill*         0x000000001001e252        0x2 
  .rodata.netif_set_link_up.str1.4
-                0x000000001001e258       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
- *fill*         0x000000001001e279        0x3 
+                0x000000001001e254       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+ *fill*         0x000000001001e275        0x3 
  .rodata.netif_set_link_down.str1.4
-                0x000000001001e27c       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
+                0x000000001001e278       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/netif.c.obj
  .rodata.pbuf_add_header_impl.str1.4
-                0x000000001001e29f       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+                0x000000001001e29b       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
                                           0xa (size before relaxing)
- *fill*         0x000000001001e29f        0x1 
+ *fill*         0x000000001001e29b        0x1 
  .rodata.pbuf_alloc_reference.str1.4
-                0x000000001001e2a0       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e2b2        0x2 
+                0x000000001001e29c       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e2ae        0x2 
  .rodata.pbuf_remove_header.str1.4
-                0x000000001001e2b4       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e2d2        0x2 
+                0x000000001001e2b0       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e2ce        0x2 
  .rodata.pbuf_free.str1.4
-                0x000000001001e2d4       0x2a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e2fe        0x2 
+                0x000000001001e2d0       0x2a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e2fa        0x2 
  .rodata.pbuf_alloc.str1.4
-                0x000000001001e300       0xab CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e3ab        0x1 
+                0x000000001001e2fc       0xab CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e3a7        0x1 
  .rodata.pbuf_realloc.str1.4
-                0x000000001001e3ac       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e411        0x3 
+                0x000000001001e3a8       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e40d        0x3 
  .rodata.pbuf_ref.str1.4
-                0x000000001001e414       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e426        0x2 
+                0x000000001001e410       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e422        0x2 
  .rodata.pbuf_cat.str1.4
-                0x000000001001e428       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e48d        0x3 
+                0x000000001001e424       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e489        0x3 
  .rodata.pbuf_copy_partial_pbuf.str1.4
-                0x000000001001e490       0xef CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e57f        0x1 
+                0x000000001001e48c       0xef CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e57b        0x1 
  .rodata.pbuf_copy.str1.4
-                0x000000001001e580       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e59a        0x2 
+                0x000000001001e57c       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e596        0x2 
  .rodata.pbuf_copy_partial.str1.4
-                0x000000001001e59c       0x43 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e5df        0x1 
+                0x000000001001e598       0x43 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e5db        0x1 
  .rodata.pbuf_take.str1.4
-                0x000000001001e5e0       0x82 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e662        0x2 
+                0x000000001001e5dc       0x82 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e65e        0x2 
  .rodata.pbuf_take_at.str1.4
-                0x000000001001e664       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e67b        0x1 
+                0x000000001001e660       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e677        0x1 
  .rodata.pbuf_clone.str1.4
-                0x000000001001e67c       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
- *fill*         0x000000001001e68d        0x3 
+                0x000000001001e678       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/pbuf.c.obj
+ *fill*         0x000000001001e689        0x3 
  .rodata.raw_input.str1.4
-                0x000000001001e690       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/raw.c.obj
- *fill*         0x000000001001e6d9        0x3 
+                0x000000001001e68c       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/raw.c.obj
+ *fill*         0x000000001001e6d5        0x3 
  .rodata.tcp_remove_listener.str1.4
-                0x000000001001e6dc       0x26 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e702        0x2 
+                0x000000001001e6d8       0x26 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e6fe        0x2 
  .rodata.tcp_listen_closed.str1.4
-                0x000000001001e704       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e725        0x3 
+                0x000000001001e700       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e721        0x3 
  .rodata.tcp_free_listen.str1.4
-                0x000000001001e728       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e741        0x3 
+                0x000000001001e724       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e73d        0x3 
  .rodata.tcp_free.str1.4
-                0x000000001001e744       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e755        0x3 
+                0x000000001001e740       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e751        0x3 
  .rodata.tcp_update_rcv_ann_wnd.str1.4
-                0x000000001001e758       0x3e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e796        0x2 
+                0x000000001001e754       0x3e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e792        0x2 
  .rodata.tcp_recved.str1.4
-                0x000000001001e798       0x3e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e7d6        0x2 
+                0x000000001001e794       0x3e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e7d2        0x2 
  .rodata.tcp_seg_copy.str1.4
-                0x000000001001e7d8       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e7f2        0x2 
+                0x000000001001e7d4       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e7ee        0x2 
  .rodata.tcp_recv.str1.4
-                0x000000001001e7f4       0x27 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e81b        0x1 
+                0x000000001001e7f0       0x27 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e817        0x1 
  .rodata.tcp_next_iss.str1.4
-                0x000000001001e81c       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e836        0x2 
+                0x000000001001e818       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e832        0x2 
  .rodata.tcp_eff_send_mss_netif.str1.4
-                0x000000001001e838       0x27 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e85f        0x1 
+                0x000000001001e834       0x27 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e85b        0x1 
  .rodata.tcp_connect.str1.4
-                0x000000001001e860       0x68 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+                0x000000001001e85c       0x68 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
  .rodata.tcp_pcb_purge.str1.4
-                0x000000001001e8c8       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e8e3        0x1 
+                0x000000001001e8c4       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e8df        0x1 
  .rodata.tcp_pcb_remove.str1.4
-                0x000000001001e8e4       0x87 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e96b        0x1 
+                0x000000001001e8e0       0x87 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e967        0x1 
  .rodata.tcp_abandon.str1.4
-                0x000000001001e96c       0x4d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e9b9        0x3 
+                0x000000001001e968       0x4d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e9b5        0x3 
  .rodata.tcp_netif_ip_addr_changed_pcblist.str1.4
-                0x000000001001e9bc       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+                0x000000001001e9b8       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
  .rodata.tcp_kill_state.str1.4
-                0x000000001001e9f0        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001e9fe        0x2 
+                0x000000001001e9ec        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001e9fa        0x2 
  .rodata.tcp_close_shutdown.str1.4
-                0x000000001001ea00       0x39 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ea39        0x3 
+                0x000000001001e9fc       0x39 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ea35        0x3 
  .rodata.tcp_close.str1.4
-                0x000000001001ea3c       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ea53        0x1 
+                0x000000001001ea38       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ea4f        0x1 
  .rodata.tcp_recv_null.str1.4
-                0x000000001001ea54       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ea6f        0x1 
+                0x000000001001ea50       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ea6b        0x1 
  .rodata.tcp_process_refused_data.str1.4
-                0x000000001001ea70       0x26 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ea96        0x2 
+                0x000000001001ea6c       0x26 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ea92        0x2 
  .rodata.tcp_slowtmr.str1.4
-                0x000000001001ea98      0x1c6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ec5e        0x2 
+                0x000000001001ea94      0x1c6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ec5a        0x2 
  .rodata.tcp_backoff
-                0x000000001001ec60        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ec6d        0x3 
+                0x000000001001ec5c        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ec69        0x3 
  .rodata.tcp_pcb_lists
-                0x000000001001ec70       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
-                0x000000001001ec70                tcp_pcb_lists
+                0x000000001001ec6c       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+                0x000000001001ec6c                tcp_pcb_lists
  .rodata.tcp_persist_backoff
-                0x000000001001ec80        0x7 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
- *fill*         0x000000001001ec87        0x1 
+                0x000000001001ec7c        0x7 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp.c.obj
+ *fill*         0x000000001001ec83        0x1 
  .rodata.tcp_parseopt.str1.4
-                0x000000001001ec88       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001eca2        0x2 
+                0x000000001001ec84       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001ec9e        0x2 
  .rodata.tcp_input_delayed_close.str1.4
-                0x000000001001eca4       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001ecc9        0x3 
+                0x000000001001eca0       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001ecc5        0x3 
  .rodata.tcp_timewait_input.str1.4
-                0x000000001001eccc       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+                0x000000001001ecc8       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
  .rodata.tcp_listen_input.str1.4
-                0x000000001001ecec       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001ed0a        0x2 
+                0x000000001001ece8       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001ed06        0x2 
  .rodata.tcp_free_acked_segments.str1.4
-                0x000000001001ed0c       0x48 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+                0x000000001001ed08       0x48 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
  .rodata.tcp_oos_insert_segment.str1.4
-                0x000000001001ed54       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001ed79        0x3 
+                0x000000001001ed50       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001ed75        0x3 
  .rodata.tcp_receive.str1.4
-                0x000000001001ed7c      0x130 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+                0x000000001001ed78      0x130 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
  .rodata.tcp_process.str1.4
-                0x000000001001eeac       0x86 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001ef32        0x2 
+                0x000000001001eea8       0x86 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001ef2e        0x2 
  .rodata.tcp_process
-                0x000000001001ef34       0x28 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+                0x000000001001ef30       0x28 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
  .rodata.tcp_input.str1.4
-                0x000000001001ef5c      0x172 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
- *fill*         0x000000001001f0ce        0x2 
+                0x000000001001ef58      0x172 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_in.c.obj
+ *fill*         0x000000001001f0ca        0x2 
  .rodata.tcp_write_checks.str1.4
-                0x000000001001f0d0       0x8e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f15e        0x2 
+                0x000000001001f0cc       0x8e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f15a        0x2 
  .rodata.tcp_output_segment_busy.str1.4
-                0x000000001001f160       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f185        0x3 
+                0x000000001001f15c       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f181        0x3 
  .rodata.tcp_output_fill_options.str1.4
-                0x000000001001f188       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f1c3        0x1 
+                0x000000001001f184       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f1bf        0x1 
  .rodata.tcp_pbuf_prealloc.str1.4
-                0x000000001001f1c4       0x58 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f1c0       0x58 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_create_segment.str1.4
-                0x000000001001f21c       0x59 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f275        0x3 
+                0x000000001001f218       0x59 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f271        0x3 
  .rodata.tcp_output_alloc_header_common.str1.4
-                0x000000001001f278       0x2e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f2a6        0x2 
+                0x000000001001f274       0x2e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f2a2        0x2 
  .rodata.tcp_output_alloc_header.str1.4
-                0x000000001001f2a8       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f2cd        0x3 
+                0x000000001001f2a4       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f2c9        0x3 
  .rodata.tcp_rst_common.str1.4
-                0x000000001001f2d0       0x37 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f307        0x1 
+                0x000000001001f2cc       0x37 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f303        0x1 
  .rodata.tcp_output_segment.str1.4
-                0x000000001001f308       0x62 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f36a        0x2 
+                0x000000001001f304       0x62 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f366        0x2 
  .rodata.tcp_output_control_segment_netif.str1.4
-                0x000000001001f36c       0x31 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f39d        0x3 
+                0x000000001001f368       0x31 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f399        0x3 
  .rodata.tcp_output_control_segment.str1.4
-                0x000000001001f3a0       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f3c9        0x3 
+                0x000000001001f39c       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f3c5        0x3 
  .rodata.tcp_write.str1.4
-                0x000000001001f3cc      0x1a2 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f56e        0x2 
+                0x000000001001f3c8      0x1a2 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f56a        0x2 
  .rodata.tcp_split_unsent_seg.str1.4
-                0x000000001001f570       0x74 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f56c       0x74 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_enqueue_flags.str1.4
-                0x000000001001f5e4      0x120 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f5e0      0x120 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_send_fin.str1.4
-                0x000000001001f704       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f71e        0x2 
+                0x000000001001f700       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f71a        0x2 
  .rodata.tcp_rexmit_rto_prepare.str1.4
-                0x000000001001f720       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f71c       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_rexmit.str1.4
-                0x000000001001f744       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f740       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_rexmit_fast.str1.4
-                0x000000001001f75c       0x1d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f779        0x3 
+                0x000000001001f758       0x1d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f775        0x3 
  .rodata.tcp_send_empty_ack.str1.4
-                0x000000001001f77c       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f778       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_output.str1.4
-                0x000000001001f79c       0x57 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f7f3        0x1 
+                0x000000001001f798       0x57 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f7ef        0x1 
  .rodata.tcp_rexmit_rto_commit.str1.4
-                0x000000001001f7f4       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f817        0x1 
+                0x000000001001f7f0       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f813        0x1 
  .rodata.tcp_rexmit_rto.str1.4
-                0x000000001001f818       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+                0x000000001001f814       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
  .rodata.tcp_keepalive.str1.4
-                0x000000001001f834       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f84f        0x1 
+                0x000000001001f830       0x1b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f84b        0x1 
  .rodata.tcp_zero_window_probe.str1.4
-                0x000000001001f850       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
- *fill*         0x000000001001f873        0x1 
+                0x000000001001f84c       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/tcp_out.c.obj
+ *fill*         0x000000001001f86f        0x1 
  .rodata.sys_timeout_abs.str1.4
-                0x000000001001f874       0x3d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
- *fill*         0x000000001001f8b1        0x3 
+                0x000000001001f870       0x3d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
+ *fill*         0x000000001001f8ad        0x3 
  .rodata.sys_timeout.str1.4
-                0x000000001001f8b4       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
- *fill*         0x000000001001f8ea        0x2 
+                0x000000001001f8b0       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
+ *fill*         0x000000001001f8e6        0x2 
  .rodata.sys_timeouts_sleeptime.str1.4
-                0x000000001001f8ec       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
- *fill*         0x000000001001f8fe        0x2 
+                0x000000001001f8e8       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
+ *fill*         0x000000001001f8fa        0x2 
  .rodata.lwip_cyclic_timers
-                0x000000001001f900       0x30 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
-                0x000000001001f900                lwip_cyclic_timers
+                0x000000001001f8fc       0x30 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/timeouts.c.obj
+                0x000000001001f8fc                lwip_cyclic_timers
  .rodata.udp_input_local_match.str1.4
-                0x000000001001f930       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001f979        0x3 
+                0x000000001001f92c       0x49 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001f975        0x3 
  .rodata.udp_input.str1.4
-                0x000000001001f97c       0x4e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001f9ca        0x2 
+                0x000000001001f978       0x4e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001f9c6        0x2 
  .rodata.udp_bind.str1.4
-                0x000000001001f9cc       0x16 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001f9e2        0x2 
+                0x000000001001f9c8       0x16 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001f9de        0x2 
  .rodata.udp_sendto_if_src.str1.4
-                0x000000001001f9e4       0xda CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001fabe        0x2 
+                0x000000001001f9e0       0xda CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001faba        0x2 
  .rodata.udp_sendto_if.str1.4
-                0x000000001001fac0       0x75 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001fb35        0x3 
+                0x000000001001fabc       0x75 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001fb31        0x3 
  .rodata.udp_sendto.str1.4
-                0x000000001001fb38       0x4f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001fb87        0x1 
+                0x000000001001fb34       0x4f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001fb83        0x1 
  .rodata.udp_connect.str1.4
-                0x000000001001fb88       0x38 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+                0x000000001001fb84       0x38 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
  .rodata.udp_recv.str1.4
-                0x000000001001fbc0       0x16 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
- *fill*         0x000000001001fbd6        0x2 
+                0x000000001001fbbc       0x16 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+ *fill*         0x000000001001fbd2        0x2 
  .rodata.udp_remove.str1.4
-                0x000000001001fbd8       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
+                0x000000001001fbd4       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/udp.c.obj
  .rodata.dhcp_option_short.str1.4
-                0x000000001001fbf0       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fc2b        0x1 
+                0x000000001001fbec       0x3b CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fc27        0x1 
  .rodata.dhcp_option.str1.4
-                0x000000001001fc2c       0x42 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fc6e        0x2 
+                0x000000001001fc28       0x42 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fc6a        0x2 
  .rodata.dhcp_option_byte.str1.4
-                0x000000001001fc70       0x35 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fca5        0x3 
+                0x000000001001fc6c       0x35 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fca1        0x3 
  .rodata.dhcp_option_long.str1.4
-                0x000000001001fca8       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fce2        0x2 
+                0x000000001001fca4       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fcde        0x2 
  .rodata.dhcp_create_msg.str1.4
-                0x000000001001fce4       0x80 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001fce0       0x80 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_option_hostname.str1.4
-                0x000000001001fd64       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001fd60       0x1c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_select.str1.4
-                0x000000001001fd80       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fdb6        0x2 
+                0x000000001001fd7c       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fdb2        0x2 
  .rodata.dhcp_dec_pcb_refcount.str1.4
-                0x000000001001fdb8       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001fdb4       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_inc_pcb_refcount.str1.4
-                0x000000001001fddc       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fe01        0x3 
+                0x000000001001fdd8       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fdfd        0x3 
  .rodata.dhcp_parse_reply.str1.4
-                0x000000001001fe04       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001fe15        0x3 
+                0x000000001001fe00       0x11 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001fe11        0x3 
  .rodata.dhcp_parse_reply
-                0x000000001001fe18       0xf0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001fe14       0xf0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_bind.str1.4
-                0x000000001001ff08       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001ff04       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_set_struct.str1.4
-                0x000000001001ff3c       0x44 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001ff38       0x44 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_network_changed_link_up.str1.4
-                0x000000001001ff80       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001ff7c       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.dhcp_start.str1.4
-                0x000000001001ff94       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
- *fill*         0x000000001001ffb5        0x3 
+                0x000000001001ff90       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+ *fill*         0x000000001001ffb1        0x3 
  .rodata.dhcp_discover_request_options
-                0x000000001001ffb8        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
+                0x000000001001ffb4        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/dhcp.c.obj
  .rodata.etharp_find_entry.str1.4
-                0x000000001001ffbc       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
- *fill*         0x0000000010020011        0x3 
+                0x000000001001ffb8       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+ *fill*         0x000000001002000d        0x3 
  .rodata.etharp_update_arp_entry.str1.4
-                0x0000000010020014       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+                0x0000000010020010       0x24 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
  .rodata.etharp_raw.str1.4
-                0x0000000010020038       0x75 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+                0x0000000010020034       0x75 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
                                          0x85 (size before relaxing)
- *fill*         0x00000000100200ad        0x3 
+ *fill*         0x00000000100200a9        0x3 
  .rodata.etharp_get_entry.str1.4
-                0x00000000100200b0       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+                0x00000000100200ac       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
  .rodata.etharp_output_to_arp_index.str1.4
-                0x00000000100200d0       0x30 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+                0x00000000100200cc       0x30 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
  .rodata.etharp_query.str1.4
-                0x0000000010020100       0x5e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
- *fill*         0x000000001002015e        0x2 
+                0x00000000100200fc       0x5e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/etharp.c.obj
+ *fill*         0x000000001002015a        0x2 
  .rodata.icmp_send_response.str1.4
-                0x0000000010020160       0x2c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
+                0x000000001002015c       0x2c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
  .rodata.icmp_input.str1.4
-                0x000000001002018c       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
- *fill*         0x00000000100201f1        0x3 
+                0x0000000010020188       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/icmp.c.obj
+ *fill*         0x00000000100201ed        0x3 
  .rodata.ip_reass_dequeue_datagram.str1.4
-                0x00000000100201f4       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
- *fill*         0x000000001002020d        0x3 
+                0x00000000100201f0       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+ *fill*         0x0000000010020209        0x3 
  .rodata.ip_reass_free_complete_datagram.str1.4
-                0x0000000010020210       0x62 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
- *fill*         0x0000000010020272        0x2 
+                0x000000001002020c       0x62 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+ *fill*         0x000000001002026e        0x2 
  .rodata.ip_reass_chain_frag_into_datagram_and_validate.str1.4
-                0x0000000010020274       0x8a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
- *fill*         0x00000000100202fe        0x2 
+                0x0000000010020270       0x8a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+ *fill*         0x00000000100202fa        0x2 
  .rodata.ip4_reass.str1.4
-                0x0000000010020300       0x48 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+                0x00000000100202fc       0x48 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
  .rodata.ip4_frag.str1.4
-                0x0000000010020348       0x3c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
+                0x0000000010020344       0x3c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_frag.c.obj
  .rodata.ip4_output_if_src.str1.4
-                0x0000000010020384       0x39 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4.c.obj
- *fill*         0x00000000100203bd        0x3 
+                0x0000000010020380       0x39 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4.c.obj
+ *fill*         0x00000000100203b9        0x3 
  .rodata.ip4addr_aton.str1.4
-                0x00000000100203c0        0xa CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
- *fill*         0x00000000100203ca        0x2 
+                0x00000000100203bc        0xa CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
+ *fill*         0x00000000100203c6        0x2 
  .rodata.ip4addr_aton
-                0x00000000100203cc       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
+                0x00000000100203c8       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
  .rodata.ip_addr_any
-                0x00000000100203e0        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
-                0x00000000100203e0                ip_addr_any
+                0x00000000100203dc        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
+                0x00000000100203dc                ip_addr_any
  .rodata.ip_addr_broadcast
-                0x00000000100203e4        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
-                0x00000000100203e4                ip_addr_broadcast
+                0x00000000100203e0        0x4 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/core/ipv4/ip4_addr.c.obj
+                0x00000000100203e0                ip_addr_broadcast
  .rodata.tcpip_thread_handle_msg.str1.4
-                0x00000000100203e8       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
- *fill*         0x0000000010020406        0x2 
+                0x00000000100203e4       0x1e CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
+ *fill*         0x0000000010020402        0x2 
  .rodata.tcpip_callback.str1.4
-                0x0000000010020408        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
- *fill*         0x0000000010020415        0x3 
+                0x0000000010020404        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
+ *fill*         0x0000000010020411        0x3 
  .rodata.tcpip_init.str1.4
-                0x0000000010020418       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
- *fill*         0x000000001002046d        0x3 
+                0x0000000010020414       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/api/tcpip.c.obj
+ *fill*         0x0000000010020469        0x3 
  .rodata.ethernet_output.str1.4
-                0x0000000010020470       0x31 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
- *fill*         0x00000000100204a1        0x3 
+                0x000000001002046c       0x31 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
+ *fill*         0x000000001002049d        0x3 
  .rodata.ethbroadcast
-                0x00000000100204a4        0x6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
-                0x00000000100204a4                ethbroadcast
- *fill*         0x00000000100204aa        0x2 
+                0x00000000100204a0        0x6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
+                0x00000000100204a0                ethbroadcast
+ *fill*         0x00000000100204a6        0x2 
  .rodata.ethzero
-                0x00000000100204ac        0x6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
-                0x00000000100204ac                ethzero
- *fill*         0x00000000100204b2        0x2 
+                0x00000000100204a8        0x6 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/src/netif/ethernet.c.obj
+                0x00000000100204a8                ethzero
+ *fill*         0x00000000100204ae        0x2 
  .rodata.sys_mutex_new.str1.4
-                0x00000000100204b4        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x00000000100204c2        0x2 
+                0x00000000100204b0        0xe CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x00000000100204be        0x2 
  .rodata.sys_mutex_lock.str1.4
-                0x00000000100204c4       0x2d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x00000000100204f1        0x3 
+                0x00000000100204c0       0x2d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x00000000100204ed        0x3 
  .rodata.sys_mutex_unlock.str1.4
-                0x00000000100204f4       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x000000001002050d        0x3 
+                0x00000000100204f0       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x0000000010020509        0x3 
  .rodata.sys_mbox_new.str1.4
-                0x0000000010020510       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x0000000010020529        0x3 
+                0x000000001002050c       0x19 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x0000000010020525        0x3 
  .rodata.sys_mbox_post.str1.4
-                0x000000001002052c       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x0000000010020551        0x3 
+                0x0000000010020528       0x25 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x000000001002054d        0x3 
  .rodata.sys_mbox_trypost.str1.4
-                0x0000000010020554       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+                0x0000000010020550       0x14 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
  .rodata.sys_arch_mbox_fetch.str1.4
-                0x0000000010020568       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x000000001002057a        0x2 
+                0x0000000010020564       0x12 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x0000000010020576        0x2 
  .rodata.sys_thread_new.str1.4
-                0x000000001002057c       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
- *fill*         0x00000000100205a5        0x3 
+                0x0000000010020578       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/lib/lwip/contrib/ports/freertos/sys_arch.c.obj
+ *fill*         0x00000000100205a1        0x3 
  .rodata.capture_additional_rosc_samples.str1.4
-                0x00000000100205a8      0x105 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
+                0x00000000100205a4      0x105 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
                                         0x10a (size before relaxing)
- *fill*         0x00000000100206ad        0x3 
+ *fill*         0x00000000100206a9        0x3 
  .rodata.__func__.1
-                0x00000000100206b0       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
+                0x00000000100206ac       0x20 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_rand/rand.c.obj
  .rodata.str1.4
-                0x00000000100206d0      0x191 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
- *fill*         0x0000000010020861        0x3 
+                0x00000000100206cc      0x191 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
+ *fill*         0x000000001002085d        0x3 
  .rodata.__func__.0
-                0x0000000010020864        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
- *fill*         0x0000000010020871        0x3 
+                0x0000000010020860        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.obj
+ *fill*         0x000000001002086d        0x3 
  .rodata.hw_claim_clear.str1.4
-                0x0000000010020874       0x5f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
- *fill*         0x00000000100208d3        0x1 
+                0x0000000010020870       0x5f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
+ *fill*         0x00000000100208cf        0x1 
  .rodata.__func__.0
-                0x00000000100208d4        0xf CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
- *fill*         0x00000000100208e3        0x1 
+                0x00000000100208d0        0xf CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.obj
+ *fill*         0x00000000100208df        0x1 
  .rodata.spin_lock_claim.str1.4
-                0x00000000100208e4       0x1f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.obj
- *fill*         0x0000000010020903        0x1 
+                0x00000000100208e0       0x1f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.obj
+ *fill*         0x00000000100208ff        0x1 
  .rodata.gpio_add_raw_irq_handler_with_order_priority_masked.str1.4
-                0x0000000010020904       0x6d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- *fill*         0x0000000010020971        0x3 
+                0x0000000010020900       0x6d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ *fill*         0x000000001002096d        0x3 
  .rodata.gpio_remove_raw_irq_handler_masked.str1.4
-                0x0000000010020974       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- *fill*         0x000000001002099d        0x3 
+                0x0000000010020970       0x29 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ *fill*         0x0000000010020999        0x3 
  .rodata.gpio_set_irq_enabled.str1.4
-                0x00000000100209a0       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- *fill*         0x00000000100209f5        0x3 
+                0x000000001002099c       0x55 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ *fill*         0x00000000100209f1        0x3 
  .rodata.__func__.1
-                0x00000000100209f8       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- *fill*         0x0000000010020a1b        0x1 
+                0x00000000100209f4       0x23 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ *fill*         0x0000000010020a17        0x1 
  .rodata.__func__.3
-                0x0000000010020a1c       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+                0x0000000010020a18       0x34 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
  .rodata.__func__.4
-                0x0000000010020a50       0x15 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
- *fill*         0x0000000010020a65        0x3 
+                0x0000000010020a4c       0x15 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.obj
+ *fill*         0x0000000010020a61        0x3 
  .rodata.make_j_16.str1.4
-                0x0000000010020a68       0x6f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020ad7        0x1 
+                0x0000000010020a64       0x6f CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020ad3        0x1 
  .rodata.insert_bl_32.str1.4
-                0x0000000010020ad8       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+                0x0000000010020ad4       0x10 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
  .rodata.irq_set_exclusive_handler.str1.4
-                0x0000000010020ae8       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020b1e        0x2 
+                0x0000000010020ae4       0x36 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020b1a        0x2 
  .rodata.irq_add_shared_handler.str1.4
-                0x0000000010020b20       0xe9 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020c09        0x3 
+                0x0000000010020b1c       0xe9 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020c05        0x3 
  .rodata.irq_remove_handler.str1.4
-                0x0000000010020c0c       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020c46        0x2 
+                0x0000000010020c08       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020c42        0x2 
  .rodata.irq_add_tail_to_free_list.str1.4
-                0x0000000010020c48       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020c82        0x2 
+                0x0000000010020c44       0x3a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020c7e        0x2 
  .rodata.__func__.0
-                0x0000000010020c84       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020c9e        0x2 
+                0x0000000010020c80       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020c9a        0x2 
  .rodata.__func__.1
-                0x0000000010020ca0        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020cad        0x3 
+                0x0000000010020c9c        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020ca9        0x3 
  .rodata.__func__.2
-                0x0000000010020cb0       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020cc3        0x1 
+                0x0000000010020cac       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020cbf        0x1 
  .rodata.__func__.3
-                0x0000000010020cc4        0xa CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020cce        0x2 
+                0x0000000010020cc0        0xa CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020cca        0x2 
  .rodata.__func__.4
-                0x0000000010020cd0        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020cdd        0x3 
+                0x0000000010020ccc        0xd CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020cd9        0x3 
  .rodata.__func__.5
-                0x0000000010020ce0       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020cf7        0x1 
+                0x0000000010020cdc       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020cf3        0x1 
  .rodata.__func__.6
-                0x0000000010020cf8       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
- *fill*         0x0000000010020d12        0x2 
+                0x0000000010020cf4       0x1a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.obj
+ *fill*         0x0000000010020d0e        0x2 
  .rodata.runtime_init_mutex.str1.4
-                0x0000000010020d14       0x5a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
- *fill*         0x0000000010020d6e        0x2 
+                0x0000000010020d10       0x5a CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+ *fill*         0x0000000010020d6a        0x2 
  .rodata.str1.4
-                0x0000000010020d70       0x51 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
- *fill*         0x0000000010020dc1        0x3 
+                0x0000000010020d6c       0x51 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+ *fill*         0x0000000010020dbd        0x3 
  .rodata.__func__.1
-                0x0000000010020dc4        0xb CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
- *fill*         0x0000000010020dcf        0x1 
+                0x0000000010020dc0        0xb CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+ *fill*         0x0000000010020dcb        0x1 
  .rodata.__func__.3
-                0x0000000010020dd0       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+                0x0000000010020dcc       0x18 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
  .rodata.__func__.6
-                0x0000000010020de8       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
- *fill*         0x0000000010020dfb        0x1 
+                0x0000000010020de4       0x13 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.obj
+ *fill*         0x0000000010020df7        0x1 
  .rodata.alarm_pool_irq_handler.str1.4
-                0x0000000010020dfc       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- *fill*         0x0000000010020e61        0x3 
+                0x0000000010020df8       0x65 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ *fill*         0x0000000010020e5d        0x3 
  .rodata.alarm_pool_get_default.str1.4
-                0x0000000010020e64       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- *fill*         0x0000000010020e85        0x3 
+                0x0000000010020e60       0x21 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ *fill*         0x0000000010020e81        0x3 
  .rodata.sleep_until.str1.4
-                0x0000000010020e88       0x4d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- *fill*         0x0000000010020ed5        0x3 
+                0x0000000010020e84       0x4d CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ *fill*         0x0000000010020ed1        0x3 
  .rodata.__func__.1
-                0x0000000010020ed8       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- *fill*         0x0000000010020eef        0x1 
+                0x0000000010020ed4       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ *fill*         0x0000000010020eeb        0x1 
  .rodata.__func__.2
-                0x0000000010020ef0       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
- *fill*         0x0000000010020f07        0x1 
+                0x0000000010020eec       0x17 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
+ *fill*         0x0000000010020f03        0x5 
  .rodata.at_the_end_of_time
                 0x0000000010020f08        0x8 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.obj
                 0x0000000010020f08                at_the_end_of_time
@@ -8841,7 +8841,7 @@ LOAD CMakeFiles/moduri.dir/home/blankmcu/FreeRTOS_Kernel/FreeRTOS-Kernel/stream_
 LOAD CMakeFiles/moduri.dir/home/blankmcu/FreeRTOS_Kernel/FreeRTOS-Kernel/tasks.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/FreeRTOS_Kernel/FreeRTOS-Kernel/timers.c.obj
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
-LOAD /tmp/ccqJDfS7.o
+LOAD /tmp/ccRAMKMc.o
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v6-m/nofp/libm.a
 START GROUP
@@ -9054,7 +9054,7 @@ LOAD linker stubs
  .ARM.attributes
                 0x0000000000000ff8       0x2c CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_multicore/multicore.c.obj
  .ARM.attributes
-                0x0000000000001024       0x22 /tmp/ccqJDfS7.o
+                0x0000000000001024       0x22 /tmp/ccRAMKMc.o
  .ARM.attributes
                 0x0000000000001046       0x1e /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/libgcc.a(_dvmd_tls.o)
  .ARM.attributes
