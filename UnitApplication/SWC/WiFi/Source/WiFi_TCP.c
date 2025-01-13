@@ -46,6 +46,7 @@ typedef struct
 	   It is used to manage the state and behavior of TCP connections */
     struct tcp_pcb *server_pcb; 
     struct tcp_pcb *client_pcb;
+    uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
     bool complete;
 } tcpServerType;
 
@@ -60,6 +61,7 @@ typedef struct {
 /*******************************************************************************/
 /*                               STATIC VARIABLES                              */
 /*******************************************************************************/
+static tcpServerType *tcpServerGlobal;
 static TCP_Client_t *clientGlobal;
 static SemaphoreHandle_t bufferMutex;
 
@@ -69,7 +71,7 @@ static SemaphoreHandle_t bufferMutex;
 #if (PICO_W_AS_TCP_SERVER == ON)
 static bool tcp_server_open(tcpServerType *tcpServer);
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
-static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
+static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
 static void tcp_server_close(tcpServerType *tcpServer);
 #else
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
@@ -96,20 +98,20 @@ bool start_TCP_server(void)
 	bool serverOpenedAndListening = false;
     bool status = false;
 
-	tcpServerType *tcpServer = (tcpServerType*)pvPortCalloc(1, sizeof(tcpServerType)); /* Warning - the server is running forever once started so this memory is not freed */
-    if (tcpServer == NULL)
+	tcpServerGlobal = (tcpServerType*)pvPortCalloc(1, sizeof(tcpServerType)); /* Warning - the server is running forever once started so this memory is not freed */
+    if (tcpServerGlobal == NULL)
 	{
 		LOG("Failed to allocate memory for the TCP server \n");
         status = false;
     }
 	else
 	{
-		serverOpenedAndListening = tcp_server_open(tcpServer);
+		serverOpenedAndListening = tcp_server_open(tcpServerGlobal);
 		if (serverOpenedAndListening == false) 
 		{
 			LOG("TCP did not successfully open, closing the server and freeing memory... \n");
-			tcp_server_close(tcpServer);
-			vPortFree(tcpServer);
+			tcp_server_close(tcpServerGlobal);
+			vPortFree(tcpServerGlobal);
             status = false;
 		}
 		else
@@ -118,8 +120,128 @@ bool start_TCP_server(void)
 			status = true;
 		}
 	}
+
+    bufferMutex = xSemaphoreCreateMutex();
+    if (bufferMutex == NULL) 
+    {
+        LOG("Failed to create mutex\n");
+        status = false;
+    }
+
     return status;
 }
+
+/* 
+ * Function: tcp_server_process_recv_message
+ * 
+ * Description: 
+ *      Prints the received buffer and analyzes its content.
+ *      Checks if the buffer starts with "cmd:".
+ *      If it does, it extracts the numeric value following "cmd:"
+ *      and stores it as the received command.
+ * 
+ * Parameters:
+ *  - received_command: Pointer to store the extracted command value
+ * 
+ * Returns: 
+ *  - void
+ */
+void tcp_server_process_recv_message(uint8_t *received_command) 
+{
+    // Wait for the mutex before accessing the buffer
+    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    {
+        // Access the receive buffer
+        uint8_t *buffer = tcpServerGlobal->receive_buffer;
+
+        // Print the entire received buffer
+        LOG("Received message: %s\n", buffer);
+
+        // Check if the buffer starts with "cmd:"
+        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
+        {
+            // Extract the number after "cmd:"
+            // Explanation of atoi return value:
+            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
+            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
+            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
+            int command_value = atoi((const char *)&buffer[4]);
+
+            // Ensure the command value is within 0-255 range
+            if (command_value >= 0 && command_value <= 255) 
+            {
+                *received_command = (uint8_t)command_value;
+                LOG("Received command: %u\n", *received_command);
+            } 
+            else 
+            {
+                LOG("Command value out of range (0-255).\n");
+            }
+        } 
+        else 
+        {
+            LOG("No command found in received message.\n");
+        }
+
+        // Clear the buffer after processing
+        memset(tcpServerGlobal->receive_buffer, 0, sizeof(tcpServerGlobal->receive_buffer));
+
+        // Release the mutex after access
+        xSemaphoreGive(bufferMutex); 
+    } 
+    else 
+    {
+        LOG("Failed to acquire the pointer to receive buffer.\n");
+    }
+}
+
+/* 
+ * Function: tcp_server_send
+ * 
+ * Description: 
+ *      Checks if the TCP server has an active client connection. If connected, 
+ *      it uses tcp_write() to queue the data for sending and then uses 
+ *      tcp_output() to actually send the queued data over the network.
+ * 
+ * Parameters:
+ *  - const char *data: Pointer to the data buffer to be sent.
+ *  - uint16_t length: Length of the data to be sent.
+ * 
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_CONN if no client is connected or other 
+ *            error codes from tcp_write() or tcp_output()) of the send operation.
+ */
+err_t tcp_server_send(const char *data, uint16_t length) 
+{
+    err_t err = ERR_OK;
+    
+    /* Check if tcpServerGlobal exists and has an active client connection */
+    if (tcpServerGlobal == NULL || tcpServerGlobal->client_pcb == NULL) 
+    {
+        LOG("Cannot send - no client connected\n");
+        return ERR_CONN;
+    }
+    
+    /* Send data */
+    err = tcp_write(tcpServerGlobal->client_pcb, data, length, TCP_WRITE_FLAG_COPY);
+    if (err == ERR_OK) 
+    {
+        /* Actually send the data */
+        err = tcp_output(tcpServerGlobal->client_pcb);
+        if (err != ERR_OK) 
+        {
+            LOG("tcp_output failed: %d\n", err);
+        }
+    } 
+    else 
+    {
+        LOG("tcp_write failed: %d\n", err);
+    }
+    
+    return err;
+}
+
 #else
 /* 
  * Function: start_TCP_client
@@ -312,7 +434,7 @@ static void tcp_server_close(tcpServerType *tcpServer)
 }
 
 /* 
- * Function: tcp_server_recieve
+ * Function: tcp_server_recv_callback
  * 
  * Description: Callback function that handles incoming data from the TCP client. 
  *              It processes the received message and notifies lwIP about the 
@@ -326,55 +448,66 @@ static void tcp_server_close(tcpServerType *tcpServer)
  * 
  * Returns: err_t indicating the result of the receive operation.
  */
-static err_t tcp_server_recieve(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err) 
+static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err) 
 {
-    /* Suppress compiler warnings for unused parameters. */
-    (void)arg; 
-    (void)err;
-
-	err_t status = E_OK;
+    (void)arg; // Unused parameter
 
     /* Check if the received buffer is NULL. */
     if (!buffer) 
     {
         /* Log a message and return if the buffer is NULL. */
         LOG("buffer is NULL, returning... \n");
-		status = ERR_BUF;
+		return ERR_BUF;
     }
-    else
+
+    if (err != ERR_OK) 
     {
-        /* Check the lwIP architecture for any state that needs to be updated. */
-        cyw43_arch_lwip_check();
-
-        /* Verify if there is data in the received buffer. */
-        if (buffer->tot_len > 0) 
-        {
-            /* Allocate a buffer to hold the received data plus one byte for the null terminator. */
-            char *recv_data = pvPortMalloc(buffer->tot_len + 1);
-            if (recv_data) 
-            {
-                /* Copy the received data from the pbuf to the newly allocated buffer. */
-                pbuf_copy_partial(buffer, recv_data, buffer->tot_len, 0);
-                
-                /* Null-terminate the received string to ensure it's a valid C string. */
-                recv_data[buffer->tot_len] = '\0'; 
-
-                /* Print the received message to the console. */
-                LOG("Received message: %s\n", recv_data);
-
-                /* Free the allocated buffer to prevent memory leaks. */
-                vPortFree(recv_data);
-            }
-            
-            /* Inform lwIP that the received data has been processed. */
-            tcp_recved(pcb, buffer->tot_len);
-        }
-        
-        /* Free the pbuf to release memory used for the received data. */
         pbuf_free(buffer);
+        return err;
     }
 
-    return status;
+    /* Check if received data fits our buffer and the buffer is not empty */
+    if ((buffer->tot_len > TCP_RECV_BUFFER_SIZE) || (buffer->tot_len == 0)) 
+    {
+        pbuf_free(buffer);
+        return ERR_MEM;
+    }
+
+    /* Check the lwIP architecture for any state that needs to be updated. */
+    cyw43_arch_lwip_check();
+
+    /* Wait for the mutex before accessing the buffer */
+    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    {
+        /* Allocate a buffer to hold the received data plus one byte for the null terminator. */
+        /* Copy the received data from the pbuf to the newly allocated buffer. */
+        pbuf_copy_partial(buffer, tcpServerGlobal->receive_buffer, buffer->tot_len, 0);
+
+        /* Null-terminate the received string to ensure it's a valid C string. */
+        tcpServerGlobal->receive_buffer[buffer->tot_len] = '\0'; 
+
+        /* Print the received message to the console. */
+        //LOG("Received message in callback: %s\n", tcpServerGlobal->receive_buffer);
+
+#if (HTTP_ENABLED == ON)
+        /* Process the HTTP response */
+        process_HTTP_response(tcpServerGlobal->receive_buffer, sizeof(tcpServerGlobal->receive_buffer));
+#endif
+        /* Inform lwIP that the received data has been processed. */
+        tcp_recved(pcb, buffer->tot_len);
+
+        /* Release the mutex after finishing with the buffer */
+        xSemaphoreGive(bufferMutex);
+    } 
+    else 
+    {
+        LOG("Failed to take mutex\n");
+    }
+    
+    /* Free the pbuf to release memory used for the received data. */
+    pbuf_free(buffer);
+
+    return ERR_OK;
 }
 
 /* 
@@ -416,7 +549,7 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
 		tcp_arg(client_pcb, tcpServer);
 
 		/* Set the receive callback function for the client PCB to handle incoming data. */
-		tcp_recv(client_pcb, tcp_server_recieve);
+		tcp_recv(client_pcb, tcp_server_recv_callback);
 	}
     
     /* ERR_OK to indicate successful acceptance of the client connection or ERR_VAL if failed */

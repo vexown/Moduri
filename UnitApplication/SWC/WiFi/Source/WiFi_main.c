@@ -55,7 +55,11 @@ typedef enum {
 /*******************************************************************************/
 
 /* WiFi Communication Type */
-static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* default communication type is TCP */
+#if (PICO_W_AS_TCP_SERVER == ON)
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* Force TCP communication type when setting up Pico as TCP server */
+#else
+static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* select either TCP or UDP */
+#endif
 
 /* Current Communication State */
 static WiFiStateType WiFiState = INIT; 
@@ -169,7 +173,11 @@ static void WiFi_ListenState(void)
 
     if(TransportLayer == TCP_COMMUNICATION)
     {
+#if (PICO_W_AS_TCP_SERVER == ON)
+        tcp_server_process_recv_message(&received_command);
+#else
         tcp_client_process_recv_message(&received_command);
+#endif
         if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -206,12 +214,20 @@ static void WiFi_ActiveState(void)
     {
         /************** RX **************/
         /* Handle any received messages */
+#if (PICO_W_AS_TCP_SERVER == ON)
+        tcp_server_process_recv_message(&received_command);
+#else
         tcp_client_process_recv_message(&received_command);
+#endif
         WiFi_ProcessCommand(received_command); 
 
          /************** TX **************/
         /* Send a message (for now just a test message) */
+#if (PICO_W_AS_TCP_SERVER == ON)
+        tcp_server_send(message, strlen(message));
+#else
         tcp_client_send(message, strlen(message));
+#endif
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
@@ -250,7 +266,11 @@ static void WiFi_MonitorState(void)
     {
         /************** RX **************/
         /* Handle any received messages */
+#if (PICO_W_AS_TCP_SERVER == ON)
+        tcp_server_process_recv_message(&received_command);
+#else
         tcp_client_process_recv_message(&received_command);
+#endif
         WiFi_ProcessCommand(received_command); 
 
          /************** TX **************/

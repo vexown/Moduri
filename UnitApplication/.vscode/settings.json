@@ -26,6 +26,7 @@
         "semphr.h": "c",
         "wifi_common.h": "c",
         "wifi_transmit.h": "c",
-        "wifi_tcp.h": "c"
+        "wifi_tcp.h": "c",
+        "common.h": "c"
     }
 }

@@ -6,6 +6,8 @@
 
 #if (PICO_W_AS_TCP_SERVER == ON)
 bool start_TCP_server(void);
+err_t tcp_server_send(const char *data, uint16_t length);
+void tcp_server_process_recv_message(uint8_t *received_command);
 #else
 bool start_TCP_client(void);
 err_t tcp_client_send(const char *data, uint16_t length);
