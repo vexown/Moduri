@@ -241,8 +241,9 @@ static void monitorTask(__unused void *taskParams)
     for( ;; )
 	{
 		vTaskDelayUntil(&xLastWakeTime, MONITOR_TASK_PERIOD_TICKS); // Execute periodically at consistent intervals based on a reference time
-
+#if (MONITORING_ENABLED == ON)
 		Monitor_MainFunction();
+#endif
     }
 }
 
