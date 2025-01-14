@@ -11,6 +11,7 @@
         "moduriconfig.h": "c",
         "adc_hal.h": "c",
         "gpio_hal.h": "c",
-        "i2c_hal.h": "c"
+        "i2c_hal.h": "c",
+        "wifi_http.h": "c"
     }
 }

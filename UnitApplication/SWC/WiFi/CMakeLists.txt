@@ -3,6 +3,8 @@ message("########## WiFi/CMakeLists.txt - start ##########")
 
 # Define the path to the source files for WiFi
 set(WIFI_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_DNS_server.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_DHCP_server.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_HTTP.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_UDP.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_TCP.c

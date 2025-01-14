@@ -18,13 +18,13 @@
 #define PICO_W_AS_TCP_SERVER   ON
 
 /* This option decides if HTTP is enabled on the Pico, it is then included within the TCP stack */
-#define HTTP_ENABLED           OFF
+#define HTTP_ENABLED           ON
 
 /* Enable this option if you want to set the IP address of the Pico to a static value PICO_W_STATIC_IP_ADDRESS. Otherwise DHCP is used */
 #define USE_STATIC_IP          ON
 
 /* Use this option if you're running the Pico as an Access Point with a TCP server */
-#define PICO_AS_ACCESS_POINT   OFF
+#define PICO_AS_ACCESS_POINT   ON
 #if (PICO_AS_ACCESS_POINT == ON)
     #if (PICO_W_AS_TCP_SERVER == OFF) 
     #error "PICO_AS_ACCESS_POINT requires PICO_W_AS_TCP_SERVER to be ON" 

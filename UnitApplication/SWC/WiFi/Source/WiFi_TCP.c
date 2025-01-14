@@ -31,6 +31,8 @@
 /* WiFi includes */
 #include "WiFi_Common.h"
 #include "WiFi_HTTP.h"
+#include "WiFi_DHCP_server.h"
+#include "WiFi_DNS_server.h"
 
 /* Misc includes */
 #include "Common.h"
@@ -48,6 +50,7 @@ typedef struct
     struct tcp_pcb *client_pcb;
     uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
     bool complete;
+    ip_addr_t gw;
 } tcpServerType;
 
 /* Basic TCP client structure */
@@ -106,6 +109,18 @@ bool start_TCP_server(void)
     }
 	else
 	{
+        ip4_addr_t mask;
+        IP4_ADDR(ip_2_ip4(&tcpServerGlobal->gw), 192, 168, 4, 1);
+        IP4_ADDR(ip_2_ip4(&mask), 255, 255, 255, 0);
+
+        // Start the dhcp server
+        dhcp_server_t dhcp_server;
+        dhcp_server_init(&dhcp_server, &tcpServerGlobal->gw, &mask);
+
+        // Start the dns server
+        dns_server_t dns_server;
+        dns_server_init(&dns_server, &tcpServerGlobal->gw);
+
 		serverOpenedAndListening = tcp_server_open(tcpServerGlobal);
 		if (serverOpenedAndListening == false) 
 		{
@@ -544,12 +559,12 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
 
 		/* Store the client PCB in the tcpServer structure for later use. */
 		tcpServer->client_pcb = client_pcb;
-
+        
 		/* Associate the tcpServer context with the client PCB for later reference. */
 		tcp_arg(client_pcb, tcpServer);
 
 		/* Set the receive callback function for the client PCB to handle incoming data. */
-		tcp_recv(client_pcb, tcp_server_recv_callback);
+		tcp_recv(client_pcb, tcp_server_recv_callback); //TODO - Continue pico_w_access_point integration from here
 	}
     
     /* ERR_OK to indicate successful acceptance of the client connection or ERR_VAL if failed */
@@ -585,11 +600,19 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     }
 
     /* Bind the PCB to the specified port. Use NULL to bind to all available interfaces. */
+#if (HTTP_ENABLED == ON)
+    err_t err = tcp_bind(pcb, IP_ANY_TYPE, TCP_HTTP_PORT);
+#else
     err_t err = tcp_bind(pcb, NULL, TCP_PORT);
+#endif
     if (err) 
     {
         /* Log an error message if binding to the port failed. */
+#if (HTTP_ENABLED == ON)
+        LOG("failed to bind to port %u\n", TCP_HTTP_PORT);
+#else
         LOG("failed to bind to port %u\n", TCP_PORT);
+#endif
         return false;
     }
 
