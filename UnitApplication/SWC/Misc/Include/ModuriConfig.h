@@ -21,7 +21,7 @@
 #define HTTP_ENABLED           ON
 
 /* Enable this option if you want to set the IP address of the Pico to a static value PICO_W_STATIC_IP_ADDRESS. Otherwise DHCP is used */
-#define USE_STATIC_IP          ON
+#define USE_STATIC_IP          OFF
 
 /* Use this option if you're running the Pico as an Access Point with a TCP server */
 #define PICO_AS_ACCESS_POINT   ON
@@ -31,9 +31,6 @@
     #endif
     #if (HTTP_ENABLED == OFF) 
     #error "PICO_AS_ACCESS_POINT requires HTTP_ENABLED to be ON" 
-    #endif
-    #if (USE_STATIC_IP == OFF) 
-    #error "PICO_AS_ACCESS_POINT requires USE_STATIC_IP to be ON" 
     #endif
 #endif
 
