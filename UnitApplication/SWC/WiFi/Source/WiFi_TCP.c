@@ -113,7 +113,7 @@ bool start_TCP_server(void)
         IP4_ADDR(ip_2_ip4(&tcpServerGlobal->gw), 192, 168, 4, 1);
         IP4_ADDR(ip_2_ip4(&mask), 255, 255, 255, 0);
 
-        // Start the dhcp server
+        // Start the dhcp server TODO - figure out DHCP failure when attempting to connect
         dhcp_server_t dhcp_server;
         dhcp_server_init(&dhcp_server, &tcpServerGlobal->gw, &mask);
 
@@ -506,7 +506,7 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
 
 #if (HTTP_ENABLED == ON)
         /* Process the HTTP response */
-        process_HTTP_response(tcpServerGlobal->receive_buffer, sizeof(tcpServerGlobal->receive_buffer));
+        process_HTTP_response(tcpServerGlobal->receive_buffer, sizeof(tcpServerGlobal->receive_buffer), pcb);
 #endif
         /* Inform lwIP that the received data has been processed. */
         tcp_recved(pcb, buffer->tot_len);
@@ -564,7 +564,7 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
 		tcp_arg(client_pcb, tcpServer);
 
 		/* Set the receive callback function for the client PCB to handle incoming data. */
-		tcp_recv(client_pcb, tcp_server_recv_callback); //TODO - Continue pico_w_access_point integration from here
+		tcp_recv(client_pcb, tcp_server_recv_callback);
 	}
     
     /* ERR_OK to indicate successful acceptance of the client connection or ERR_VAL if failed */
