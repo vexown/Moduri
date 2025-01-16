@@ -67,15 +67,47 @@
 
 # ****************************************************************************
 
-# Open a new Windows Terminal window and run the OpenOCD startup script
-wt.exe --title "OpenOCD" bash -c "./StartOpenOCD.sh && exec bash"
+################################# Functions ####################################
+
+# Function to launch OpenOCD
+launch_openocd() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux command to open a new terminal and run OpenOCD with a custom title
+        gnome-terminal --title="OpenOCD" -- bash -c "./StartOpenOCD.sh; exec bash"
+    elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+        # Windows command to open a new Windows Terminal tab and run OpenOCD
+        wt.exe --title "OpenOCD" bash -c "./StartOpenOCD.sh && exec bash"
+    else
+        echo "Unsupported OS for OpenOCD launch."
+    fi
+}
+
+# Function to launch GDB sessions
+launch_gdb() {
+    core=$1
+    script=$2
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux command to open a new terminal for GDB with a custom title
+        gnome-terminal --title="Core$core GDB" -- bash -c "./$script; exec bash"
+    elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+        # Windows command to open a new Windows Terminal tab for GDB
+        wt.exe --title "Core$core GDB" bash -c "./$script && exec bash"
+    else
+        echo "Unsupported OS for GDB launch."
+    fi
+}
+
+########################### Main script logic ##################################3
+
+# Launch OpenOCD
+launch_openocd
 
 # Wait for 1 second to ensure OpenOCD has initialized
 sleep 1
 
 # Launch GDB for core0
-wt.exe --title "Core0 GDB" bash -c "./StartGDB_Core0.sh && exec bash"
+launch_gdb 0 "StartGDB_Core0.sh"
 
 # Launch GDB for core1
-wt.exe --title "Core1 GDB" bash -c "./StartGDB_Core1.sh && exec bash"
+#launch_gdb 1 "StartGDB_Core1.sh" //TODO - core 1 not working properly right now, only core 0 supported
 
