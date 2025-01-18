@@ -138,7 +138,6 @@ bool start_TCP_server(void)
 			LOG("TCP did not successfully open, closing the server and freeing memory... \n");
 			tcp_server_close(tcpServerGlobal);
 			vPortFree(tcpServerGlobal);
-            status = false;
 		}
 		else
 		{
@@ -151,7 +150,6 @@ bool start_TCP_server(void)
     if (bufferMutex == NULL) 
     {
         LOG("Failed to create mutex\n");
-        status = false;
     }
 
     return status;
