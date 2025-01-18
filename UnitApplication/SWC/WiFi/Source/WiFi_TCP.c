@@ -138,6 +138,8 @@ bool start_TCP_server(void)
 			LOG("TCP did not successfully open, closing the server and freeing memory... \n");
 			tcp_server_close(tcpServerGlobal);
 			vPortFree(tcpServerGlobal);
+            vPortFree(dhcp_server);
+            vPortFree(dns_server);
 		}
 		else
 		{
