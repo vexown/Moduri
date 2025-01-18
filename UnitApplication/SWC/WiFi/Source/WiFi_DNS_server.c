@@ -1,4 +1,12 @@
 /**
+ * File: WiFi_DNS_server.c
+ * Description: High level implementation for lwIP-based DNS server.
+ * 
+ * Note - this code is copied from dnsserver.c file in github.com/raspberrypi/pico-examples repository. See the copyright notice below.
+ * 
+ */
+
+/**
  * Copyright (c) 2022 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause

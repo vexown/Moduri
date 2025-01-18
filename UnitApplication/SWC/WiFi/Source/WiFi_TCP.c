@@ -50,7 +50,7 @@ typedef struct
     struct tcp_pcb *client_pcb;
     uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
     bool complete;
-    ip_addr_t gw;
+    ip_addr_t gateway;
 } tcpServerType;
 
 /* Basic TCP client structure */
@@ -105,21 +105,32 @@ bool start_TCP_server(void)
     if (tcpServerGlobal == NULL)
 	{
 		LOG("Failed to allocate memory for the TCP server \n");
-        status = false;
     }
 	else
 	{
         ip4_addr_t mask;
-        IP4_ADDR(ip_2_ip4(&tcpServerGlobal->gw), 192, 168, 4, 1);
-        IP4_ADDR(ip_2_ip4(&mask), 255, 255, 255, 0);
+        IP4_ADDR(ip_2_ip4(&tcpServerGlobal->gateway), 192, 168, 4, 1); // Set the gateway IP address of the TCP server to 192.168.4.1
+        IP4_ADDR(ip_2_ip4(&mask), 255, 255, 255, 0); // Set the subnet mask to 255.255.255.0
+        
+        dhcp_server_t* dhcp_server = (dhcp_server_t*)pvPortCalloc(1, sizeof(dhcp_server_t));
+        if (dhcp_server == NULL) 
+        {
+            LOG("Failed to allocate memory for DHCP server.\n");
+            vPortFree(tcpServerGlobal);
+        }
+        /* Start the dhcp server */
+        dhcp_server_init(dhcp_server, &tcpServerGlobal->gateway, &mask);
 
-        // Start the dhcp server TODO - figure out DHCP failure when attempting to connect
-        dhcp_server_t dhcp_server;
-        dhcp_server_init(&dhcp_server, &tcpServerGlobal->gw, &mask);
-
-        // Start the dns server
-        dns_server_t dns_server;
-        dns_server_init(&dns_server, &tcpServerGlobal->gw);
+        
+        dns_server_t* dns_server = (dns_server_t*)pvPortCalloc(1, sizeof(dns_server_t)); 
+        if (dns_server == NULL) 
+        {
+            LOG("Failed to allocate memory for DNS server.\n");
+            vPortFree(tcpServerGlobal);
+            vPortFree(dhcp_server);
+        }
+        /* Start the dns server */
+        dns_server_init(dns_server, &tcpServerGlobal->gateway);
 
 		serverOpenedAndListening = tcp_server_open(tcpServerGlobal);
 		if (serverOpenedAndListening == false) 

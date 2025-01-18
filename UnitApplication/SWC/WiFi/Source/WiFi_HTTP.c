@@ -159,7 +159,7 @@ void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb
         {
             /* Send redirect */
             //TODO
-            //con_state->header_len = snprintf(buffer, sizeof(buffer), HTTP_RESPONSE_REDIRECT, ipaddr_ntoa(con_state->gw));
+            //con_state->header_len = snprintf(buffer, sizeof(buffer), HTTP_RESPONSE_REDIRECT, ipaddr_ntoa(con_state->gateway));
             //LOG("Sending redirect %s", buffer);
             LOG("Redirect not implemented currently \n");
         }

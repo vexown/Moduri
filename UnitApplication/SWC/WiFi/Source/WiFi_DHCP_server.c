@@ -1,3 +1,11 @@
+/**
+ * File: WiFi_DHCP_server.c
+ * Description: High level implementation for lwIP-based DHCP server.
+ * 
+ * Note - this code is copied from dhcpserver.c file in github.com/raspberrypi/pico-examples repository. See the copyright notice below.
+ * 
+ */
+
 /*
  * This file is part of the MicroPython project, http://micropython.org/
  *
