@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "Common.h"
 #include "lwip/tcp.h"
+#include "WiFi_TCP.h"
 
 #if (HTTP_ENABLED == ON)
 
@@ -20,7 +21,7 @@
 bool send_http_get_request(const char *host, const char *path);
 
 /* Processes the received HTTP response */
-void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb);
+void process_HTTP_response(tcpServerType* tcpServer, struct tcp_pcb *pcb);
 
 #endif /* HTTP_ENABLED */
 

@@ -25,41 +25,15 @@
 #include <lwip/netdb.h>
 #include <lwip/dns.h>
 #include "lwip/pbuf.h"
-#include "lwip/tcp.h"
 #include "lwip/err.h"
 
 /* WiFi includes */
-#include "WiFi_Common.h"
 #include "WiFi_HTTP.h"
 #include "WiFi_DHCP_server.h"
 #include "WiFi_DNS_server.h"
 
 /* Misc includes */
 #include "Common.h"
-
-/*******************************************************************************/
-/*                               DATA TYPES                                    */
-/*******************************************************************************/
-
-/* Structure of the TCP server */
-typedef struct
-{
-	/* tcp_pcb is a huge struct defined in lwIP tcp.h file. PCB stands for Protocol Control Block 
-	   It is used to manage the state and behavior of TCP connections */
-    struct tcp_pcb *server_pcb; 
-    struct tcp_pcb *client_pcb;
-    uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
-    bool complete;
-    ip_addr_t gateway;
-} tcpServerType;
-
-/* Basic TCP client structure */
-typedef struct {
-    struct tcp_pcb *pcb;                      // The TCP protocol control block - lwIP's main structure for a TCP connection
-    uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
-    uint16_t receive_length;                  // Length of received data
-    bool is_connected;                        // Connection status
-} TCP_Client_t;
 
 /*******************************************************************************/
 /*                               STATIC VARIABLES                              */
@@ -72,10 +46,11 @@ static SemaphoreHandle_t bufferMutex;
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
 #if (PICO_W_AS_TCP_SERVER == ON)
-static bool tcp_server_open(tcpServerType *tcpServer);
+static bool tcp_server_open();
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
 static void tcp_server_close(tcpServerType *tcpServer);
+static void tcp_server_err_callback(void *arg, err_t err);
 #else
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
@@ -132,7 +107,7 @@ bool start_TCP_server(void)
         /* Start the dns server */
         dns_server_init(dns_server, &tcpServerGlobal->gateway);
 
-		serverOpenedAndListening = tcp_server_open(tcpServerGlobal);
+		serverOpenedAndListening = tcp_server_open();
 		if (serverOpenedAndListening == false) 
 		{
 			LOG("TCP did not successfully open, closing the server and freeing memory... \n");
@@ -476,13 +451,13 @@ static void tcp_server_close(tcpServerType *tcpServer)
  */
 static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err) 
 {
-    (void)arg; // Unused parameter
-
     /* Check if the received buffer is NULL. */
     if (!buffer) 
     {
         /* Log a message and return if the buffer is NULL. */
         LOG("buffer is NULL, returning... \n");
+        LOG("connection closed\n");
+        tcp_close_client_connection(pcb);
 		return ERR_BUF;
     }
 
@@ -517,7 +492,7 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
 
 #if (HTTP_ENABLED == ON)
         /* Process the HTTP response */
-        process_HTTP_response(tcpServerGlobal->receive_buffer, sizeof(tcpServerGlobal->receive_buffer), pcb);
+        process_HTTP_response(tcpServerGlobal, pcb);
 #endif
         /* Inform lwIP that the received data has been processed. */
         tcp_recved(pcb, buffer->tot_len);
@@ -537,6 +512,62 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
 }
 
 /* 
+ * Function: tcp_close_client_connection
+ * 
+ * Description: Closes the client connection by freeing the resources associated 
+ *              with the client PCB and setting the client PCB pointer to NULL.
+ * 
+ * Parameters:
+ *  - client_pcb: Pointer to the tcp_pcb structure representing the client connection.
+ * 
+ * Returns: void
+ */
+void tcp_close_client_connection(struct tcp_pcb *client_pcb) 
+{
+    if (client_pcb) 
+    {
+        /* Clear the callbacks for the client PCB to release the associated resources. */
+        tcp_arg(client_pcb, NULL);
+        tcp_poll(client_pcb, NULL, 0);
+        tcp_sent(client_pcb, NULL);
+        tcp_recv(client_pcb, NULL);
+        tcp_err(client_pcb, NULL);
+
+        /* Close the client PCB to terminate the connection. */
+        err_t err = tcp_close(client_pcb);
+        if (err != ERR_OK) 
+        {
+            LOG("close failed %d, calling abort\n", err);
+            tcp_abort(client_pcb);
+        }
+    }
+}
+
+/* 
+ * Function: tcp_server_err_callback
+ * 
+ * Description: Callback function that is called when an error occurs during 
+ *              the TCP server operation. It logs the error and closes the client 
+ *              connection if the error is not an abort error.
+ * 
+ * Parameters:
+ *  - arg: User-defined argument passed to the error callback, typically containing server context.
+ *  - err: Error status indicating the type of error that occurred.
+ * 
+ * Returns: void
+ */
+static void tcp_server_err_callback(void *arg, err_t err) 
+{
+    (void)arg; // Unused parameter
+
+    if (err != ERR_ABRT) 
+    {
+        LOG("tcp_client_err_fn %d\n", err);
+        tcp_close_client_connection(tcpServerGlobal->client_pcb);
+    }
+}
+
+/* 
  * Function: tcp_server_accept
  * 
  * Description: Callback function that is called when a new client connects 
@@ -552,15 +583,22 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
  */
 static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err) 
 {
-    /* Cast the argument to the expected tcpServerType structure. */
-    tcpServerType *tcpServer = (tcpServerType*)arg;
+    (void)arg; // Unused parameter
+    
 	err_t status = ERR_OK;
 
     /* Check for errors in the accept callback or if the client PCB is NULL. */
     if (err != ERR_OK || client_pcb == NULL) 
     {
         /* Log a failure message if the connection was not successful. */
-        LOG("Failure in accept\n");
+        if (err != ERR_OK) 
+        { 
+            LOG("Failure in accept: Error code %d\n", err); 
+        } 
+        else 
+        { 
+            LOG("Failure in accept: client_pcb is NULL\n"); 
+        }
         status = ERR_VAL; // Return an error value to indicate failure
     }
 	else
@@ -569,13 +607,12 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
 		LOG("Client connected\n");
 
 		/* Store the client PCB in the tcpServer structure for later use. */
-		tcpServer->client_pcb = client_pcb;
-        
-		/* Associate the tcpServer context with the client PCB for later reference. */
-		tcp_arg(client_pcb, tcpServer);
+		tcpServerGlobal->client_pcb = client_pcb;
 
 		/* Set the receive callback function for the client PCB to handle incoming data. */
 		tcp_recv(client_pcb, tcp_server_recv_callback);
+        /* Set the error callback function for the client PCB to handle connection errors. */
+        tcp_err(client_pcb, tcp_server_err_callback);
 	}
     
     /* ERR_OK to indicate successful acceptance of the client connection or ERR_VAL if failed */
@@ -588,19 +625,22 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
  * Description: Initializes and opens the TCP server, binding it to a specified port 
  *              and setting up a listening state for incoming connections.
  * 
- * Parameters:
- *  - tcpServer: Pointer to the tcpServerType structure that will hold the server PCB.
+ * Parameters: void (uses the global tcpServer structure)
  * 
  * Returns: bool indicating the success (true) or failure (false) of the server opening.
  */
-static bool tcp_server_open(tcpServerType *tcpServer) 
+static bool tcp_server_open(void) 
 {
     /* Create a new TCP protocol control block (PCB) for the server,
        allowing any IP address type to be used (IPv4 or IPv6). */
     struct tcp_pcb *pcb = tcp_new_ip_type(IPADDR_TYPE_ANY);
 
     /* Log the starting message with the server's IP address and port. */
+#if (HTTP_ENABLED == ON)
+    LOG("Starting server at %s on port %u\n", ip4addr_ntoa(netif_ip4_addr(netif_list)), TCP_HTTP_PORT);
+#else
     LOG("Starting server at %s on port %u\n", ip4addr_ntoa(netif_ip4_addr(netif_list)), TCP_PORT);
+#endif
 
     /* Check if the PCB was successfully created. */
     if (!pcb) 
@@ -628,8 +668,8 @@ static bool tcp_server_open(tcpServerType *tcpServer)
     }
 
     /* Set the PCB to listen for incoming connections with a backlog of 1. */
-    tcpServer->server_pcb = tcp_listen_with_backlog(pcb, 1);
-    if (!tcpServer->server_pcb) 
+    tcpServerGlobal->server_pcb = tcp_listen_with_backlog(pcb, 1);
+    if (!tcpServerGlobal->server_pcb) 
     {
         /* Log an error message if setting the server to listen failed. */
         LOG("failed to listen\n");
@@ -641,11 +681,8 @@ static bool tcp_server_open(tcpServerType *tcpServer)
         return false; 
     }
 
-    /* Associate the tcpServer context with the listening PCB. */
-    tcp_arg(tcpServer->server_pcb, tcpServer);
-
     /* Set the accept callback function for incoming connections. */
-    tcp_accept(tcpServer->server_pcb, tcp_server_accept);
+    tcp_accept(tcpServerGlobal->server_pcb, tcp_server_accept);
 
     /* Return true to indicate the server has been successfully opened and is listening for incoming connections */
     return true;
@@ -710,7 +747,7 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
 
 #if (HTTP_ENABLED == ON)
         // Process the HTTP response
-        process_HTTP_response(client->receive_buffer, client->receive_length);
+        //process_HTTP_response(arg, client->receive_buffer, client->receive_length, tpcb); TODO - implement HTTP response processing for TCP client
 #endif
         // Release the mutex after finishing with the buffer
         xSemaphoreGive(bufferMutex);

@@ -89,8 +89,8 @@ bool send_http_get_request(const char *host, const char *path)
  * Description: Processes the received HTTP GET request and generates the response.
  * 
  * Parameters:
- * - buffer: Pointer to the buffer containing the received HTTP GET request.
- * - length: The length of the received HTTP GET request.
+ * - tcpServer: pointer to the global TCP server structure
+ * - pcb: Pointer to the TCP protocol control block associated with the connection.
  * 
  * Returns: void 
  * 
@@ -99,13 +99,14 @@ bool send_http_get_request(const char *host, const char *path)
  *      Host: example.com
  *      [Optional headers]
  */
-void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb) 
+void process_HTTP_response(tcpServerType* tcpServer, struct tcp_pcb *pcb) 
 {
     /* Compare the beginning of the buffer with the HTTP_GET string to check if the buffer contains an HTTP GET request */
-    if (strncmp(HTTP_GET, (const char *)buffer, strlen(HTTP_GET)) == 0) // returns 0 if equal
+    if (strncmp(HTTP_GET, (const char *)tcpServer->receive_buffer, strlen(HTTP_GET)) == 0) // returns 0 if equal
     {
         /* Extract the request from the buffer */
-        char *request = (char *)buffer + strlen(HTTP_GET) + 1; // +1 to skip the space after GET
+        char *request = (char *)tcpServer->receive_buffer + strlen(HTTP_GET) + 1; // +1 to skip the space after GET
+        LOG("Parsed Request: %s\n", request);
 
         /* Find the '?' character in the request. In the context of an HTTP request, the ? character is used to separate the URL path from the query string. 
            For example HTTP request URL typically looks like this: http://example.com/path/to/resource?key1=value1&key2=value2
@@ -122,6 +123,7 @@ void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb
                This is often done to split a string into two parts. For example, if query is "/ledtest?led=1", this line would change it to 
                /ledtest\0led=1", making "/ledtest" a complete string while moving one character ahead to the query string, which is now "led=1". */
             *query++ = 0;
+            LOG("Parsed Query: %s\n", query);
 
             if (space) // if the second space character was found
             { 
@@ -142,34 +144,34 @@ void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb
         if (response_len > strlen(response)) 
         {
             LOG("Too much response data %d\n", response_len);
+            tcp_close_client_connection(pcb);
             return;
         }
 
         /* Generate web page */
         if (response_len > 0) 
         {
-            header_len = snprintf(buffer, sizeof(buffer), HTTP_RESPONSE_HEADERS, 200, response_len);
-            if (header_len > strlen(buffer)) 
+            header_len = snprintf(tcpServer->receive_buffer, sizeof(tcpServer->receive_buffer), HTTP_RESPONSE_HEADERS, 200, response_len);
+            if (header_len > strlen(tcpServer->receive_buffer)) 
             {
                 LOG("Too much header data %d\n", header_len);
+                tcp_close_client_connection(pcb);
                 return;
             }
         } 
         else 
         {
             /* Send redirect */
-            //TODO
-            //con_state->header_len = snprintf(buffer, sizeof(buffer), HTTP_RESPONSE_REDIRECT, ipaddr_ntoa(con_state->gateway));
-            //LOG("Sending redirect %s", buffer);
-            LOG("Redirect not implemented currently \n");
+            header_len = snprintf(tcpServer->receive_buffer, sizeof(tcpServer->receive_buffer), HTTP_RESPONSE_REDIRECT, ipaddr_ntoa(&tcpServer->gateway));
+            LOG("Sending redirect %s", tcpServer->receive_buffer);
         }
 
         /* Send the headers to the client */
-        //con_state->sent_len = 0; TODO - is this needed?
-        err_t err = tcp_write(pcb, buffer, header_len, 0);
+        err_t err = tcp_write(pcb, tcpServer->receive_buffer, header_len, 0);
         if (err != ERR_OK) 
         {
             LOG("Failed to write header data %d\n", err);
+            tcp_close_client_connection(pcb);
             return;
         }
 
@@ -180,6 +182,7 @@ void process_HTTP_response(uint8_t *buffer, uint16_t length, struct tcp_pcb *pcb
             if (err != ERR_OK) 
             {
                 LOG("Failed to write response data %d\n", err);
+                tcp_close_client_connection(pcb);
                 return;
             }
         }
