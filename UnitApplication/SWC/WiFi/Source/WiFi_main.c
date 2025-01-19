@@ -45,7 +45,7 @@ typedef enum {
 /* Communication State */
 typedef enum {
     INIT = 0,
-    LISTEN = 1,
+    LISTENING = 1,
     ACTIVE_SEND_AND_RECEIVE = 2,
     MONITOR = 3
 } WiFiStateType;
@@ -94,7 +94,7 @@ void WiFi_MainFunction(void)
 {
     switch (WiFiState)
     {
-        case LISTEN:
+        case LISTENING:
             WiFi_ListenState();
             break;
         case ACTIVE_SEND_AND_RECEIVE:
@@ -141,7 +141,7 @@ static void WiFi_ProcessCommand(uint8_t command)
             break;
         case PICO_TRANSITION_TO_LISTEN_MODE:
             LOG("Transitioning to Listen Mode...\n");
-            WiFiState = LISTEN;
+            WiFiState = LISTENING;
             break;
         case PICO_TRANSITION_TO_MONITOR_MODE:
             LOG("Transitioning to Monitor Mode...\n");
@@ -196,7 +196,7 @@ static void WiFi_ListenState(void)
  * 
  * Description: State in which the Pico W can both receive/send messages and process 
  * various commands. This state can be achieved by sending PICO_TRANSITION_TO_ACTIVE_MODE 
- * command to take Pico out of the passive LISTEN state.
+ * command to take Pico out of the passive LISTENING state.
  * 
  * 
  * Parameters:
@@ -296,7 +296,7 @@ static void WiFi_MonitorState(void)
  * - Pico as UDP server (currently not supported)
  * - Pico as UDP client (TransportLayer set to UDP_COMMUNICATION)
  * 
- * After initialization the default state of communication is LISTEN.
+ * After initialization the default state of communication is LISTENING.
  * This means the Pico W will passively listen to incoming messages.
  * In this mode it will only print the received messages, and react
  * only to one command - PICO_TRANSITION_TO_ACTIVE_MODE, which transitions
@@ -313,14 +313,14 @@ static void WiFi_InitCommunication(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
 #if (PICO_W_AS_TCP_SERVER == ON)
-        if(start_TCP_server() == true) WiFiState = LISTEN;
+        if(start_TCP_server() == true) WiFiState = LISTENING;
 #else /* defaults to Pico as TCP client */
-        if(start_TCP_client() == true) WiFiState = LISTEN;
+        if(start_TCP_client() == true) WiFiState = LISTENING;
 #endif
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
-        if(start_UDP_client() == true) WiFiState = LISTEN;
+        if(start_UDP_client() == true) WiFiState = LISTENING;
     }
     else
     {
