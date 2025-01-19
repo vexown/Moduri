@@ -138,7 +138,7 @@ void process_HTTP_response(tcpServerType* tcpServer, struct tcp_pcb *pcb)
         response_len = test_server_content(request, query, response, sizeof(response));
 
         LOG("Request: %s?%s\n", request, query);
-        LOG("Response: %d\n", response_len);
+        LOG("Response length: %d\n", response_len);
 
         /* Check we had enough buffer space */
         if (response_len > strlen(response)) 
@@ -231,6 +231,12 @@ static int test_server_content(const char *request, const char *query, char *res
             len = snprintf(response, max_response_len, LED_TEST_BODY, "OFF", 1, "ON");
         }
     }
+
+    if(len > 0)
+    {
+        LOG("Generated Response: %s\n", response);
+    }
+    
     return len;
 }
 

@@ -454,11 +454,20 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
     /* Check if the received buffer is NULL. */
     if (!buffer) 
     {
-        /* Log a message and return if the buffer is NULL. */
-        LOG("buffer is NULL, returning... \n");
-        LOG("connection closed\n");
-        tcp_close_client_connection(pcb);
-		return ERR_BUF;
+        /* When the client sends a FIN (indicating it wants to close the connection), the tcp_recv callback will be invoked with buffer == NULL. */
+        if (err == ERR_OK)
+        {
+            LOG("Connection closed gracefully\n");
+            tcp_close_client_connection(pcb);
+            /* err value you return from the tcp_recv callback should guide lwIP in how to proceed with the connection. In this case we tell lwIP all is good */
+            return ERR_OK; 
+        } 
+        else /* In other cases - NULL buffer means something went wrong */
+        {
+            LOG("Error receiving data: %d\n", err); 
+            tcp_close_client_connection(pcb);
+            return ERR_ABRT; // Tell lwIP to abort the connection
+        }
     }
 
     if (err != ERR_OK) 
