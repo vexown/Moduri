@@ -535,6 +535,11 @@ void tcp_close_client_connection(struct tcp_pcb *client_pcb)
 {
     if (client_pcb) 
     {
+        /* Log the client's IP address and port before closing the connection. */
+        ip_addr_t *client_ip = &client_pcb->remote_ip;
+        u16_t client_port = client_pcb->remote_port;
+        LOG("Closing connection for client: IP=%s, Port=%d\n", ipaddr_ntoa(client_ip), client_port);
+
         /* Clear the callbacks for the client PCB to release the associated resources. */
         tcp_arg(client_pcb, NULL);
         tcp_poll(client_pcb, NULL, 0);
@@ -549,6 +554,10 @@ void tcp_close_client_connection(struct tcp_pcb *client_pcb)
             LOG("close failed %d, calling abort\n", err);
             tcp_abort(client_pcb);
         }
+    } 
+    else 
+    {
+        LOG("tcp_close_client_connection called with NULL client_pcb\n");
     }
 }
 
