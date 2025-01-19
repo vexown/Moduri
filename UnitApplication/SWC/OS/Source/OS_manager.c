@@ -150,6 +150,7 @@ void OS_start( void )
 	LOG("Setting up the RTOS configuration... \n");
 
 	/* Create the Software Timers. These use System Tick as time base. They are handled in a dedicated Timer Service task (aka Daemon Task) */
+#if (ALIVE_TIMER_ENABLED == ON)
 	/* "Alive" Timer which is used to toggle the on-board LED to show the system is not stuck (is alive) */
     aliveTimer = xTimerCreate( "AliveTimer",                     // Timer name (for debugging)
 								ALIVE_TIMER_PERIOD,    			 // Timer period in ticks
@@ -160,6 +161,7 @@ void OS_start( void )
 	/* If all FreeRTOS objects were created sucessfully proceed with task creation and starting the scheduler */
 	if(aliveTimer != NULL)
 	{
+#endif
 		/* Create the tasks */
 		taskCreationStatus[0] = xTaskCreate( networkTask,				/* The function that implements the task. */
 											"Network", 					/* The text name assigned to the task - for debug only as it is not used by the kernel. */
@@ -181,7 +183,7 @@ void OS_start( void )
 				CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
 			}
 		}
-
+#if (ALIVE_TIMER_ENABLED == ON)
 		/* Start the Alive Timer */
 		aliveTimerStarted = xTimerStart(aliveTimer, NO_TIMEOUT); //don't wait for space in the timer command queue, if there is no space we throw an error
 
@@ -194,14 +196,17 @@ void OS_start( void )
 		{
 			CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_SW_TIMER_FAILED_TO_START);
 		}
+#endif
 
 		LOG("RTOS configuration finished, starting the scheduler... \n");
 		vTaskStartScheduler();
+#if (ALIVE_TIMER_ENABLED == ON)
 	}
 	else
 	{
 		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_RTOS_OBJECTS_FAILED_TO_CREATE);
 	}
+#endif
 
 	/* If all is well, the scheduler will now be running, and the following
 	line will never be reached.  If the following line does execute, then

@@ -37,4 +37,7 @@
 /* Use this option to enable printing (or TCP sending) of monitoring data such as Tasks Statistics, Heap and Stack usage etc. */
 #define MONITORING_ENABLED      OFF
 
+/* Use this option to enable a periodically flashing on-board LED which signalizes the software is running (as opposed to being stuck) */
+#define ALIVE_TIMER_ENABLED     OFF
+
 #endif // MODURICONFIG_H
