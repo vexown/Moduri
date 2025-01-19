@@ -47,7 +47,7 @@ static SemaphoreHandle_t bufferMutex;
 /*******************************************************************************/
 #if (PICO_W_AS_TCP_SERVER == ON)
 static bool tcp_server_open();
-static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err);
+static err_t tcp_server_accept_callback(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
 static void tcp_server_close(tcpServerType *tcpServer);
 static void tcp_server_err_callback(void *arg, err_t err);
@@ -577,25 +577,22 @@ static void tcp_server_err_callback(void *arg, err_t err)
 }
 
 /* 
- * Function: tcp_server_accept
+ * Function: tcp_server_accept_callback
  * 
- * Description: Callback function that is called when a new client connects 
- *              to the TCP server. It sets up the client PCB and prepares to 
- *              receive data from the client.
+ * Description: Callback function that is called when there is a new connection request by a client 
+ *              to the TCP server. It sets up the client PCB and prepares to receive data from the client.
  * 
  * Parameters:
  *  - arg: User-defined argument passed to the accept callback, typically containing server context.
  *  - client_pcb: Pointer to the tcp_pcb structure representing the new client connection.
  *  - err: Error status indicating if there was an error during the accept process.
  * 
- * Returns: err_t indicating the result of the accept operation (ERR_OK or ERR_VAL).
+ * Returns: ERR_OK always - we either accept the connection or abort it.
  */
-static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err) 
+static err_t tcp_server_accept_callback(void *arg, struct tcp_pcb *client_pcb, err_t err) 
 {
     (void)arg; // Unused parameter
     
-	err_t status = ERR_OK;
-
     /* Check for errors in the accept callback or if the client PCB is NULL. */
     if (err != ERR_OK || client_pcb == NULL) 
     {
@@ -608,24 +605,30 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
         { 
             LOG("Failure in accept: client_pcb is NULL\n"); 
         }
-        status = ERR_VAL; // Return an error value to indicate failure
+
+        if (client_pcb != NULL) 
+        {
+            tcp_abort(client_pcb); // Clean up the client PCB
+        }
     }
 	else
 	{
 		/* Log a message indicating that a client has connected successfully. */
-		LOG("Client connected\n");
+        ip_addr_t *client_ip = &client_pcb->remote_ip;
+        u16_t client_port = client_pcb->remote_port;
+        LOG("Client connected from IP: %s, Port: %d\n", ipaddr_ntoa(client_ip), client_port);
 
 		/* Store the client PCB in the tcpServer structure for later use. */
 		tcpServerGlobal->client_pcb = client_pcb;
 
 		/* Set the receive callback function for the client PCB to handle incoming data. */
 		tcp_recv(client_pcb, tcp_server_recv_callback);
+
         /* Set the error callback function for the client PCB to handle connection errors. */
         tcp_err(client_pcb, tcp_server_err_callback);
 	}
     
-    /* ERR_OK to indicate successful acceptance of the client connection or ERR_VAL if failed */
-    return status;
+    return ERR_OK; // Always return ERR_OK to lwIP (we either accept the connection or abort it)
 }
 
 /* 
@@ -691,7 +694,7 @@ static bool tcp_server_open(void)
     }
 
     /* Set the accept callback function for incoming connections. */
-    tcp_accept(tcpServerGlobal->server_pcb, tcp_server_accept);
+    tcp_accept(tcpServerGlobal->server_pcb, tcp_server_accept_callback);
 
     /* Return true to indicate the server has been successfully opened and is listening for incoming connections */
     return true;
