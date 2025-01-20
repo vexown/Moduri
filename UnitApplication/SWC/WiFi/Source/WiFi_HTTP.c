@@ -22,6 +22,11 @@
 #include <string.h>
 
 /*******************************************************************************/
+/*                               STATIC VARIABLES                              */
+/*******************************************************************************/
+static char response[2048]; // 2kB response buffer for HTTP GET requests. This will be stored in RAM in the .bss section.
+
+/*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
 
@@ -132,7 +137,6 @@ void process_HTTP_response(tcpServerType* tcpServer, struct tcp_pcb *pcb)
         }
 
         /* Generate content */
-        char response[256];
         int response_len;
         int header_len;
         response_len = test_server_content(request, query, response, sizeof(response));
@@ -224,11 +228,11 @@ static int test_server_content(const char *request, const char *query, char *res
         /* Generate the response */
         if (led_state) 
         {
-            len = snprintf(response, max_response_len, LED_TEST_BODY, "ON", 0, "OFF");
+            len = snprintf(response, max_response_len, PICO_HTML_PAGE, "ON", 0, "OFF");
         } 
         else 
         {
-            len = snprintf(response, max_response_len, LED_TEST_BODY, "OFF", 1, "ON");
+            len = snprintf(response, max_response_len, PICO_HTML_PAGE, "OFF", 1, "ON");
         }
     }
 
