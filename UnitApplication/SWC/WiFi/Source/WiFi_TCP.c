@@ -578,7 +578,7 @@ static void tcp_server_err_callback(void *arg, err_t err)
 {
     (void)arg; // Unused parameter
 
-    if (err != ERR_ABRT) 
+    if (err != ERR_ABRT) // See list of possible error codes in lwip/err.h in pico-sdk
     {
         LOG("tcp_client_err_fn %d\n", err);
         tcp_close_client_connection(tcpServerGlobal->client_pcb);
