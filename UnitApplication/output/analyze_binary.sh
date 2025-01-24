@@ -15,36 +15,38 @@
 #   - `xxd` for hex dumping
 
 # Raspberry Pi Pico W Memory Map:
-# (Source - Address Map chapter in https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf)
+# (Source - Address Map chapter in https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
 #
-# - ROM: 0x00000000 
+# - ROM: 0x00000000-0x00008000 (32kB)
 #        This is ACTUAL ROM - Read Only Memory - The ROM contents are fixed at the time the silicon is manufactured
 #        It's not some relict bullshit of calling regular writeable flash/EEPROM as ROM, as manufacturers and people often do.
-#        It contains the initial startup routine, flash boot seq, flash programming routines, USB mass storage dev etc.
-# - RAM: 264KB SRAM at 0x20000000 - 0x20042000
-#        Divided into 6 banks for vastly improved mem bandwith for multiple masters. For SW - it can be treated as single 264kB mem region.
-#        Can be used for anything, processor code, data buffers... there is no restrictions. Accessed via AHB-Lite arbiter.
-# - Program Flash (XIP): 2MB XIP at 0x10000000 - 0x10200000
+#        It contains things like the Core 0 boot sequence, Core 1 Launch code, USB/UART bootloader but also some useful runtime APIs,
+#        see https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf#page=376 for details
+# - SRAM: 0x20000000 - 0x20082000 (520kB)
+#        Divided into 10 banks. Banking is a physical partitioning of SRAM which improves performance by allowing multiple simultaneous
+#        accesses. Logically, there is a single 520 kB contiguous memory. Each SRAM bank is accessed via a dedicated AHB5 arbiter.
+#        This means different bus managers can access different SRAM banks in parallel, so up to six 32-bit SRAM accesses can take place 
+#        every system clock cycle (one per manager).
+# - Program Flash (XIP): 0x10000000 - 0x10200000 (2MB)
 #        External Flash, accessed via QSPI interface using execute-in-place (XIP) hardware. Meaning it can be addressed and accessed by the 
-#        system as it were internal memory. Once correctly configured by RP2040's bootrom and flash second stage, the software can treat 
-#        flash as a large read-only memory (the memory in theory is writeable but in this context of XIP, it is read-only for the SW)
+#        system as it were internal memory. A 16 kB on-chip cache retains the values of recent reads and writes. This reduces the chances 
+#        that XIP bus accesses must go to external memory, improving the average throughput and latency of the XIP interface.
 # - APB Peripheral Registers: Start at 0x40000000
-#        APB Peripherals include: SYSCFG, CLOCKS, PLL, UART, SPI, I2C, ADC, PWM, TIMER, WATCHDOG etc.
+#        APB Peripherals include: SYSCFG, CLOCKS, PLL, UART, SPI, I2C, ADC, PWM, TIMER, WATCHDOG, OTP, SHA256, CORESIGHT etc.
 # - AHB-Lite Peripheral Registers: Start at 0x50000000
-#        AHB-Lite Peripherals: only DMA. RP2040 DMA (Direct Memory Access) controller has separate read and write connections, enabling 
-#        efficient bulk data transfers without processor intervention.
+#        AHB-Lite Peripherals: DMA, USBCTRL, PIO, XIP_AUX, HSTX_FIFO etc.
 #        For DMA examples see https://github.com/raspberrypi/pico-examples/tree/master/dma 
-# - IOPORT Registers: Start at 0xD0000000
-#        Used to access SIO - The Single-cycle IO block (SIO) contains several peripherals that require low-latency, deterministic access 
-#        from the processors. All IOPORT reads and writes (and therefore all SIO accesses) take place in exactly one cycle, unlike the main AHB-Lite
-#        system bus, where the Cortex-M0+ requires two cycles for a load or store, and may have to wait longer due to contention from other system 
-#        bus masters. This is vital for interfaces such as GPIO, which have tight timing requirements.
-#        SIO peripherals include: CPUID, GPIO Control, HW Spinlocks, Inter-processor FIFOs, Integer Divider, Interpolator.
-# - Cortex-M0+ core Internal Registers: Start at 0xE0000000
-#        Info from RP2040 datasheet but they took it from Cortex-M0+ Technical Reference Manual: https://developer.arm.com/documentation/ddi0484/latest
-#        The ARM Cortex-M0+ processor is a very low gate count, highly energy efficient processor that is intended for microcontroller and deeply 
-#        embedded applications that require an area optimized, low-power processor.
-#        ARM Cortex-M0+ registers refer to internal ARM core stuff such as: SysTick, NVIC, SCR, CCR, VTOR, ICSR, MPU etc.
+# - Core-local Peripherals (SIO): Start at 0xD0000000
+#        Used to access SIO - The Single-cycle IO subsystem (SIO) contains peripherals that require low-latency, deterministic access from the
+#        processors. It is accessed via the AHB Fabric. The SIO has a dedicated bus interface for each processor.
+#        The single-cycle IO block contains registers which processors must access quickly. FIFOs, doorbells and spinlocks support message passing and
+#        synchronisation between the two cores. The shared GPIO registers provide fast, direct access to GPIO-capable pins. Interpolators can accelerate 
+#        common software tasks.
+#        The SIO contains: CPUID registers, Mailbox FIFOs, Doorbells, Hardware spinlocks, Interpolators, RISC-V platform timer, GPIO regs for bitbanging
+# - Cortex-M33 Private Peripherals: Start at 0xE0000000 
+#        The Private Peripheral Bus (PPB) memory region provides access to internal and external processor resources.
+#        The PPB provides access to: System Control Space (SCS) - including MPU, SAU and NVIC, Data Watchpoint and Trace (DWT), Breakpoint Unit (BPU),
+#        Embedded Trace Macrocell (ETM), CoreSight Micro Trace Buffer (MTB), Cross Trigger Interface (CTI), ROM table.
 
 BIN_FILE="moduri.bin"
 ELF_FILE="moduri.elf"
@@ -124,7 +126,7 @@ echo -e "Address\tSize\tType\tName" > $OUTPUT_DIR/large_symbols.txt
 sort -nrk 2 $OUTPUT_DIR/symbols_ram.txt $OUTPUT_DIR/symbols_flash.txt | head -n 10 >> $OUTPUT_DIR/large_symbols.txt
 
 # 4. Hex Dump with Adjusted Addresses
-FLASH_BASE_ADDR=0x10000000  # Base address for flash memory (for Raspberry Pi Pico W)
+FLASH_BASE_ADDR=0x10000000  # Base address for flash memory (for Raspberry Pi Pico 2 W)
 
 echo "Generating hex dump from BIN with flash address adjustment..."
 xxd -g 1 -u $BIN_FILE | awk -v base=$FLASH_BASE_ADDR '
