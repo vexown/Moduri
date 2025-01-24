@@ -105,7 +105,9 @@ static void networkTask(__unused void *taskParams);
 static void monitorTask(__unused void *taskParams);
 
 /******************************* Timer callbacks *******************************/
+#if (ALIVE_TIMER_ENABLED == ON)
 static void aliveTimerCallback(TimerHandle_t xTimer);
+#endif
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
@@ -133,10 +135,12 @@ void OS_start( void )
 {
 	const char *rtos_type;
 	BaseType_t taskCreationStatus[NUM_OF_TASKS_TO_CREATE];
+#if (ALIVE_TIMER_ENABLED == ON)
 	TimerHandle_t aliveTimer;
 	BaseType_t aliveTimerStarted;
+#endif
 
-    /** Check if we're running FreeRTOS on single core or both RP2040 cores:
+    /** Check if we're running FreeRTOS on single core or both RP2350 cores:
       * - Standard FreeRTOS is designed for single-core systems, with simpler task scheduling and communication mechanisms.
 	  * - FreeRTOS SMP is an enhanced version for multi-core systems, allowing tasks to run concurrently across multiple cores */
 #if (configNUMBER_OF_CORES == 2)
@@ -293,6 +297,7 @@ static void networkTask(__unused void *taskParams)
 
 }
 
+#if (ALIVE_TIMER_ENABLED == ON)
 /* 
  * Function: aliveTimerCallback
  * 
@@ -313,6 +318,7 @@ static void aliveTimerCallback(TimerHandle_t xTimer)
 	state_LED = !state_LED;
 	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, state_LED); //Set a GPIO pin on the wireless chip to a given value (LED pin in this case) 
 }
+#endif
 
 
 
