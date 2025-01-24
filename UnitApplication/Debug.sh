@@ -5,7 +5,7 @@
 #
 # Description:
 # This script automates the process of setting up an OpenOCD debug session
-# for an RP2040 microcontroller. It performs the following steps:
+# for an RP2350 microcontroller. It performs the following steps:
 # 1. Opens a new Windows Terminal (WT) window and runs the StartOpenOCD.sh script,
 #    which starts the OpenOCD server for the target device.
 # 2. Waits for 1 second to ensure that OpenOCD is fully initialized.
@@ -18,7 +18,7 @@
 #    - Start running the program.
 #
 # Usage:
-# Run this script to start debugging your embedded application on the RP2040
+# Run this script to start debugging your embedded application on the RP2350
 # microcontroller. Ensure that the StartOpenOCD.sh script is correctly set up
 # to initialize the OpenOCD session before running this script.
 #
@@ -47,7 +47,7 @@
 # This separation allows GDB to remain architecture-independent while OpenOCD
 # handles the hardware-specific details of communicating with the target MCU.
 #
-# Commonly Used GDB Commands for RP2040 Debugging
+# Commonly Used GDB Commands for RP2350 Debugging
 #
 # 1. target remote [host:port]          # Connect to a remote GDB server (e.g., OpenOCD)
 # 2. monitor reset halt                 # Reset the MCU and halt execution immediately after the reset
