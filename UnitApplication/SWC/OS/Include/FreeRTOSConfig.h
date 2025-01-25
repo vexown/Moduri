@@ -104,7 +104,7 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
  * support tickless mode. See
  * https://www.freertos.org/low-power-tickless-rtos.html Defaults to 0 if left
  * undefined. */
-#define configUSE_TICKLESS_IDLE                    1 //TODO - CHANGE IF NOT NEEDED
+#define configUSE_TICKLESS_IDLE                    0
 
 /* Set configUSE_TIME_SLICING to 1 to have the scheduler switch between Ready
  * state tasks of equal priority on every tick interrupt.  Set
@@ -168,7 +168,7 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
 /* configQUEUE_REGISTRY_SIZE sets the maximum number of queues and semaphores
  * that can be referenced from the queue registry.  Only required when using a
  * kernel aware debugger.  Defaults to 0 if left undefined. */
-#define configQUEUE_REGISTRY_SIZE                  8 //TODO - CHANGE IF NOT NEEDED
+#define configQUEUE_REGISTRY_SIZE                  8
 
 /* Set configENABLE_BACKWARD_COMPATIBILITY to 1 to map function names and
  * datatypes from old version of FreeRTOS to their latest equivalent.  Defaults
@@ -180,7 +180,7 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
  * in the array.  See
  * https://www.freertos.org/thread-local-storage-pointers.html Defaults to 0 if
  * left undefined. */
-#define configNUM_THREAD_LOCAL_STORAGE_POINTERS    5 //TODO - CHANGE IF NOT NEEDED
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS    5
 
 /* When configUSE_MINI_LIST_ITEM is set to 0, MiniListItem_t and ListItem_t are
  * both the same. When configUSE_MINI_LIST_ITEM is set to 1, MiniListItem_t
@@ -384,9 +384,9 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
  * application writer needs to provide a clock source if set to 1.  Defaults to
  * 0 if left undefined.  See https://www.freertos.org/rtos-run-time-stats.html.
  */
-#define configGENERATE_RUN_TIME_STATS           0 //TODO - ENABLE IF NOT CAUSING ISSUES
-//#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()   Monitor_initRuntimeCounter() //TODO - ENABLE IF NOT CAUSING ISSUES
-//#define portGET_RUN_TIME_COUNTER_VALUE()           Monitor_getRuntimeCounter() //TODO - ENABLE IF NOT CAUSING ISSUES
+#define configGENERATE_RUN_TIME_STATS           1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()   Monitor_initRuntimeCounter() 
+#define portGET_RUN_TIME_COUNTER_VALUE()           Monitor_getRuntimeCounter()
 
 /* Set configUSE_TRACE_FACILITY to include additional task structure members
  * are used by trace and visualisation functions and tools.  Set to 0 to exclude
@@ -529,7 +529,6 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
 #if configNUMBER_OF_CORES > 1
 #define configRUN_MULTIPLE_PRIORITIES             0
 #endif
-#define configRUN_MULTIPLE_PRIORITIES             0 //TODO - remove this if not needed
 
 /* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), set
  * configUSE_CORE_AFFINITY to 1 to enable core affinity feature. When core
@@ -655,7 +654,7 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
 #define configUSE_MUTEXES                      1
 #define configUSE_RECURSIVE_MUTEXES            1
 #define configUSE_COUNTING_SEMAPHORES          1
-#define configUSE_QUEUE_SETS                   1 //TODO - disable if not needed
+#define configUSE_QUEUE_SETS                   0
 #define configUSE_APPLICATION_TASK_TAG         0
 
 /* USE_POSIX_ERRNO enables the task global FreeRTOS_errno variable which will
