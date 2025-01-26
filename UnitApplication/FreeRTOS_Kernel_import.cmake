@@ -1,11 +1,11 @@
 # ------------------------------------------------------------------------------
-# This CMake script helps locate and include the FreeRTOS kernel for the RP2040 
+# This CMake script helps locate and include the FreeRTOS kernel for the RP2350 
 # in an external project. It checks if the FREERTOS_KERNEL_PATH environment variable 
 # is set or provided as a CMake argument, verifies the kernel's existence, and 
 # then includes the necessary FreeRTOS port directory.
 #
-# Original source: <FREERTOS_KERNEL_PATH>/portable/ThirdParty/GCC/RP2040/FREERTOS_KERNEL_import.cmake
-# Git repository: <https://github.com/FreeRTOS/FreeRTOS-Kernel>
+# Original source: <FREERTOS_KERNEL_PATH>/portable/ThirdParty/GCC/RP2350_ARM_NTZ/FREERTOS_KERNEL_import.cmake
+# Git repository: <https://github.com/raspberrypi/FreeRTOS-Kernel>
 # ------------------------------------------------------------------------------
 
 if (NOT DEFINED ENV{FREERTOS_KERNEL_PATH})
@@ -24,15 +24,15 @@ set(FREERTOS_KERNEL_PATH "${FREERTOS_KERNEL_PATH}" CACHE PATH "Path to the FreeR
 # Convert FREERTOS_KERNEL_PATH to an absolute path
 get_filename_component(FREERTOS_KERNEL_PATH "${FREERTOS_KERNEL_PATH}" REALPATH)
 
-# Define the path to the FreeRTOS port directory for RP2040
-set(FREERTOS_KERNEL_RP2040_PATH "${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040")
+# Define the path to the FreeRTOS port directory for RP2350
+set(FREERTOS_KERNEL_RP2350_PATH "${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2350_ARM_NTZ")
 
 # Stop if the FreeRTOS port directory does not exist
-if (NOT EXISTS "${FREERTOS_KERNEL_RP2040_PATH}")
-    message(FATAL_ERROR "Directory '${FREERTOS_KERNEL_RP2040_PATH}' not found. Make sure the FREERTOS_KERNEL_PATH points to the FreeRTOS kernel directory")
+if (NOT EXISTS "${FREERTOS_KERNEL_RP2350_PATH}")
+    message(FATAL_ERROR "Directory '${FREERTOS_KERNEL_RP2350_PATH}' not found. Make sure the FREERTOS_KERNEL_PATH points to the FreeRTOS kernel directory")
 endif ()
 
-# Include the FreeRTOS port directory for RP2040
-message(STATUS "########## FreeRTOS RP2040 CMakeLists.txt - start ##########")
-add_subdirectory(${FREERTOS_KERNEL_RP2040_PATH} FREERTOS_KERNEL)
-message(STATUS "########## FreeRTOS RP2040 CMakeLists.txt - end ##########")
+# Include the FreeRTOS port directory for RP2350
+message(STATUS "########## FreeRTOS RP2350 CMakeLists.txt - start ##########")
+add_subdirectory(${FREERTOS_KERNEL_RP2350_PATH} FREERTOS_KERNEL)
+message(STATUS "########## FreeRTOS RP2350 CMakeLists.txt - end ##########")
