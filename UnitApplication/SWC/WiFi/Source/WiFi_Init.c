@@ -89,21 +89,19 @@ bool connectToWifi(void)
  *  - none
  * 
  * Returns: bool
- * - true if Access Point set up successfully
- * - false if Access Point set up failed
+ * - always returns true for now
  * 
  */
 
 bool setupWifiAccessPoint(void)
 {
-    bool status = false;
     const char* ssid_local = "MainBox";
     const char* pass_local = "password"; //THIS IS NOT A SECRET, ONLY FOR TESTING 
 
     /* Enables Wi-Fi in Access Point (AP) mode with WPA2 security */
     cyw43_arch_enable_ap_mode(ssid_local, pass_local, CYW43_AUTH_WPA2_AES_PSK);
 
-    return status;
+    return true; 
 }
 
 /*******************************************************************************/
