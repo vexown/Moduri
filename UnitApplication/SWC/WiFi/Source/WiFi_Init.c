@@ -57,16 +57,6 @@ bool connectToWifi(void)
 {
     bool status = false;
 
-    /* Initializes the cyw43_driver code and initializes the lwIP stack (for use in specific country) */
-    if (cyw43_arch_init()) 
-    {
-        LOG("failed to initialize\n");
-    } 
-    else 
-    {
-        LOG("initialized successfully\n");
-    }
-
     /* Enables Wi-Fi in Station (STA) mode such that connections can be made to other Wi-Fi Access Points */
     cyw43_arch_enable_sta_mode();
 
@@ -109,17 +99,6 @@ bool setupWifiAccessPoint(void)
     bool status = false;
     const char* ssid_local = "MainBox";
     const char* pass_local = "password"; //THIS IS NOT A SECRET, ONLY FOR TESTING 
-
-    /* Initializes the cyw43_driver code and initializes the lwIP stack */
-    if (cyw43_arch_init()) 
-    {
-        LOG("failed to initialize\n");
-    } 
-    else 
-    {
-        LOG("initialized successfully\n");
-        status = true;
-    }
 
     /* Enables Wi-Fi in Access Point (AP) mode with WPA2 security */
     cyw43_arch_enable_ap_mode(ssid_local, pass_local, CYW43_AUTH_WPA2_AES_PSK);
