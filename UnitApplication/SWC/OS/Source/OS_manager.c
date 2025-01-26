@@ -107,7 +107,7 @@ void OS_start(void);
 /*******************************************************************************/
 /*                       STATIC FUNCTION DECLARATIONS                          */
 /*******************************************************************************/
-#if (ALIVE_TASK_ENABLED == ON && WATCHDOG_ENABLED == ON)
+#if (WATCHDOG_ENABLED == ON)
 static void checkResetReason(void);
 #endif
 /***************************** Tasks declarations ******************************/
@@ -132,7 +132,7 @@ TaskHandle_t monitorTaskHandle = NULL;
 /*                          STATIC FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
-#if (ALIVE_TASK_ENABLED == ON && WATCHDOG_ENABLED == ON)
+#if (WATCHDOG_ENABLED == ON)
 /* 
  * Function: checkResetReason
  * 
@@ -343,8 +343,11 @@ static void aliveTask(__unused void *taskParams)
 	/*                          Task Initialization Code                           */
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
+
+#if (ALIVE_LED_ENABLED == ON)
 	static bool state_LED;
 	static uint8_t consecutiveFailures = 0;
+#endif
 
 	/* Initialize xLastWakeTime - this only needs to be done once. */
 	xLastWakeTime = xTaskGetTickCount();
@@ -355,46 +358,47 @@ static void aliveTask(__unused void *taskParams)
 	{
 		vTaskDelayUntil(&xLastWakeTime, ALIVE_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 
-#if (ALIVE_TASK_ENABLED == ON)
-            state_LED = !state_LED; // Toggle the state of the LED
-            
-			/* Get the async context from the CYW43 driver. async_context is a data structure used for managing asynchronous operations 
-			   in a thread-safe manner. It maintains an internal event queue where asynchronous events are posted and processed. 
-			   In FreeRTOS where we use the pico_cyw43_arch_lwip_sys_freertos library, a dedicated task is used to process these events */
-            async_context_t *context = cyw43_arch_async_context();
+#if (ALIVE_LED_ENABLED == ON)
+		state_LED = !state_LED; // Toggle the state of the LED
+		
+		/* Get the async context from the CYW43 driver. async_context is a data structure used for managing asynchronous operations 
+			in a thread-safe manner. It maintains an internal event queue where asynchronous events are posted and processed. 
+			In FreeRTOS where we use the pico_cyw43_arch_lwip_sys_freertos library, a dedicated task is used to process these events */
+		async_context_t *context = cyw43_arch_async_context();
 
-			/* Acquire the lock */
-            async_context_acquire_lock_blocking(context);
-            
-			/* Set the state of the LED */
-            int ret = cyw43_gpio_set(&cyw43_state, CYW43_WL_GPIO_LED_PIN, state_LED);
-            
-			/* Release the lock */
-            async_context_release_lock(context);
+		/* Acquire the lock */
+		async_context_acquire_lock_blocking(context);
+		
+		/* Set the state of the LED */
+		int ret = cyw43_gpio_set(&cyw43_state, CYW43_WL_GPIO_LED_PIN, state_LED);
+		
+		/* Release the lock */
+		async_context_release_lock(context);
 
-			/* TODO - add additional critical system checks that should be done before resetting the watchdog */
-
-			/* Check if the LED was set successfully */
-            if(ret != 0)
-            {
-                consecutiveFailures++;
-                LOG("LED failure number %d \n", consecutiveFailures);
-                
-                if(consecutiveFailures >= 3)
-                {
-					/* If the LED fails to set 3 times in a row, enter error state */
-                    CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_LED_FAILED);
-                }
-            }
-            else
-            {
-				/* Reset the counter if the LED was set successfully */
-                consecutiveFailures = 0;
-#if (WATCHDOG_ENABLED == ON)
-                /* Pet the watchdog to keep him from barking (rebooting the system) */
-                watchdog_update();
+		/* Check if the LED was set successfully */
+		if(ret != 0)
+		{
+			consecutiveFailures++;
+			LOG("LED failure number %d \n", consecutiveFailures);
+			
+			if(consecutiveFailures >= 3)
+			{
+				/* If the LED fails to set 3 times in a row, enter error state */
+				CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_LED_FAILED);
+			}
+		}
+		else
+		{
+			/* Reset the counter if the LED was set successfully */
+			consecutiveFailures = 0;
+		}
 #endif
-            }
+
+#if (WATCHDOG_ENABLED == ON)
+		/* TODO - add additional critical system checks that should be done before resetting the watchdog */
+
+		/* Pet the watchdog to keep him from barking (rebooting the system) */
+		watchdog_update();
 #endif
 
 	}
