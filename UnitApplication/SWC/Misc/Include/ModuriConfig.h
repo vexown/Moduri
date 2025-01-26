@@ -18,13 +18,13 @@
 #define PICO_W_AS_TCP_SERVER   ON
 
 /* This option decides if HTTP is enabled on the Pico, it is then included within the TCP stack */
-#define HTTP_ENABLED           ON
+#define HTTP_ENABLED           OFF
 
 /* Enable this option if you want to set the IP address of the Pico to a static value PICO_W_STATIC_IP_ADDRESS. Otherwise DHCP is used */
-#define USE_STATIC_IP          OFF
+#define USE_STATIC_IP          ON
 
 /* Use this option if you're running the Pico as an Access Point with a TCP server */
-#define PICO_AS_ACCESS_POINT   ON
+#define PICO_AS_ACCESS_POINT   OFF
 #if (PICO_AS_ACCESS_POINT == ON)
     #if (PICO_W_AS_TCP_SERVER == OFF) 
     #error "PICO_AS_ACCESS_POINT requires PICO_W_AS_TCP_SERVER to be ON" 
@@ -38,6 +38,11 @@
 #define MONITORING_ENABLED      OFF
 
 /* Use this option to enable a periodically flashing on-board LED which signalizes the software is running (as opposed to being stuck) */
-#define ALIVE_TIMER_ENABLED     OFF
+#define ALIVE_TASK_ENABLED       ON
+
+/* Watchdog timer (WDT) is fundamentally a hardware timer that requires periodic "kicks" or "refreshes" from the software to confirm 
+ * that the system is running as expected. If the timer expires (i.e., the software fails to refresh it in time), it triggers a 
+   predefined action, typically a system reset (which is our case) */
+#define WATCHDOG_ENABLED        ON
 
 #endif // MODURICONFIG_H

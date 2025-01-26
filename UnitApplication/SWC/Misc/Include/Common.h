@@ -28,6 +28,9 @@
 #define ERROR_ID_WIFI_DID_NOT_CONNECT               (uint8_t)(0x2U)
 #define ERROR_ID_RTOS_OBJECTS_FAILED_TO_CREATE      (uint8_t)(0x3U)
 #define ERROR_ID_SW_TIMER_FAILED_TO_START           (uint8_t)(0x4U)
+#define ERROR_ID_CYW43_INIT_FAILED                  (uint8_t)(0x5U)
+#define ERROR_ID_LED_FAILED                         (uint8_t)(0x6U)
+#define ERROR_ID_WATCHDOG_RESETS                    (uint8_t)(0x7U)
 
 /* Module IDs */
 #define MODULE_ID_OS    (uint8_t)(0x1U)

@@ -48,6 +48,10 @@
 #include "hardware/gpio.h"
 #include "pico/cyw43_arch.h"
 #include "lwip/sockets.h"
+#include "pico/async_context.h"
+#include "hardware/watchdog.h"
+#include "hardware/regs/watchdog.h"
+#include "hardware/structs/watchdog.h"
 
 /* WiFi includes */
 #include "WiFi_UDP.h"
@@ -68,23 +72,27 @@
 /*******************************************************************************/
 
 /* Priorities for the tasks (bigger number = higher prio) */
-#define MONITOR_TASK_PRIORITY				(tskIDLE_PRIORITY + 1)
-#define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 2)
+#define CYW43_INIT_TASK_PRIORITY        	(configMAX_PRIORITIES - 1)  // Highest
+#define ALIVE_TASK_PRIORITY             	(tskIDLE_PRIORITY + 1) 		// Lowest (but still higher than the idle task)
+#define MONITOR_TASK_PRIORITY				(tskIDLE_PRIORITY + 2)
+#define NETWORK_TASK_PRIORITY 				(tskIDLE_PRIORITY + 3)
 
 /* Context for time-related macros, we use these two main helper macros from FreeRTOS (configTICK_RATE_HZ is defined in FreeRTOSConfig.h)
 	- pdMS_TO_TICKS(TimeInMs):     (TimeInMs * configTICK_RATE_HZ) / 1000
 	- pdTICKS_TO_MS(TimeInTicks):  (TimeInTicks * 1000 ) / (configTICK_RATE_HZ)
 */
 /* Task periods */
+#define ALIVE_TASK_PERIOD_TICKS			    pdMS_TO_TICKS(500)  //500ms
 #define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(5000)  //5s
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
-
-/* Timer periods */
-#define ALIVE_TIMER_PERIOD                  pdMS_TO_TICKS(500) //500ms
 
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) 
 #define STACK_2048_BYTES					(configSTACK_DEPTH_TYPE)(512) 
+
+/* Watchdog settings */
+#define MAX_WATCHDOG_RESETS 				3
+#define WATCHDOG_TIMEOUT_MS 				((uint32_t)2000)
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
@@ -99,24 +107,65 @@ void OS_start(void);
 /*******************************************************************************/
 /*                       STATIC FUNCTION DECLARATIONS                          */
 /*******************************************************************************/
-
+#if (ALIVE_TASK_ENABLED == ON && WATCHDOG_ENABLED == ON)
+static void checkResetReason(void);
+#endif
 /***************************** Tasks declarations ******************************/
+static void aliveTask(__unused void *taskParams);
+static void cyw43initTask(__unused void *taskParams);
 static void networkTask(__unused void *taskParams);
 static void monitorTask(__unused void *taskParams);
-
-/******************************* Timer callbacks *******************************/
-#if (ALIVE_TIMER_ENABLED == ON)
-static void aliveTimerCallback(TimerHandle_t xTimer);
-#endif
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
 /*******************************************************************************/
+/* .uninitialized_data section is placed in RAM and is not initialized on startup (so-called no-init RAM)
+ * Its content persists over SOFT resets, but not over HARD resets (power cycle) */
+static uint8_t watchdogResetCount __attribute__((section(".uninitialized_data")));
 
 /*******************************************************************************/
 /*                             GLOBAL VARIABLES                                */
 /*******************************************************************************/
 TaskHandle_t monitorTaskHandle = NULL;
+
+/*******************************************************************************/
+/*                          STATIC FUNCTION DEFINITIONS                        */
+/*******************************************************************************/
+
+#if (ALIVE_TASK_ENABLED == ON && WATCHDOG_ENABLED == ON)
+/* 
+ * Function: checkResetReason
+ * 
+ * Description: Check the reset cause and handle it accordingly
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void checkResetReason(void) 
+{
+	/* Check if the system was reset by the watchdog */
+    if (watchdog_enable_caused_reboot()) 
+	{
+        watchdogResetCount++;
+        LOG("Watchdog reset detected! Count: %d\n", watchdogResetCount);
+        
+        if (watchdogResetCount >= MAX_WATCHDOG_RESETS) 
+		{
+            LOG("Too many watchdog resets! Entering error state\n");
+            watchdog_disable();
+
+			CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WATCHDOG_RESETS);
+        }
+    } 
+	else 
+	{
+        /* Reset not caused by watchdog, reset the counter */
+        watchdogResetCount = 0;
+    }
+}
+#endif
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -135,9 +184,10 @@ void OS_start( void )
 {
 	const char *rtos_type;
 	BaseType_t taskCreationStatus[NUM_OF_TASKS_TO_CREATE];
-#if (ALIVE_TIMER_ENABLED == ON)
-	TimerHandle_t aliveTimer;
-	BaseType_t aliveTimerStarted;
+
+#if (WATCHDOG_ENABLED == ON)
+	/* Check if the system was reset by the watchdog */
+	checkResetReason();
 #endif
 
     /** Check if we're running FreeRTOS on single core or both RP2350 cores:
@@ -153,64 +203,43 @@ void OS_start( void )
 
 	LOG("Setting up the RTOS configuration... \n");
 
-	/* Create the Software Timers. These use System Tick as time base. They are handled in a dedicated Timer Service task (aka Daemon Task) */
-#if (ALIVE_TIMER_ENABLED == ON)
-	/* "Alive" Timer which is used to toggle the on-board LED to show the system is not stuck (is alive) */
-    aliveTimer = xTimerCreate( "AliveTimer",                     // Timer name (for debugging)
-								ALIVE_TIMER_PERIOD,    			 // Timer period in ticks
-								pdTRUE,                          // Is it Auto-reload timer (one-shot timer if pdFALSE)
-								0,                               // Timer ID (optional user data, not used here)
-								aliveTimerCallback);     		 // Callback function (executes when timer expires)
+	/* Create the tasks */
+	taskCreationStatus[0] = xTaskCreate( aliveTask,                 /* The function that implements the task. */
+										"AliveLED",                 /* The text name assigned to the task - for debug only as it is not used by the kernel. */
+										STACK_1024_BYTES,           /* The size of the stack to allocate to the task (in words) */
+										NULL,                       /* The parameter passed to the task - not used in this case. */
+										ALIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
+										NULL );                     /* The task handle, if not needed put NULL */
+	taskCreationStatus[1] = xTaskCreate( networkTask, "Network", STACK_2048_BYTES, NULL, NETWORK_TASK_PRIORITY, NULL);
+	taskCreationStatus[2] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY, &monitorTaskHandle);
+	taskCreationStatus[3] = xTaskCreate( cyw43initTask, "CYW43_Init", STACK_1024_BYTES, NULL, CYW43_INIT_TASK_PRIORITY, NULL); // Must be highest priority, will be deleted after it runs
 
-	/* If all FreeRTOS objects were created sucessfully proceed with task creation and starting the scheduler */
-	if(aliveTimer != NULL)
-	{
+#if (WATCHDOG_ENABLED == ON)
+    /*  Enable the watchdog timer: 
+	 *  	void watchdog_enable(uint32_t delay_ms, bool pause_on_debug)
+	 *  	delay_ms: 		Number of milliseconds before watchdog will reboot without watchdog_update being called. 
+	              		Maximum of 8388, which is approximately 8.3 seconds
+     *  	pause_on_debug: If the watchdog should be paused when the debugger is stepping through code */
+	watchdog_enable(WATCHDOG_TIMEOUT_MS, true);
+
+	LOG("Watchdog enabled with %d ms timeout \n", WATCHDOG_TIMEOUT_MS);
 #endif
-		/* Create the tasks */
-		taskCreationStatus[0] = xTaskCreate( networkTask,				/* The function that implements the task. */
-											"Network", 					/* The text name assigned to the task - for debug only as it is not used by the kernel. */
-											STACK_2048_BYTES,		 	/* The size of the stack to allocate to the task (in words) */
-											NULL, 						/* The parameter passed to the task - not used in this case. */
-											NETWORK_TASK_PRIORITY, 		/* The priority assigned to the task. */
-											NULL );						/* The task handle, if not needed put NULL */
-		taskCreationStatus[1] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY , &monitorTaskHandle);
 
-		/* Check if the tasks were created successfully */
-		for(uint8_t i = 0; i < NUM_OF_TASKS_TO_CREATE; i++)
+	/* Check if the tasks were created successfully */
+	for(uint8_t i = 0; i < NUM_OF_TASKS_TO_CREATE; i++)
+	{
+		if(taskCreationStatus[i] == pdPASS)
 		{
-			if(taskCreationStatus[i] == pdPASS)
-			{
-				LOG("Task number %u created successfully \n", i);
-			}
-			else /* pdFAIL */
-			{
-				CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
-			}
-		}
-#if (ALIVE_TIMER_ENABLED == ON)
-		/* Start the Alive Timer */
-		aliveTimerStarted = xTimerStart(aliveTimer, NO_TIMEOUT); //don't wait for space in the timer command queue, if there is no space we throw an error
-
-		/* Check if the Software Timers have successfully started */
-		if(aliveTimerStarted == pdPASS)
-		{
-			LOG("Alive Timer started successfully \n");
+			LOG("Task number %u created successfully \n", i);
 		}
 		else /* pdFAIL */
 		{
-			CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_SW_TIMER_FAILED_TO_START);
+			CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
 		}
-#endif
+	}
 
-		LOG("RTOS configuration finished, starting the scheduler... \n");
-		vTaskStartScheduler();
-#if (ALIVE_TIMER_ENABLED == ON)
-	}
-	else
-	{
-		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_RTOS_OBJECTS_FAILED_TO_CREATE);
-	}
-#endif
+	LOG("RTOS configuration finished, starting the scheduler... \n");
+	vTaskStartScheduler();
 
 	/* If all is well, the scheduler will now be running, and the following
 	line will never be reached.  If the following line does execute, then
@@ -297,32 +326,104 @@ static void networkTask(__unused void *taskParams)
 
 }
 
-#if (ALIVE_TIMER_ENABLED == ON)
 /* 
- * Function: aliveTimerCallback
+ * Function: aliveTask
  * 
- * Description: Callback function for the Alive Timer, executed every ALIVE_TIMER_PERIOD 
+ * Description: Task responsible for blinking the LED to indicate the system is alive
+ * 				Also, it resets the watchdog timer to prevent the system from rebooting.
  * 
  * Parameters:
- *   - xTimer (handle to the Alive Timer)
+ *   - taskParams (not used)
  * 
  * Returns: void
  */
-static void aliveTimerCallback(TimerHandle_t xTimer)
+static void aliveTask(__unused void *taskParams)
 {
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
+	TickType_t xLastWakeTime;
 	static bool state_LED;
+	static uint8_t consecutiveFailures = 0;
 
-	(void)xTimer; // Timer handle not used in the callback currently
+	/* Initialize xLastWakeTime - this only needs to be done once. */
+	xLastWakeTime = xTaskGetTickCount();
+	/*******************************************************************************/
+	/*                               Task Loop Code                                */
+	/*******************************************************************************/
+	for( ;; )
+	{
+		vTaskDelayUntil(&xLastWakeTime, ALIVE_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
 
-	/* Toggle the LED State */
-	state_LED = !state_LED;
-	cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, state_LED); //Set a GPIO pin on the wireless chip to a given value (LED pin in this case) 
-}
+#if (ALIVE_TASK_ENABLED == ON)
+            state_LED = !state_LED; // Toggle the state of the LED
+            
+			/* Get the async context from the CYW43 driver. async_context is a data structure used for managing asynchronous operations 
+			   in a thread-safe manner. It maintains an internal event queue where asynchronous events are posted and processed. 
+			   In FreeRTOS where we use the pico_cyw43_arch_lwip_sys_freertos library, a dedicated task is used to process these events */
+            async_context_t *context = cyw43_arch_async_context();
+
+			/* Acquire the lock */
+            async_context_acquire_lock_blocking(context);
+            
+			/* Set the state of the LED */
+            int ret = cyw43_gpio_set(&cyw43_state, CYW43_WL_GPIO_LED_PIN, state_LED);
+            
+			/* Release the lock */
+            async_context_release_lock(context);
+
+			/* TODO - add additional critical system checks that should be done before resetting the watchdog */
+
+			/* Check if the LED was set successfully */
+            if(ret != 0)
+            {
+                consecutiveFailures++;
+                LOG("LED failure number %d \n", consecutiveFailures);
+                
+                if(consecutiveFailures >= 3)
+                {
+					/* If the LED fails to set 3 times in a row, enter error state */
+                    CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_LED_FAILED);
+                }
+            }
+            else
+            {
+				/* Reset the counter if the LED was set successfully */
+                consecutiveFailures = 0;
+#if (WATCHDOG_ENABLED == ON)
+                /* Pet the watchdog to keep him from barking (rebooting the system) */
+                watchdog_update();
+#endif
+            }
 #endif
 
+	}
+}
 
+/* 
+ * Function: cyw43initTask
+ * 
+ * Description: Task initializing the CYW43 wireless chip. Must be run first (set to highest priority).
+ * 
+ * Parameters:
+ *   - taskParams (not used)
+ * 
+ * Returns: void
+ */
+static void cyw43initTask(__unused void *taskParams)
+{
+	/*******************************************************************************/
+	/*                          Task Initialization Code                           */
+	/*******************************************************************************/
 
+	/* Initialize the cyw43_driver code and the lwIP stack */
+	int ret_status = cyw43_arch_init();
+	if(ret_status != 0)
+	{
+		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_CYW43_INIT_FAILED);
+	}
 
-
-
+	/* Delete the task after it runs */
+	vTaskDelete(NULL);
+}
 

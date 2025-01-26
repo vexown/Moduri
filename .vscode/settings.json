@@ -13,6 +13,14 @@
         "gpio_hal.h": "c",
         "i2c_hal.h": "c",
         "wifi_http.h": "c",
-        "functional": "c"
+        "functional": "c",
+        "optional": "c",
+        "system_error": "c",
+        "array": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "istream": "c",
+        "ostream": "c"
     }
 }
