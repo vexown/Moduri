@@ -13,7 +13,9 @@
 # Dependencies:
 #   - ARM toolchain (arm-none-eabi)
 #   - `xxd` for hex dumping
-
+#
+#########################################################################################################################################################
+#
 # Raspberry Pi Pico W Memory Map:
 # (Source - Address Map chapter in https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
 #
@@ -47,6 +49,50 @@
 #        The Private Peripheral Bus (PPB) memory region provides access to internal and external processor resources.
 #        The PPB provides access to: System Control Space (SCS) - including MPU, SAU and NVIC, Data Watchpoint and Trace (DWT), Breakpoint Unit (BPU),
 #        Embedded Trace Macrocell (ETM), CoreSight Micro Trace Buffer (MTB), Cross Trigger Interface (CTI), ROM table.
+#
+#########################################################################################################################################################
+# 
+# Linker script for Raspberry Pi Pico 2 W (RP2350) can be found at https://github.com/raspberrypi/pico-sdk/tree/master/src/rp2_common/pico_crt0/rp2350
+# 
+# Summary of the linker script (the default one):
+#
+# Memory Layout:
+#   Defines three main regions:
+#     - Flash memory (actual layout included from separate file)
+#     - Main RAM (512KB starting at 0x20000000)
+#     - Two 4KB scratch regions (X and Y) for core-specific operations
+#
+# Flash Memory Organization:
+#   Starts with critical boot sections in strict order:
+#     - Vector table (must be first)
+#     - Binary info header (must be within first 1KB)
+#     - Boot2 section (limited to 256 bytes)
+#   Contains read-only sections:
+#     - Program code (.text)
+#     - Constants (.rodata)
+#     - Binary information for tools
+#     - Initial values for initialized variables
+#
+# RAM Organization:
+#   Contains several key regions:
+#     - .data (initialized variables, copied from flash)
+#     - .bss (zero-initialized variables)
+#     - Heap (grows upward from end of .bss)
+#     - Vector table copy (for runtime modifications)
+#     - Uninitialized data section
+#
+# Stack Organization:
+#   Uses scratch memory regions:
+#     - Core 0's stack in SCRATCH_Y
+#     - Core 1's stack in SCRATCH_X (when used)
+#   Stack grows downward from top of respective regions
+#   Stack sizes determined by .stack_dummy sections
+#
+# Symbols for Runtime:
+#   Provides locations needed by startup code:
+#     - __StackTop for initial stack pointer
+#     - data_start and __etext for data copying
+#     - bss_start and bss_end for zeroing BSS
 
 BIN_FILE="moduri.bin"
 ELF_FILE="moduri.elf"
