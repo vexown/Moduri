@@ -24,15 +24,25 @@ cmake_minimum_required(VERSION 3.13)
 # Print messages for script tracking and debugging
 message("########## TOP CMakeLists.txt - start ##########")
 
-# Specify build type
-#     debug build   - use DEBUG_BUILD
-#     release build - use RELEASE_BUILD
-add_compile_definitions(DEBUG_BUILD)
+# Specify build type within the Moduri project
+option(DEBUG_BUILD "Enable debug build" ON)
+option(RELEASE_BUILD "Enable release build" OFF)
+
+if(DEBUG_BUILD AND RELEASE_BUILD)
+    message(FATAL_ERROR "Cannot define both DEBUG_BUILD and RELEASE_BUILD.")
+elseif(DEBUG_BUILD)
+    add_compile_definitions(DEBUG_BUILD)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+elseif(RELEASE_BUILD)
+    add_compile_definitions(RELEASE_BUILD)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+else()
+    message(FATAL_ERROR "Please define either DEBUG_BUILD or RELEASE_BUILD.")
+endif()
 
 # Specify parameters for pico-sdk
 set(PICO_BOARD pico2_w)
 set(PICO_PLATFORM rp2350)
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
 ######################### Pre build imports ###############################
 
