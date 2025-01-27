@@ -43,6 +43,7 @@ endif()
 # Specify parameters for pico-sdk
 set(PICO_BOARD pico2_w)
 set(PICO_PLATFORM rp2350)
+set(PICO_COMPILER pico_arm_cortex_m33_gcc)
 
 ######################### Pre build imports ###############################
 
@@ -67,6 +68,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Initialize the Pico SDK
 # This macro sets up the Pico SDK and prepares it for use.
+# Take note of the board configuration parameters set in https://github.com/raspberrypi/pico-sdk/blob/master/src/boards/include/boards/pico2_w.h
 message("########## pico_sdk_init macro - start ##########")
 pico_sdk_init()
 
