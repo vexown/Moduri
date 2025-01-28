@@ -21,6 +21,7 @@
         "type_traits": "c",
         "utility": "c",
         "istream": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "spi_hal.h": "c"
     }
 }
