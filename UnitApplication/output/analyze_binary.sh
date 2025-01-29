@@ -117,16 +117,11 @@ echo "Analyzing ELF: $ELF_FILE"
 echo "Analyzing BIN: $BIN_FILE"
 echo "Output will be saved in $OUTPUT_DIR/"
 
-# 1. File Overview
-echo "File overview:" > $OUTPUT_DIR/overview.txt
-file $ELF_FILE >> $OUTPUT_DIR/overview.txt
-${TOOLCHAIN_PREFIX}-size $ELF_FILE >> $OUTPUT_DIR/overview.txt
-
-# 2. Disassembly
+# 1. Disassembly
 echo "Generating disassembly from ELF..."
 ${TOOLCHAIN_PREFIX}-objdump -d $ELF_FILE > $OUTPUT_DIR/disassembly.txt
 
-# 3. Symbol Analysis
+# 2. Symbol Analysis
 echo "Analyzing symbols from ELF (RAM and FLASH segregation)..."
 echo -e "Address\tSize\tType\tName" > $OUTPUT_DIR/symbols_ram.txt
 echo -e "Address\tSize\tType\tName" > $OUTPUT_DIR/symbols_flash.txt
@@ -171,7 +166,7 @@ echo "Generating top 10 largest symbols..."
 echo -e "Address\tSize\tType\tName" > $OUTPUT_DIR/large_symbols.txt
 sort -nrk 2 $OUTPUT_DIR/symbols_ram.txt $OUTPUT_DIR/symbols_flash.txt | head -n 10 >> $OUTPUT_DIR/large_symbols.txt
 
-# 4. Hex Dump with Adjusted Addresses
+# 3. Hex Dump with Adjusted Addresses
 FLASH_BASE_ADDR=0x10000000  # Base address for flash memory (for Raspberry Pi Pico 2 W)
 
 echo "Generating hex dump from BIN with flash address adjustment..."
@@ -188,11 +183,11 @@ xxd -g 1 -u $BIN_FILE | awk -v base=$FLASH_BASE_ADDR '
   }
 ' > $OUTPUT_DIR/hexdump.txt
 
-# 5. Memory Sections
+# 4. Memory Sections
 echo "Analyzing memory sections from ELF..."
 ${TOOLCHAIN_PREFIX}-objdump -h $ELF_FILE > $OUTPUT_DIR/memory_sections.txt
 
-# 6. Generate Summary Report
+# 5. Generate Summary Report
 echo "Generating summary report..."
 SUMMARY_FILE="$OUTPUT_DIR/summary.txt"
 {
