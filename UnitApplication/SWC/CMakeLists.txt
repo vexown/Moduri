@@ -16,6 +16,8 @@ add_executable(moduri
         ${MONITOR_SOURCE_FILES}
         ${HAL_SOURCE_FILES}
         )
+        
+pico_generate_pio_header(moduri ${CMAKE_CURRENT_LIST_DIR}/blink.pio)
 
 # Set compile definitions if needed
 target_compile_definitions(moduri PRIVATE)

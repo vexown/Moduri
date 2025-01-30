@@ -22,6 +22,9 @@
         "utility": "c",
         "istream": "c",
         "ostream": "c",
-        "spi_hal.h": "c"
+        "spi_hal.h": "c",
+        "pio_hal.h": "c",
+        "string_view": "c",
+        "blink.pio.h": "c"
     }
 }
