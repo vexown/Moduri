@@ -1,4 +1,41 @@
+/**
+ * File: PIO_HAL.c
+ * Description: High-level HAL for easier use of PIO on Raspberry Pico 2 W
+ */
+
+/**
+ * PIO Hardware Abstraction Layer
+ * 
+ * Documentation references:
+ * - PIO APIs Reference: SDK Documentation - Hardware PIO: https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#group_hardware_pio
+ * - PIO Theory: RP2350 datasheet, PIO chapter: https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf
+ * 
+ * Overview:
+ * A programmable input/output block (PIO) is a versatile hardware interface supporting various IO standards.
+ * - RP2040 has two PIO blocks
+ * - RP2350 has three PIO blocks (our Raspberry Pico 2 W board uses RP2350)
+ * 
+ * Each PIO contains four state machines that independently execute sequential programs to manipulate GPIOs
+ * and transfer data. These are optimized for deterministic timing and IO operations.
+ * 
+ * State Machine Features:
+ * - Two 32-bit bidirectional shift registers with configurable shift count
+ * - Two 32-bit scratch registers
+ * - 4x32 bit bus FIFO in each direction (TX/RX), reconfigurable as 8x32 in single direction
+ * - Fractional clock divider (16 integer, 8 fractional bits)
+ * - Flexible GPIO mapping
+ * - DMA interface with sustained throughput up to 1 word per clock
+ * - IRQ flag management (set/clear/status)
+ */
+
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
 #include "PIO_HAL.h"
+
+/*******************************************************************************/
+/*                        GLOBAL FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
 
 PIO_HAL_Status_t PIO_SetupAndRun(PIO_HAL_Config_t *PIO_config)
 {

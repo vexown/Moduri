@@ -67,6 +67,10 @@ static bool is_valid_i2c_pins(I2C_Instance instance, uint8_t sda_pin, uint8_t sc
     return false;
 }
 
+/*******************************************************************************/
+/*                        GLOBAL FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
+
 /* Description: I2C initializtion function, uses pico-sdk I2C functions to:
  * 	- set the I2C instance 
  * 	- set the I2C pins 
