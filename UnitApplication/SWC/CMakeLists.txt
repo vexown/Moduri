@@ -6,6 +6,7 @@ add_subdirectory(Misc)
 add_subdirectory(WiFi)
 add_subdirectory(Monitor)
 add_subdirectory(HAL)
+add_subdirectory(PIO)
 
 # Define the executable target for the application
 add_executable(moduri
@@ -16,8 +17,6 @@ add_executable(moduri
         ${MONITOR_SOURCE_FILES}
         ${HAL_SOURCE_FILES}
         )
-        
-pico_generate_pio_header(moduri ${CMAKE_CURRENT_LIST_DIR}/blink.pio)
 
 # Set compile definitions if needed
 target_compile_definitions(moduri PRIVATE)
@@ -43,6 +42,11 @@ target_link_libraries(moduri
                         hardware_pio
                         FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
                         )
+
+# Generate the PIO header files
+foreach(PIO_FILE ${PIO_SOURCE_FILES})
+pico_generate_pio_header(moduri ${PIO_FILE})
+endforeach()
 
 # Add extra outputs specific to the Pico SDK
 pico_add_extra_outputs(moduri)
