@@ -73,10 +73,10 @@
 launch_openocd() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux command to open a new terminal and run OpenOCD with a custom title
-        gnome-terminal --title="OpenOCD" -- bash -c "./StartOpenOCD.sh; exec bash"
+        gnome-terminal --title="OpenOCD" -- bash -c "./Tools/GDB_and_OpenOCD/StartOpenOCD.sh; exec bash"
     elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
         # Windows command to open a new Windows Terminal tab and run OpenOCD
-        wt.exe --title "OpenOCD" bash -c "./StartOpenOCD.sh && exec bash"
+        wt.exe --title "OpenOCD" bash -c "./Tools/GDB_and_OpenOCD/StartOpenOCD.sh && exec bash"
     else
         echo "Unsupported OS for OpenOCD launch."
     fi
@@ -106,8 +106,8 @@ launch_openocd
 sleep 1
 
 # Launch GDB for core0
-launch_gdb 0 "StartGDB_Core0.sh"
+launch_gdb 0 "./Tools/GDB_and_OpenOCD/StartGDB_Core0.sh"
 
 # Launch GDB for core1
-#launch_gdb 1 "StartGDB_Core1.sh" //TODO - core 1 not working properly right now, only core 0 supported
+#launch_gdb 1 "./Tools/GDB_and_OpenOCD/StartGDB_Core1.sh" //TODO - core 1 not working properly right now, only core 0 supported
 
