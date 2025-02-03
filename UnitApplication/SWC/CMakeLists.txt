@@ -40,6 +40,7 @@ target_link_libraries(moduri
                         hardware_spi
                         hardware_pwm
                         hardware_pio
+                        hardware_dma
                         FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
                         )
 
