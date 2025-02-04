@@ -42,25 +42,35 @@ int8_t DMA_Init(DMA_Config_t *config)
 {
     if (config == NULL) return -1;
 
+    /* Attempt to claim an unused DMA channel, return -1 if none available */
     int channel = dma_claim_unused_channel(false);
     if (channel < 0) return -1;
 
+    /* Mark channel as used */
     dma_channels_used[channel] = true;
 
-    dma_channel_config c = dma_channel_get_default_config(channel);
-    channel_config_set_transfer_data_size(&c, config->data_size);
-    channel_config_set_read_increment(&c, config->src_increment);
-    channel_config_set_write_increment(&c, config->dst_increment);
+    /* Get the default channel configuration for a given channel */
+    dma_channel_config channel_config = dma_channel_get_default_config(channel);
 
+    /* Now modify the default configuration to match the user's requirements */
+    channel_config_set_transfer_data_size(&channel_config, config->data_size);
+
+    /* Set the increment mode for source and destination addresses - this will determine 
+       whether the addresses are incremented by the data size after each transfer */
+    channel_config_set_read_increment(&channel_config, config->src_increment);
+    channel_config_set_write_increment(&channel_config, config->dst_increment);
+
+    /* Configure the DMA channel with the specified parameters */
     dma_channel_configure(
         channel,
-        &c,
+        &channel_config,
         config->dest_addr,
         config->src_addr,
         config->transfer_count,
         false
     );
 
+    /* Return the channel number - it is our handle for DMA operations */
     return channel;
 }
 
@@ -124,7 +134,10 @@ void DMA_Release(uint8_t channel)
 {
     if (channel < DMA_MAX_CHANNELS && dma_channels_used[channel]) 
     {
+        /* Abort any ongoing transfer */
         dma_channel_abort(channel);
+
+        /* Unclaim the channel and mark it as unused */
         dma_channel_unclaim(channel);
         dma_channels_used[channel] = false;
     }

@@ -119,9 +119,9 @@ typedef struct
     void* dest_addr;         /*!< Destination address for DMA transfer */
     const void* src_addr;    /*!< Source address for DMA transfer */
     uint32_t transfer_count; /*!< Number of transfers to perform */
-    uint8_t data_size;      /*!< Size of each transfer (1, 2, or 4 bytes) */
-    bool src_increment;      /*!< Whether to increment source address */
-    bool dst_increment;      /*!< Whether to increment destination address */
+    uint8_t data_size;       /*!< Size of each transfer (4bytes - full word, 2bytes - half word, 1byte - byte) */
+    bool src_increment;      /*!< Whether to increment source address automatically after each transfer */
+    bool dst_increment;      /*!< Whether to increment destination address automatically after each transfer */
 } DMA_Config_t;
 
 /**
