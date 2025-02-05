@@ -31,6 +31,34 @@
 static bool dma_channels_used[DMA_MAX_CHANNELS] = {false};
 
 /*******************************************************************************/
+/*                        STATIC FUNCTION DEFINITIONS                         */
+/*******************************************************************************/
+static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominator) 
+{
+    const uint32_t SYSTEM_CLOCK_FREQ = 150000000; // 150MHz
+    const uint32_t MIN_TRANSFER_RATE = SYSTEM_CLOCK_FREQ / UINT16_MAX;
+    const uint32_t MAX_TRANSFER_RATE = SYSTEM_CLOCK_FREQ;
+
+    if (desired_rate < MIN_TRANSFER_RATE || desired_rate > MAX_TRANSFER_RATE) 
+    {
+        return false; // Desired rate out of range
+    }
+
+    /* Calculate fraction: desired_rate = SYSTEM_CLOCK_FREQ * (num/den)
+     * Therefore: num/den = desired_rate/SYSTEM_CLOCK_FREQ
+     * (Numinator is assumed to be 1) */
+    uint32_t denominator_local = SYSTEM_CLOCK_FREQ / desired_rate;
+    if (denominator_local > UINT16_MAX) 
+    {
+        denominator_local = UINT16_MAX;
+    }
+    
+    *denominator = (uint16_t)denominator_local;
+    
+    return true;
+}
+
+/*******************************************************************************/
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 /**
@@ -59,6 +87,44 @@ int8_t DMA_Init(DMA_Config_t *config)
        whether the addresses are incremented by the data size after each transfer */
     channel_config_set_read_increment(&channel_config, config->src_increment);
     channel_config_set_write_increment(&channel_config, config->dst_increment);
+
+    /* In default config this is set to DREQ_FORCE which essentially means no pacing signal (send data as fast as possible) */
+    /* If you want to use such signal, you need to configure the transfer request (TREQ) signal to pace the transfer rate */
+    channel_config_set_dreq(&channel_config, config->transfer_req_sig);
+
+    /* If the transfer request signal is set to use DMA timer, attempt to claim it and set the multiplier */
+    if(config->transfer_req_sig == HAL_DREQ_DMA_TIMER0)
+    {
+        /* Check if DMA timer 0 is already claimed */
+        bool timerClaimed = dma_timer_is_claimed(0);
+
+        if (!timerClaimed)
+        {
+            dma_timer_claim(0);
+        }
+        else
+        {
+            dma_channel_unclaim(channel);
+            dma_channels_used[channel] = false;
+            return -1;
+        }
+        
+        /* Set the multiplier for DMA timer 0 */
+        /* The timer will run at the system_clock_freq (150MHz on RP2350) * numerator / denominator, so this is the speed
+           that data elements will be transferred at via a DMA channel using this timer as a DREQ. The multiplier must be less than or equal to one.
+           Minimum transfer rate is 150MHz * 1/65536 =~ 2.29kHz. 
+           Maximum transfer rate is 150MHz * 1/1 = 150MHz */
+        const uint16_t numerator = 1;
+        uint16_t denominator;
+        if (!calculate_timer_fraction(config->treq_timer_rate_hz, &denominator)) 
+        {
+            dma_channel_unclaim(channel);
+            dma_channels_used[channel] = false;
+            return -1;
+        }
+
+        dma_timer_set_fraction(0, numerator, denominator);
+    }
 
     /* Configure the DMA channel with the specified parameters */
     dma_channel_configure(
