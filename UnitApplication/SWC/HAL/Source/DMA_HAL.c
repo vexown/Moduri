@@ -24,15 +24,32 @@
 /*                                 INCLUDES                                    */
 /*******************************************************************************/
 #include "DMA_HAL.h"
+#include "hardware/gpio.h"
+#include "hardware/regs/intctrl.h"
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
 /*******************************************************************************/
 static bool dma_channels_used[DMA_MAX_CHANNELS] = {false};
+static int dma_irq0_channel; // static variable to store the channel number for the IRQ0 handler
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                         */
 /*******************************************************************************/
+static void dma_irq0_handler(void) 
+{
+    gpio_put(DMA_TIMING_PIN, 0); // Set the timing pin low as indication of the Transfer End
+    
+    dma_hw->ints0 = 1u << dma_irq0_channel; // Clear the interrupt request
+}
+
+static void dma_timing_gpio_init(void) 
+{
+    gpio_init(DMA_TIMING_PIN);
+    gpio_set_dir(DMA_TIMING_PIN, GPIO_OUT);
+    gpio_put(DMA_TIMING_PIN, 0); // Set the timing pin low initially
+}
+
 static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominator) 
 {
     const uint32_t SYSTEM_CLOCK_FREQ = 150000000; // 150MHz
@@ -136,6 +153,19 @@ int8_t DMA_Init(DMA_Config_t *config)
         false
     );
 
+    if(config->enableIRQ0)
+    {
+        dma_irq0_channel = channel;
+        dma_timing_gpio_init();
+
+        /* Enable DMA interrupts on the given channel using DMA_IRQ_0 line (on RP2350 there is 4 lines dedicated to DMA: DMA_IRQ_0-3) */
+        /* The interupt will be triggered when the WHOLE set of transfers is complete NOT after each individual transfer */
+        dma_channel_set_irq0_enabled(channel, true);
+        /* Set the handler and enable the interrupt */
+        irq_set_exclusive_handler(DMA_IRQ_0, dma_irq0_handler);
+        irq_set_enabled(DMA_IRQ_0, true);
+    }
+
     /* Return the channel number - it is our handle for DMA operations */
     return channel;
 }
@@ -149,6 +179,7 @@ bool DMA_Start(uint8_t channel)
 {
     if (channel >= DMA_MAX_CHANNELS || !dma_channels_used[channel]) return false;
     
+    gpio_put(DMA_TIMING_PIN, 1); // Set the timing pin high as indication of the Transfer Start
     dma_channel_start(channel);
     return true;
 }
@@ -200,8 +231,14 @@ void DMA_Release(uint8_t channel)
 {
     if (channel < DMA_MAX_CHANNELS && dma_channels_used[channel]) 
     {
+        /* Disable the DMA transfer complete interrupts */
+        dma_channel_set_irq0_enabled(channel, false);
+
         /* Abort any ongoing transfer */
         dma_channel_abort(channel);
+
+        /* Clear the spurious interrupt (if any) */
+        dma_channel_acknowledge_irq0(channel);
 
         /* Unclaim the channel and mark it as unused */
         dma_channel_unclaim(channel);

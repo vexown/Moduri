@@ -31,7 +31,8 @@ static void test_dma_init(void) {
         .src_increment = true,
         .dst_increment = true,
         .transfer_req_sig = HAL_DREQ_FORCE,
-        .treq_timer_rate_hz = 0 // Not used with HAL_DREQ_FORCE
+        .treq_timer_rate_hz = 0, // Not used with HAL_DREQ_FORCE
+        .enableIRQ0 = true
     };
 
     test_channel = DMA_Init(&config);
@@ -97,7 +98,8 @@ static void test_dma_timer_treq(void) {
         .src_increment = true,
         .dst_increment = true,
         .transfer_req_sig = HAL_DREQ_DMA_TIMER0,  // Use Timer 0 as TREQ source
-        .treq_timer_rate_hz = 10000 // 10kHz TREQ rate
+        .treq_timer_rate_hz = 10000, // 10kHz TREQ rate
+        .enableIRQ0 = true
     };
     
     int8_t channel = DMA_Init(&config);
@@ -156,6 +158,7 @@ int main(void)
  */
 #define DMA_MAX_CHANNELS 12     /* Maximum number of DMA channels */
 #define DMA_TIMEOUT_MS 1000     /* Timeout for DMA operations in milliseconds */
+#define DMA_TIMING_PIN 16       /* GPIO pin for measuring DMA complete transfer time - can be used with a Logic Analyzer */ 
 
 /**
  * @brief Reduced version of dreq_num_t enum from pico-sdk
@@ -174,11 +177,12 @@ typedef struct
     void* dest_addr;                 /*!< Destination address for DMA transfer */
     const void* src_addr;            /*!< Source address for DMA transfer */
     uint32_t transfer_count;         /*!< Number of transfers to perform */
-    uint8_t data_size;              /*!< Size of each transfer (4 bytes - full word, 2 bytes - half word, 1 byte - byte) */
+    uint8_t data_size;               /*!< Size of each transfer (4 bytes - full word, 2 bytes - half word, 1 byte - byte) */
     bool src_increment;              /*!< Whether to increment source address after each transfer */
     bool dst_increment;              /*!< Whether to increment destination address after each transfer */
     hal_dreq_num_t transfer_req_sig; /*!< Transfer Request (TREQ) Signal to pace the transfer rate. Use HAL_DREQ_FORCE for unpaced transfers */
-    uint32_t treq_timer_rate_hz;    /*!< Timer-based TREQ rate in Hz, from 2288Hz to 150MHz (use only with transfer_req_sig set to HAL_DREQ_DMA_TIMER0) */
+    uint32_t treq_timer_rate_hz;     /*!< Timer-based TREQ rate in Hz, from 2288Hz to 150MHz (use only with transfer_req_sig set to HAL_DREQ_DMA_TIMER0) */
+    bool enableIRQ0;                    /*!< Enable debug output */
 } DMA_Config_t;
 
 /**
