@@ -34,8 +34,59 @@ static bool dma_channels_used[DMA_MAX_CHANNELS] = {false};
 static int dma_irq0_channel; // static variable to store the channel number for the IRQ0 handler
 
 /*******************************************************************************/
-/*                        STATIC FUNCTION DEFINITIONS                         */
+/*                        STATIC FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
+static int8_t claim_dma_channel(void);
+static void configure_channel_properties(dma_channel_config *channel_config, const DMA_Config_t *config);
+static void dma_irq0_handler(void);
+static void dma_timing_gpio_init(void);
+static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominator);
+static bool setup_dma_timer(const DMA_Config_t *config);
+static void setup_dma_interrupts(uint8_t channel);
+
+/*******************************************************************************/
+/*                        STATIC FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
+
+/**
+ * @brief Claim an unused DMA channel
+ * @return Channel number if successful, -1 if error
+ */
+static int8_t claim_dma_channel(void) 
+{
+    /* Attempt to claim an unused DMA channel, return -1 if none available */
+    int channel = dma_claim_unused_channel(false);
+    if (channel < 0) return -1;
+
+    /* Mark channel as used */
+    dma_channels_used[channel] = true;
+
+    return channel;
+}
+
+/**
+ * @brief Configure the DMA channel properties according to the user's requirements
+ * @param channel_config Pointer to DMA channel configuration structure
+ * @param config Pointer to DMA configuration structure
+ */
+static void configure_channel_properties(dma_channel_config *channel_config, const DMA_Config_t *config) 
+{
+    /* Set the data size for each individual transfer (1, 2 or 4 bytes) */
+    channel_config_set_transfer_data_size(channel_config, config->data_size);
+
+    /* Set the increment mode for source and destination addresses - this will determine 
+       whether the addresses are incremented by the data size after each transfer */
+    channel_config_set_read_increment(channel_config, config->src_increment);
+    channel_config_set_write_increment(channel_config, config->dst_increment);
+
+    /* In default config this is set to DREQ_FORCE which essentially means no pacing signal (send data as fast as possible) */
+    /* If you want to use such signal, you need to configure the transfer request (TREQ) signal to pace the transfer rate */
+    channel_config_set_dreq(channel_config, config->transfer_req_sig);
+}
+
+/**
+ * @brief DMA IRQ0 handler which is called when the whole set of transfers is complete
+ */
 static void dma_irq0_handler(void) 
 {
     gpio_put(DMA_TIMING_PIN, 0); // Set the timing pin low as indication of the Transfer End
@@ -43,6 +94,9 @@ static void dma_irq0_handler(void)
     dma_hw->ints0 = 1u << dma_irq0_channel; // Clear the interrupt request
 }
 
+/**
+ * @brief Initialize the GPIO pin for measuring DMA transfer time
+ */
 static void dma_timing_gpio_init(void) 
 {
     gpio_init(DMA_TIMING_PIN);
@@ -50,6 +104,12 @@ static void dma_timing_gpio_init(void)
     gpio_put(DMA_TIMING_PIN, 0); // Set the timing pin low initially
 }
 
+/**
+ * @brief Calculate the timer fraction for the DMA timer
+ * @param desired_rate Desired transfer rate in Hz
+ * @param denominator Pointer to store the calculated denominator
+ * @return true if successful, false if error
+ */
 static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominator) 
 {
     const uint32_t SYSTEM_CLOCK_FREQ = 150000000; // 150MHz
@@ -75,6 +135,57 @@ static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominato
     return true;
 }
 
+/**
+ * @brief Setup the DMA timer for pacing the transfer rate
+ * @param config Pointer to DMA configuration structure
+ * @return true if successful, false if error
+ */
+static bool setup_dma_timer(const DMA_Config_t *config) 
+{
+    /* Attempt to claim DMA timer 0 */
+    if (!dma_timer_is_claimed(0))
+    {
+        dma_timer_claim(0); 
+    }
+    else
+    {
+        return false;
+    }
+    
+    /* Set the multiplier for DMA timer 0 */
+    /* The timer will run at the system_clock_freq (150MHz on RP2350) * numerator / denominator, so this is the speed
+        that data elements will be transferred at via a DMA channel using this timer as a DREQ. The multiplier must be less than or equal to one.
+        Minimum transfer rate is 150MHz * 1/65536 =~ 2.29kHz. 
+        Maximum transfer rate is 150MHz * 1/1 = 150MHz */
+    const uint16_t numerator = 1;
+    uint16_t denominator;
+    if (!calculate_timer_fraction(config->treq_timer_rate_hz, &denominator)) 
+    {
+        return false;
+    }
+    dma_timer_set_fraction(0, numerator, denominator);
+    
+    return true;
+}
+
+/**
+ * @brief Setup the DMA interrupts for the given channel
+ * @param channel DMA channel number
+ */
+static void setup_dma_interrupts(uint8_t channel) 
+{
+    dma_irq0_channel = channel; // store the channel number for the IRQ0 handler
+    dma_timing_gpio_init();
+
+    /* Enable DMA interrupts on the given channel using DMA_IRQ_0 line (on RP2350 there is 4 lines dedicated to DMA: DMA_IRQ_0-3) */
+    /* The interupt will be triggered when the WHOLE set of transfers is complete NOT after each individual transfer */
+    dma_channel_set_irq0_enabled(channel, true);
+
+    /* Set the handler and enable the interrupt */
+    irq_set_exclusive_handler(DMA_IRQ_0, dma_irq0_handler);
+    irq_set_enabled(DMA_IRQ_0, true);
+}
+
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
@@ -87,83 +198,38 @@ int8_t DMA_Init(DMA_Config_t *config)
 {
     if (config == NULL) return -1;
 
-    /* Attempt to claim an unused DMA channel, return -1 if none available */
-    int channel = dma_claim_unused_channel(false);
-    if (channel < 0) return -1;
-
-    /* Mark channel as used */
-    dma_channels_used[channel] = true;
+    int channel = claim_dma_channel();
 
     /* Get the default channel configuration for a given channel */
     dma_channel_config channel_config = dma_channel_get_default_config(channel);
-
+    
     /* Now modify the default configuration to match the user's requirements */
-    channel_config_set_transfer_data_size(&channel_config, config->data_size);
-
-    /* Set the increment mode for source and destination addresses - this will determine 
-       whether the addresses are incremented by the data size after each transfer */
-    channel_config_set_read_increment(&channel_config, config->src_increment);
-    channel_config_set_write_increment(&channel_config, config->dst_increment);
-
-    /* In default config this is set to DREQ_FORCE which essentially means no pacing signal (send data as fast as possible) */
-    /* If you want to use such signal, you need to configure the transfer request (TREQ) signal to pace the transfer rate */
-    channel_config_set_dreq(&channel_config, config->transfer_req_sig);
+    configure_channel_properties(&channel_config, config);
 
     /* If the transfer request signal is set to use DMA timer, attempt to claim it and set the multiplier */
     if(config->transfer_req_sig == HAL_DREQ_DMA_TIMER0)
     {
-        /* Check if DMA timer 0 is already claimed */
-        bool timerClaimed = dma_timer_is_claimed(0);
-
-        if (!timerClaimed)
-        {
-            dma_timer_claim(0);
-        }
-        else
+        if(!setup_dma_timer(config))
         {
             dma_channel_unclaim(channel);
             dma_channels_used[channel] = false;
-            return -1;
+            return -1;   
         }
-        
-        /* Set the multiplier for DMA timer 0 */
-        /* The timer will run at the system_clock_freq (150MHz on RP2350) * numerator / denominator, so this is the speed
-           that data elements will be transferred at via a DMA channel using this timer as a DREQ. The multiplier must be less than or equal to one.
-           Minimum transfer rate is 150MHz * 1/65536 =~ 2.29kHz. 
-           Maximum transfer rate is 150MHz * 1/1 = 150MHz */
-        const uint16_t numerator = 1;
-        uint16_t denominator;
-        if (!calculate_timer_fraction(config->treq_timer_rate_hz, &denominator)) 
-        {
-            dma_channel_unclaim(channel);
-            dma_channels_used[channel] = false;
-            return -1;
-        }
-
-        dma_timer_set_fraction(0, numerator, denominator);
     }
 
-    /* Configure the DMA channel with the specified parameters */
+    /* Apply the DMA channel configuration with the specified parameters */
     dma_channel_configure(
-        channel,
-        &channel_config,
-        config->dest_addr,
-        config->src_addr,
-        config->transfer_count,
-        false
+        channel,           // DMA channel number
+        &channel_config,   // Pointer to the DMA config structure
+        config->dest_addr, // Initial write address
+        config->src_addr,  // Initial read address
+        config->transfer_count,  // Number of transfers to perform
+        false              // True to start transfer immediately
     );
 
     if(config->enableIRQ0)
     {
-        dma_irq0_channel = channel;
-        dma_timing_gpio_init();
-
-        /* Enable DMA interrupts on the given channel using DMA_IRQ_0 line (on RP2350 there is 4 lines dedicated to DMA: DMA_IRQ_0-3) */
-        /* The interupt will be triggered when the WHOLE set of transfers is complete NOT after each individual transfer */
-        dma_channel_set_irq0_enabled(channel, true);
-        /* Set the handler and enable the interrupt */
-        irq_set_exclusive_handler(DMA_IRQ_0, dma_irq0_handler);
-        irq_set_enabled(DMA_IRQ_0, true);
+        setup_dma_interrupts(channel);
     }
 
     /* Return the channel number - it is our handle for DMA operations */
