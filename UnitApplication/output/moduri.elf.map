@@ -518,20 +518,87 @@ Discarded input sections
  .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
  .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
  .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .text.PIO_SetupAndRun
-                0x0000000000000000      0x158 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_info    0x0000000000000000      0xccb CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_abbrev  0x0000000000000000      0x31f CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_loc     0x0000000000000000      0x42c CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_aranges
+ .text.PIO_Init
+                0x0000000000000000      0x1d4 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .text.PIO_EnableSM
+                0x0000000000000000       0x2c CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .text.PIO_DisableSM
+                0x0000000000000000       0x2c CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .text.PIO_TX_FIFO_Write
                 0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_ranges  0x0000000000000000      0x148 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_line    0x0000000000000000      0x566 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_str     0x0000000000000000      0x7b4 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .text.PIO_ExecuteInstruction
+                0x0000000000000000       0x14 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .data.currentPIOStatus
+                0x0000000000000000        0x1 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_info    0x0000000000000000     0x12dd CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_abbrev  0x0000000000000000      0x357 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_loc     0x0000000000000000      0x78f CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_aranges
+                0x0000000000000000       0x40 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_ranges  0x0000000000000000      0x248 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_line    0x0000000000000000      0x800 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_str     0x0000000000000000      0xd18 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
  .comment       0x0000000000000000       0x34 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
- .debug_frame   0x0000000000000000       0x44 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .debug_frame   0x0000000000000000       0x8c CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
  .ARM.attributes
                 0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+ .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.dma_irq0_handler
+                0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.calculate_timer_fraction
+                0x0000000000000000       0x2c CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.claim_dma_channel
+                0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .rodata.configure_channel_properties.str1.4
+                0x0000000000000000       0xd7 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.configure_channel_properties
+                0x0000000000000000       0xe4 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.setup_dma_timer
+                0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.dma_timing_gpio_init
+                0x0000000000000000       0x18 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.setup_dma_interrupts
+                0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_Init
+                0x0000000000000000       0xb8 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_Init_Basic
+                0x0000000000000000       0x40 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_Start
+                0x0000000000000000       0x2c CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_WaitComplete
+                0x0000000000000000       0x24 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_IsTransferComplete
+                0x0000000000000000       0x28 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_Abort
+                0x0000000000000000       0x30 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text.DMA_Release
+                0x0000000000000000       0x74 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .bss.dma_channels_used
+                0x0000000000000000        0xc CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .data.dma_irq0_channel
+                0x0000000000000000        0x4 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .rodata.__func__.0
+                0x0000000000000000       0x18 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .rodata.__func__.1
+                0x0000000000000000       0x26 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .rodata.__func__.2
+                0x0000000000000000       0x1c CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .rodata.__func__.3
+                0x0000000000000000       0x18 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_info    0x0000000000000000     0x1dfc CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_abbrev  0x0000000000000000      0x454 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_loc     0x0000000000000000      0xe97 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_aranges
+                0x0000000000000000       0x88 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_ranges  0x0000000000000000      0x2f8 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_line    0x0000000000000000      0xc68 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_str     0x0000000000000000     0x122a CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .comment       0x0000000000000000       0x34 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .debug_frame   0x0000000000000000      0x154 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .ARM.attributes
+                0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
  .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
@@ -8911,6 +8978,7 @@ LOAD CMakeFiles/moduri.dir/HAL/Source/SSD1306_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/PWM_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
+LOAD CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2350/pico_platform/platform.c.o

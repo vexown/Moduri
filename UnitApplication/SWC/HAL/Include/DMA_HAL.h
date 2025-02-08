@@ -9,140 +9,141 @@
 
 #if 0 /* Test Code - you can use this to test the DMA HAL or as a reference to get an idea how to use it */
 
-#include <stdio.h>
-#include "pico/stdlib.h"
 #include "DMA_HAL.h"
 #include <string.h>
 
-// Test data
-static const char __attribute__((aligned(4))) test_src[] = "Hello, world! (from DMA HAL)";
-static char __attribute__((aligned(4))) test_dst[32];
-static uint8_t test_channel = 0;
+/* Test data */
+static const char __attribute__((aligned(4))) dma_test_src[] = "DMA HAL Test Data";
+static char __attribute__((aligned(4))) dma_test_dst[32];
+static uint8_t test_channel;
 
-// Test functions
-static void test_dma_init(void) {
-    printf("\nTesting DMA_Init...\n");
+/* Test functions */
+static void test_basic_transfer(void) {
+    memset(dma_test_dst, 0, sizeof(dma_test_dst));
+
+    test_channel = DMA_Init_Basic(dma_test_src, dma_test_dst, sizeof(dma_test_src));
+    
+    DMA_Start(test_channel);
+    DMA_WaitComplete(test_channel);
+    
+    DMA_Release(test_channel);
+}
+
+static void test_paced_transfer(void) {
+    memset(dma_test_dst, 0, sizeof(dma_test_dst));
     
     DMA_Config_t config = {
-        .dest_addr = test_dst,
-        .src_addr = test_src,
-        .transfer_count = sizeof(test_src),
+        .dest_addr = dma_test_dst,
+        .src_addr = dma_test_src,
+        .transfer_count = sizeof(dma_test_src),
+        .data_size = DMA_SIZE_8,
+        .src_increment = true,
+        .dst_increment = true,
+        .transfer_req_sig = HAL_DREQ_DMA_TIMER0,
+        .treq_timer_rate_hz = 10000, // 10kHz transfer rate
+        .enableIRQ0 = true
+    };
+    
+    test_channel = DMA_Init(&config);
+    
+    DMA_Start(test_channel);
+    DMA_WaitComplete(test_channel);
+    
+    DMA_Release(test_channel);
+}
+
+static void test_chained_transfer(void) {
+    static char __attribute__((aligned(4))) chain_dst1[16];
+    static char __attribute__((aligned(4))) chain_dst2[16];
+    memset(chain_dst1, 0, sizeof(chain_dst1));
+    memset(chain_dst2, 0, sizeof(chain_dst2));
+    
+    // Configure second channel
+    DMA_Config_t config2 = {
+        .dest_addr = chain_dst2,
+        .src_addr = dma_test_src + 8,
+        .transfer_count = 10,
         .data_size = DMA_SIZE_8,
         .src_increment = true,
         .dst_increment = true,
         .transfer_req_sig = HAL_DREQ_FORCE,
-        .treq_timer_rate_hz = 0, // Not used with HAL_DREQ_FORCE
-        .enableIRQ0 = true
+        .enableIRQ0 = true,
+        .channelToChainTo = DMA_NO_CHAIN
     };
 
-    test_channel = DMA_Init(&config);
-    printf("DMA_Init returned channel: %d\n", test_channel);
-    assert(test_channel >= 0);
-}
+    int8_t chan2 = DMA_Init(&config2);
 
-static void test_dma_transfer(void) {
-    printf("\nTesting DMA transfer...\n");
-    
-    // Clear destination buffer
-    memset(test_dst, 0, sizeof(test_dst));
-    
-    // Start transfer
-    bool start_ok = DMA_Start(test_channel);
-    assert(start_ok);
-    printf("DMA transfer started\n");
-    
-    // Wait for completion with timeout
-    bool wait_ok = DMA_WaitComplete(test_channel);
-    if (!wait_ok) {
-        printf("DMA transfer timeout!\n");
-        assert(false);
-        return;
-    }
-    printf("DMA transfer complete\n");
-    
-    // Add small delay to ensure DMA finished
-    sleep_ms(1);
-    
-    // Verify transfer
-    if (memcmp(test_src, test_dst, strlen(test_src)) == 0) {
-        printf("Transfer verified: %s\n", test_dst);
-    } else {
-        printf("Transfer verification failed!\n");
-        assert(false);
-    }
-}
-
-static void test_dma_error_handling(void) {
-    printf("\nTesting error handling...\n");
-    
-    // Test invalid channel
-    assert(DMA_Start(DMA_MAX_CHANNELS + 1) == false);
-    
-    // Test NULL config
-    assert(DMA_Init(NULL) == -1);
-}
-
-static void test_dma_timer_treq(void) {
-    printf("\nTesting DMA Timer TREQ (Timer 0) configuration...\n");
-    
-    /* Test data */
-    static const char __attribute__((aligned(4))) test_src[] = "DMA Timer TREQ";
-    static char __attribute__((aligned(4))) test_dst[32] = {0};
-    
-    /* Configure DMA to use DMA Timer0 as pacing signal */
-    DMA_Config_t config = {
-        .dest_addr = test_dst,
-        .src_addr = test_src,
-        .transfer_count = sizeof(test_src),
+    // Configure first channel
+    DMA_Config_t config1 = {
+        .dest_addr = chain_dst1,
+        .src_addr = dma_test_src,
+        .transfer_count = 8,
         .data_size = DMA_SIZE_8,
         .src_increment = true,
         .dst_increment = true,
-        .transfer_req_sig = HAL_DREQ_DMA_TIMER0,  // Use Timer 0 as TREQ source
-        .treq_timer_rate_hz = 10000, // 10kHz TREQ rate
-        .enableIRQ0 = true
+        .transfer_req_sig = HAL_DREQ_FORCE,
+        .channelToChainTo = chan2 // Chain to second channel, which will start automatically when first channel completes
+    };
+
+    int8_t chan1 = DMA_Init(&config1);
+    
+    DMA_Start(chan1);  // Start first channel
+    DMA_WaitComplete(chan2);  // Wait for second channel
+    
+    DMA_Release(chan1);
+    DMA_Release(chan2);
+}
+
+static void test_ring_buffer(void) {
+    #define RING_SIZE 16
+    #define PATTERN_SIZE 4
+    #define PATTERN_SIZE_BITS 2  // 2^2 = 4 bytes
+    
+    static char __attribute__((aligned(RING_SIZE))) ring_buffer[RING_SIZE];
+    static const char __attribute__((aligned(4))) test_pattern[] = "1234";
+    
+    memset(ring_buffer, 0, RING_SIZE);
+    
+    DMA_Config_t config = {
+        .dest_addr = ring_buffer,
+        .src_addr = test_pattern,
+        .transfer_count = RING_SIZE,
+        .data_size = DMA_SIZE_8,
+        .src_increment = true,
+        .dst_increment = true,
+        .transfer_req_sig = HAL_DREQ_FORCE,
+        .enableIRQ0 = true,
+        .ring_buffer_write_or_read = false,  // Wrap source address
+        .ring_buffer_size_bits = PATTERN_SIZE_BITS
     };
     
     int8_t channel = DMA_Init(&config);
-    printf("DMA_Init returned channel: %d\n", channel);
     assert(channel >= 0);
     
-    bool start_ok = DMA_Start(channel);
-    assert(start_ok);
-    printf("DMA transfer started (Timer TREQ)...\n");
+    DMA_Start(channel);
+    DMA_WaitComplete(channel);
     
-    bool wait_ok = DMA_WaitComplete(channel);
-    assert(wait_ok);
-    printf("DMA transfer complete (Timer TREQ)...\n");
-    
-    /* Verify the transfer */
-    if (memcmp(test_src, test_dst, strlen(test_src)) == 0)
-        printf("Transfer verified (Timer TREQ): %s\n", test_dst);
-    else {
-       printf("Transfer verification failed (Timer TREQ)!\n");
-       assert(false);
+    // Verify pattern repeats
+    for(int i = 0; i < RING_SIZE; i += PATTERN_SIZE) {
+        assert(memcmp(&ring_buffer[i], test_pattern, PATTERN_SIZE) == 0);
     }
     
     DMA_Release(channel);
-    printf("DMA Timer TREQ test complete\n");
 }
 
 int main(void)
 {
     setupHardware();
 
-    printf("\nStarting DMA HAL tests...\n");
+    /* Step through these tests in debugger to see results because printf is causing issues */
+    test_basic_transfer();
+    test_paced_transfer();
+    test_chained_transfer();
+    test_ring_buffer();
 
-    // Run tests
-    test_dma_init();
-    test_dma_transfer();
-    test_dma_error_handling();
-    test_dma_timer_treq();
-    
-    printf("\nDMA HAL tests completed!\n");
-
-    while(1);
-
-    OS_start();
+    while(1) {
+        sleep_ms(1000);
+    }
 }
 
 #endif

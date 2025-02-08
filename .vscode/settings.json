@@ -26,6 +26,8 @@
         "pio_hal.h": "c",
         "string_view": "c",
         "blink.pio.h": "c",
-        "dma_hal.h": "c"
+        "dma_hal.h": "c",
+        "random": "c",
+        "ranges": "c"
     }
 }
