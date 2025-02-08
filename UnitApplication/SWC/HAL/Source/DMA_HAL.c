@@ -31,7 +31,7 @@
 /*                             STATIC VARIABLES                                */
 /*******************************************************************************/
 static bool dma_channels_used[DMA_MAX_CHANNELS] = {false};
-static int dma_irq0_channel; // static variable to store the channel number for the IRQ0 handler
+static int dma_irq0_channel = -1; // static variable to store the channel number for the IRQ0 handler
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
@@ -82,6 +82,12 @@ static void configure_channel_properties(dma_channel_config *channel_config, con
     /* In default config this is set to DREQ_FORCE which essentially means no pacing signal (send data as fast as possible) */
     /* If you want to use such signal, you need to configure the transfer request (TREQ) signal to pace the transfer rate */
     channel_config_set_dreq(channel_config, config->transfer_req_sig);
+
+    if (config->channelToChainTo != DMA_NO_CHAIN && config->channelToChainTo < DMA_MAX_CHANNELS)
+    {
+        /* Chain to another channel after this channel completes */
+        channel_config_set_chain_to(channel_config, config->channelToChainTo);
+    }
 }
 
 /**
@@ -297,14 +303,18 @@ void DMA_Release(uint8_t channel)
 {
     if (channel < DMA_MAX_CHANNELS && dma_channels_used[channel]) 
     {
-        /* Disable the DMA transfer complete interrupts */
-        dma_channel_set_irq0_enabled(channel, false);
+        if(dma_irq0_channel == channel)
+        {
+            /* Disable the DMA transfer complete interrupts */
+            dma_channel_set_irq0_enabled(channel, false);
+            irq_set_enabled(DMA_IRQ_0, false);
+            irq_remove_handler(DMA_IRQ_0, dma_irq0_handler);
+
+            dma_irq0_channel = -1;
+        }
 
         /* Abort any ongoing transfer */
         dma_channel_abort(channel);
-
-        /* Clear the spurious interrupt (if any) */
-        dma_channel_acknowledge_irq0(channel);
 
         /* Unclaim the channel and mark it as unused */
         dma_channel_unclaim(channel);

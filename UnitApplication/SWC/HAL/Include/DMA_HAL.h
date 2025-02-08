@@ -159,6 +159,8 @@ int main(void)
 #define DMA_MAX_CHANNELS 12     /* Maximum number of DMA channels */
 #define DMA_TIMEOUT_MS 1000     /* Timeout for DMA operations in milliseconds */
 #define DMA_TIMING_PIN 16       /* GPIO pin for measuring DMA complete transfer time - can be used with a Logic Analyzer */ 
+#define DMA_NO_CHAIN 0xFF       /* No chaining of DMA channels */
+#define DMA_NOT_PACED 0         /* No pacing of DMA transfers */
 
 /**
  * @brief Reduced version of dreq_num_t enum from pico-sdk
@@ -182,7 +184,8 @@ typedef struct
     bool dst_increment;              /*!< Whether to increment destination address after each transfer */
     hal_dreq_num_t transfer_req_sig; /*!< Transfer Request (TREQ) Signal to pace the transfer rate. Use HAL_DREQ_FORCE for unpaced transfers */
     uint32_t treq_timer_rate_hz;     /*!< Timer-based TREQ rate in Hz, from 2288Hz to 150MHz (use only with transfer_req_sig set to HAL_DREQ_DMA_TIMER0) */
-    bool enableIRQ0;                    /*!< Enable debug output */
+    bool enableIRQ0;                 /*!< Enable interrupts on completion of the whole set of transfers */
+    uint8_t channelToChainTo;        /*!< Channel to chain to. It will be auto-triggered after this channel completes. Use DMA_NO_CHAIN to disable chaining */
 } DMA_Config_t;
 
 /**
