@@ -161,6 +161,9 @@ int main(void)
 #define DMA_TIMING_PIN 16       /* GPIO pin for measuring DMA complete transfer time - can be used with a Logic Analyzer */ 
 #define DMA_NO_CHAIN 0xFF       /* No chaining of DMA channels */
 #define DMA_NOT_PACED 0         /* No pacing of DMA transfers */
+#define DMA_RING_DISABLED 0    /* Disable ring buffer mode */
+#define DMA_RING_MIN_BITS 1    /* Minimum ring size (2 bytes) */
+#define DMA_RING_MAX_BITS 15   /* Maximum ring size (32768 bytes) */
 
 /**
  * @brief Reduced version of dreq_num_t enum from pico-sdk
@@ -186,6 +189,8 @@ typedef struct
     uint32_t treq_timer_rate_hz;     /*!< Timer-based TREQ rate in Hz, from 2288Hz to 150MHz (use only with transfer_req_sig set to HAL_DREQ_DMA_TIMER0) */
     bool enableIRQ0;                 /*!< Enable interrupts on completion of the whole set of transfers */
     uint8_t channelToChainTo;        /*!< Channel to chain to. It will be auto-triggered after this channel completes. Use DMA_NO_CHAIN to disable chaining */
+    bool ring_buffer_write_or_read;  /*!< True for ring buffer write, false for read */
+    uint8_t ring_buffer_size_bits;   /*!< Ring buffer size in bits. Use DMA_RING_DISABLED to disable ring buffer */
 } DMA_Config_t;
 
 /**

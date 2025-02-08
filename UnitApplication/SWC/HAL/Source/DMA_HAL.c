@@ -88,6 +88,15 @@ static void configure_channel_properties(dma_channel_config *channel_config, con
         /* Chain to another channel after this channel completes */
         channel_config_set_chain_to(channel_config, config->channelToChainTo);
     }
+
+    if (config->ring_buffer_size_bits != DMA_RING_DISABLED) 
+    {
+        if (config->ring_buffer_size_bits >= DMA_RING_MIN_BITS && config->ring_buffer_size_bits <= DMA_RING_MAX_BITS) 
+        {
+            /* Set the ring buffer mode with the specified size */
+            channel_config_set_ring(channel_config, config->ring_buffer_write_or_read, config->ring_buffer_size_bits);
+        }
+    }
 }
 
 /**
