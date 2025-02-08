@@ -94,6 +94,10 @@ static void configure_channel_properties(dma_channel_config *channel_config, con
         if (config->ring_buffer_size_bits >= DMA_RING_MIN_BITS && config->ring_buffer_size_bits <= DMA_RING_MAX_BITS) 
         {
             /* Set the ring buffer mode with the specified size */
+            /* Size of address wrap region works like this:
+                - If 0, don’t wrap (DMA_RING_DISABLED)
+                - For values n > 0, only the lower n bits of the address will change. This wraps the address on a (1 << n) byte boundary, 
+                  facilitating access to naturally-aligned ring buffers. So in normal words, size of the ring buffer is 2^n bytes */
             channel_config_set_ring(channel_config, config->ring_buffer_write_or_read, config->ring_buffer_size_bits);
         }
     }
@@ -204,6 +208,26 @@ static void setup_dma_interrupts(uint8_t channel)
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
+
+int8_t DMA_Init_Basic(const void* source_ptr_u8, void* destiniation_ptr_u8, uint32_t sizeof_data) 
+{
+    DMA_Config_t config = {
+        .dest_addr = destiniation_ptr_u8,
+        .src_addr = source_ptr_u8,
+        .transfer_count = sizeof_data,
+        .data_size = DMA_SIZE_8,
+        .src_increment = true,
+        .dst_increment = true,
+        .transfer_req_sig = HAL_DREQ_FORCE, 
+        .treq_timer_rate_hz = DMA_NOT_PACED,
+        .enableIRQ0 = false,
+        .channelToChainTo = DMA_NO_CHAIN,
+        .ring_buffer_write_or_read = false,
+        .ring_buffer_size_bits = DMA_RING_DISABLED
+    };
+    
+    return DMA_Init(&config);
+}
 /**
  * @brief Initialize a DMA channel with specified configuration
  * @param config Pointer to DMA configuration structure

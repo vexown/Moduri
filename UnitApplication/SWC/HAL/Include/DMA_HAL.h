@@ -190,7 +190,7 @@ typedef struct
     bool enableIRQ0;                 /*!< Enable interrupts on completion of the whole set of transfers */
     uint8_t channelToChainTo;        /*!< Channel to chain to. It will be auto-triggered after this channel completes. Use DMA_NO_CHAIN to disable chaining */
     bool ring_buffer_write_or_read;  /*!< True for ring buffer write, false for read */
-    uint8_t ring_buffer_size_bits;   /*!< Ring buffer size in bits. Use DMA_RING_DISABLED to disable ring buffer */
+    uint8_t ring_buffer_size_bits;   /*!< Ring buffer size in bit shifts. Possible ring size: 2-32768 bytes (size_bits 1-15). DMA_RING_DISABLED to disable ring buffer */
 } DMA_Config_t;
 
 /**
@@ -233,5 +233,14 @@ bool DMA_IsTransferComplete(uint8_t channel);
  * @return true if successful, false if error
  */
 bool DMA_Abort(uint8_t channel);
+
+/**
+ * @brief Initialize a DMA channel with basic configuration
+ * @param source_ptr_u8 Pointer to source data
+ * @param destiniation_ptr_u8 Pointer to destination data
+ * @param sizeof_data Size of data to transfer
+ * @return Channel number if successful, -1 if error
+ */
+int8_t DMA_Init_Basic(const void* source_ptr_u8, void* destiniation_ptr_u8, uint32_t sizeof_data);
 
 #endif /* DMA_HAL_H */
