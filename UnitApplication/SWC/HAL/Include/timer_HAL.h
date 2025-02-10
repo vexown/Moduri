@@ -1,34 +1,36 @@
+/**
+ * @file timer_HAL.h
+ * @brief Hardware Abstraction Layer for Timer functionality on RP2350
+ * 
+ * This HAL provides a unified interface for both hardware and software timers.
+ * Hardware timers utilize the RP2350's timer peripherals while software timers
+ * are implemented using the system time with microsecond resolution.
+ * 
+ * Features:
+ * - Hardware and software timer support
+ * - One-shot and periodic timer modes
+ * - Configurable resolution:
+ *   * Hardware Timers: 1µs resolution (direct hardware support)
+ *   * Software Timers: 100µs resolution (to maintain system stability)
+ * - Callback support
+ * - Period modification during runtime
+ * - Remaining time queries
+ * - Resource management with timer pool
+ * 
+ * The HAL automatically handles timer resource allocation and provides
+ * comprehensive error checking for all operations.
+ * 
+ * @note Maximum of 8 software timers can be active simultaneously
+ * @note For timing requirements < 100µs, use hardware timers
+ * @note Software timer resolution is limited to protect system performance
+ */
+
 #ifndef TIMER_HAL_H
 #define TIMER_HAL_H
 
 #include "pico/stdlib.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-/*
- * Key features:
- *
- * Flexible Timer Types:
- * - Hardware timers using the RP2350's timer peripherals
- * - Software timers with microsecond resolution
- * - Support for both one-shot and periodic timers
- *
- * Clean API:
- * - Simple initialization with configuration structure
- * - Basic operations: start, stop, reset
- * - Period updates and remaining time queries
- * - Clear error handling with status codes
- *
- * Resource Management:
- * - Automatic timer ID assignment
- * - Pool of software timers with maximum limit
- * - Proper cleanup and state tracking
- *
- * Error Handling:
- * - Invalid parameter checking
- * - State validation (running/not running)
- * - Resource availability checking
- */
 
 #if 0 /* Test Code - you can use this to test the timer HAL or as a reference to get an idea how to use it */
 
@@ -173,7 +175,7 @@ int main(void) {
 
 #endif
 
-// Error codes
+/* Error codes */
 typedef enum 
 {
     TIMER_OK = 0,
@@ -184,20 +186,22 @@ typedef enum
     TIMER_ERROR_INVALID_PERIOD
 } timer_status_t;
 
-// Timer configuration structure
-typedef struct {
-    uint32_t period_us;          // Timer period in microseconds
-    bool repeat;                 // True for periodic timer, false for one-shot
-    void (*callback)(void);      // Timer callback function
+/* Timer configuration structure */
+typedef struct 
+{
+    uint32_t period_us;         // Timer period in microseconds
+    bool repeat;                // True for periodic timer, false for one-shot
+    void (*callback)(void);     // Timer callback function
     bool hw_timer;              // True to use hardware timer, false for software timer
 } timer_config_t;
 
-// Timer handle structure
-typedef struct {
+/* Timer handle structure */
+typedef struct 
+{
     uint8_t timer_id;           // Internal timer identifier
     timer_config_t config;      // Timer configuration
     bool is_running;            // Current timer state
-    uint64_t start_time;        // Last start time in microseconds
+    uint64_t last_trigger_time;        // Last start time in microseconds
     repeating_timer_t hw_timer; // Hardware timer instance (if used)
 } timer_handle_t;
 
