@@ -4,6 +4,7 @@
 /*******************************************************************************/
 #include "timer_HAL.h"
 #include "hardware/timer.h"
+#include "hardware/gpio.h"
 #include <string.h>
 
 /*******************************************************************************/
@@ -11,6 +12,13 @@
 /*******************************************************************************/
 #define MAX_SW_TIMERS 8
 #define SW_TIMER_CHECK_PERIOD_US 100  // 100µs resolution
+
+#ifdef DEBUG_BUILD
+    #define TIMER_DEBUG_ENABLED 1 // Enable debug pin (GPIO 16) for timing measurements
+    #define TIMER_DEBUG_PIN 16
+#else
+    #define TIMER_DEBUG_ENABLED 0
+#endif
 
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
@@ -35,6 +43,9 @@ static bool hw_timer_callback(repeating_timer_t* rt)
     timer_handle_t* handle = (timer_handle_t*)rt->user_data;
     if (handle && handle->config.callback) 
     {
+#if TIMER_DEBUG_ENABLED
+        gpio_xor_mask(1u << TIMER_DEBUG_PIN);  // Toggle pin
+#endif
         handle->config.callback();
     }
 
@@ -95,6 +106,9 @@ static void update_sw_timers(void)
                    Example: if 2 periods passed, call callback twice */
                 for (uint32_t j = 0; j < periods; j++) 
                 {
+#if TIMER_DEBUG_ENABLED
+                    gpio_xor_mask(1u << TIMER_DEBUG_PIN);  // Toggle pin
+#endif
                     if (sw_timers[i]->config.callback) 
                     {
                         sw_timers[i]->config.callback();
@@ -139,6 +153,17 @@ static bool sw_timer_check_callback(repeating_timer_t *rt)
 timer_status_t timer_init(const timer_config_t* config, timer_handle_t* handle) 
 {
     if (!config || !handle) return TIMER_ERROR_INVALID_TIMER;
+
+#if TIMER_DEBUG_ENABLED
+    static bool debug_pin_initialized = false;
+    if (!debug_pin_initialized) 
+    {
+        gpio_init(TIMER_DEBUG_PIN);
+        gpio_set_dir(TIMER_DEBUG_PIN, GPIO_OUT);
+        gpio_put(TIMER_DEBUG_PIN, 0);
+        debug_pin_initialized = true;
+    }
+#endif
 
     /* If the configured timer is a software timer, initialize the "system" that manages them */
     if (!sw_timer_system_initialized && !config->hw_timer) 
