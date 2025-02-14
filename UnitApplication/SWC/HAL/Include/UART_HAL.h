@@ -6,12 +6,6 @@
 
  #ifndef UART_HAL_H
  #define UART_HAL_H
-
- #if 0 /* Test Code - you can use this to test the UART HAL or as a reference to get an idea how to use it */
-
- //TODO - add test code
-
- #endif
  
  #include "pico/stdlib.h"
  #include "hardware/uart.h"
@@ -157,5 +151,265 @@ UART_Status_t UART_FlushRx(uart_inst_t* uart_id);
  * @return UART_Status_t UART_OK on success or UART_ERROR_NOT_INITIALIZED if the UART is not initialized.
  */
 UART_Status_t UART_DisableRxInterrupt(uart_inst_t* uart_id);
- 
- #endif /* UART_HAL_H */
+
+
+#if 0 /* Test Code - you can use this to test the UART HAL or as a reference to get an idea how to use it */
+
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include <string.h>
+#include "UART_HAL.h"
+
+// Test configuration
+#define TEST_UART uart1  // Changed to UART1
+#define TEST_BAUD_RATE 115200
+// UART1 default pins for Pico W are:
+#define TEST_TX_PIN 4    // Changed to GP4
+#define TEST_RX_PIN 5    // Changed to GP5
+#define BUFFER_SIZE 128
+
+// Test status tracking
+static volatile bool rx_callback_triggered = false;
+static uint32_t test_count = 0;
+static uint32_t tests_passed = 0;
+
+// Buffer for loopback testing
+static uint8_t rx_buffer[BUFFER_SIZE];
+static const char test_message[] = "UART HAL Test Message 123!";
+
+/**
+ * @brief Print test result
+ */
+void print_test_result(const char* test_name, bool passed) {
+    test_count++;
+    if (passed) {
+        tests_passed++;
+        printf("✓ Test %lu: %s - PASSED\n", test_count, test_name);
+    } else {
+        printf("✗ Test %lu: %s - FAILED\n", test_count, test_name);
+    }
+}
+
+/**
+ * @brief RX callback for interrupt test
+ */
+void uart_rx_callback_kek(void) {
+    rx_callback_triggered = true;
+    printf("Interrupt triggered!\n"); // ADDED DEBUG PRINT
+}
+
+/**
+ * @brief Test UART initialization
+ */
+void test_uart_init(void) {
+    UART_Config_t config = {
+        .uart_id = TEST_UART,
+        .baud_rate = TEST_BAUD_RATE,
+        .data_bits = 8,
+        .stop_bits = 1,
+        .parity = UART_PARITY_NONE,
+        .tx_pin = TEST_TX_PIN,
+        .rx_pin = TEST_RX_PIN
+    };
+
+    UART_Status_t status = UART_Init(&config);
+    print_test_result("UART Initialization", status == UART_OK);
+}
+
+/**
+ * @brief Test UART transmit functionality
+ */
+void test_uart_transmit(void) {
+    UART_Status_t status = UART_Send(TEST_UART, (uint8_t*)test_message, strlen(test_message), 1000);
+    print_test_result("UART Transmit", status == UART_OK);
+    
+    // Wait for transmission to complete
+    sleep_ms(100);
+}
+
+/**
+ * @brief Test UART receive functionality with detailed debugging
+ */
+void test_uart_receive(void) {
+    memset(rx_buffer, 0, BUFFER_SIZE);
+    printf("\nStarting detailed receive test...\n");
+    
+    // First clear any pending data
+    UART_FlushRx(TEST_UART);
+    sleep_ms(10);  // Give time for flush to complete
+    
+    // Send the test message
+    printf("Sending test message: '%s'\n", test_message);
+    printf("Message length: %d bytes\n", strlen(test_message));
+    
+    UART_Status_t tx_status = UART_Send(TEST_UART, (uint8_t*)test_message, strlen(test_message), 1000);
+    printf("TX Status: %d\n", tx_status);
+    
+    // Small delay to ensure transmission is complete
+    sleep_ms(50);
+    
+    // Check if data is available
+    bool data_available = UART_IsRxAvailable(TEST_UART);
+    printf("RX data available before receive: %s\n", data_available ? "yes" : "no");
+    
+    // Receive data
+    UART_Status_t rx_status = UART_Receive(TEST_UART, rx_buffer, strlen(test_message), 1000);
+    printf("Receive status: %d\n", rx_status);
+    
+    // Print both buffers for comparison
+    printf("\nExpected data: ");
+    for(size_t i = 0; i < strlen(test_message); i++) {
+        printf("%02X ", test_message[i]);
+    }
+    printf("\nReceived data: ");
+    for(size_t i = 0; i < strlen(test_message); i++) {
+        printf("%02X ", rx_buffer[i]);
+    }
+    printf("\n\nReceived as text: '%s'\n", rx_buffer);
+    
+    bool data_matches = (memcmp(rx_buffer, test_message, strlen(test_message)) == 0);
+    printf("Data match: %s\n", data_matches ? "yes" : "no");
+    
+    if (!data_matches) {
+        printf("Mismatched positions: ");
+        for(size_t i = 0; i < strlen(test_message); i++) {
+            if (test_message[i] != rx_buffer[i]) {
+                printf("%zu ", i);
+            }
+        }
+        printf("\n");
+    }
+    
+    print_test_result("UART Receive", data_matches);
+}
+
+/**
+ * @brief Test UART interrupt functionality with detailed debugging
+ */
+void test_uart_interrupt(void) {
+    printf("\nStarting detailed interrupt test...\n");
+    
+    // Clear any existing data and state
+    rx_callback_triggered = false;
+    UART_FlushRx(TEST_UART);
+    
+    // Ensure RX buffer is empty
+    while(uart_is_readable(TEST_UART)) {
+        uart_getc(TEST_UART);
+    }
+    sleep_ms(10);
+    
+    // Register callback
+    printf("Registering callback...\n");
+    UART_Status_t status = UART_RegisterRxCallback(TEST_UART, uart_rx_callback_kek);
+    print_test_result("UART Callback Registration", status == UART_OK);
+    
+    // Add small delay
+    sleep_ms(10);
+    
+    // Send test byte
+    uint8_t test_byte = '!';
+    printf("Sending test byte: 0x%02X\n", test_byte);
+    status = UART_Send(TEST_UART, &test_byte, 1, 100);
+    printf("Send status: %d\n", status);
+    
+    // Add delay after sending
+    sleep_ms(5);
+    
+    // Wait for interrupt with timeout
+    uint32_t timeout = 1000;
+    printf("Waiting for interrupt trigger...\n");
+    
+    while (!rx_callback_triggered && timeout > 0) {
+        sleep_ms(1);
+        timeout--;
+    }
+    
+    print_test_result("UART Interrupt Triggered", rx_callback_triggered);
+    
+    // Cleanup
+    UART_RegisterRxCallback(TEST_UART, NULL);
+    UART_DisableRxInterrupt(TEST_UART);
+}
+
+/**
+ * @brief Test UART status functions
+ */
+void test_uart_status(void) {
+    // Test TX ready
+    bool tx_ready = UART_IsTxReady(TEST_UART);
+    print_test_result("UART TX Ready Check", tx_ready);
+    
+    // Send data and test RX available
+    UART_Send(TEST_UART, (uint8_t*)"Test", 4, 100);
+    sleep_ms(10);
+    bool rx_available = UART_IsRxAvailable(TEST_UART);
+    print_test_result("UART RX Available Check", rx_available);
+}
+
+/**
+ * @brief Test UART buffer operations
+ */
+void test_uart_buffer_ops(void) {
+    // Test TX buffer flush
+    UART_Status_t status = UART_FlushTx(TEST_UART);
+    print_test_result("UART TX Buffer Flush", status == UART_OK);
+    
+    // Test RX buffer flush
+    status = UART_FlushRx(TEST_UART);
+    print_test_result("UART RX Buffer Flush", status == UART_OK);
+}
+
+/**
+ * @brief Test error conditions
+ */
+void test_uart_errors(void) {
+    // Test null pointer handling
+    UART_Status_t status = UART_Send(TEST_UART, NULL, 10, 100);
+    print_test_result("UART Null Pointer Handling", status == UART_ERROR_INVALID_PARAMS);
+    
+    // Test timeout handling
+    uint8_t dummy_buffer[256];
+    status = UART_Receive(TEST_UART, dummy_buffer, 256, 1); // 1ms timeout
+    print_test_result("UART Timeout Handling", status == UART_ERROR_TIMEOUT);
+}
+
+/**
+ * @brief Main test sequence
+ */
+int main(void) {
+    // Initialize stdio for printf (using UART0)
+    stdio_init_all();
+    sleep_ms(2000);  // Wait for serial terminal connection
+    
+    printf("\nUART HAL Test Suite (Using UART1)\n");
+    printf("================================\n\n");
+    printf("Please connect GP4 (TX) to GP5 (RX) for loopback testing\n\n");
+    
+    /* To run the tests, you'll need to connect your Pico's UART1 TX (GP4) to RX (GP5) for loopback testing */
+    test_uart_init();
+    test_uart_transmit();
+    test_uart_receive();
+    test_uart_interrupt();
+    test_uart_status();
+    test_uart_buffer_ops();
+    test_uart_errors();
+    
+    // Print test summary
+    printf("\nTest Summary\n");
+    printf("============\n");
+    printf("Tests passed: %lu/%lu (%.1f%%)\n", tests_passed, test_count, (float)tests_passed / test_count * 100);
+    
+    // Cleanup
+    UART_Deinit(TEST_UART);
+
+    while(1) {
+        tight_loop_contents();
+    }
+    
+    return 0;
+}
+
+#endif /* Test Code */
+
+#endif /* UART_HAL_H */
