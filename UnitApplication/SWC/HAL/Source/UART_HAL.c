@@ -23,9 +23,22 @@ static UART_Internal_State_t uart1_state = {false, NULL, 0, uart1, false, false}
  * @return Pointer to internal state structure
  */
 static UART_Internal_State_t* get_uart_state(uart_inst_t* uart_id) {
-    if (uart_id == uart0) return &uart0_state;
-    if (uart_id == uart1) return &uart1_state;
+    if (uart0_state.uart_id == uart_id) return &uart0_state;
+    if (uart1_state.uart_id == uart_id) return &uart1_state;
     return NULL;
+}
+
+UART_Status_t UART_DisableRxInterrupt(uart_inst_t* uart_id) {
+    UART_Internal_State_t* state = get_uart_state(uart_id);
+    if (!state || !state->initialized) return UART_ERROR_NOT_INITIALIZED;
+
+    // Disable IRQ in NVIC and UART
+    irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
+    uart_set_irq_enables(uart_id, false, false);
+    state->interrupt_enabled = false;
+    state->rx_callback = NULL;
+    state->rx_callback_triggered = false;
+    return UART_OK;
 }
 
 static void uart_irq_handler(uart_inst_t *uart_id) {
@@ -33,24 +46,21 @@ static void uart_irq_handler(uart_inst_t *uart_id) {
     if (!state || !state->interrupt_enabled) {
         return;
     }
-
-    uart_hw_t *hw = uart_get_hw(uart_id);
-    uint32_t status = hw->mis;
-
-    if ((status & UART_UARTMIS_RXMIS_BITS) && state->rx_callback) {
-        // Read single byte if available
-        if (uart_is_readable(uart_id)) {
-            uint8_t byte = uart_getc(uart_id);
-            state->rx_callback_triggered = true;
+    
+    // If a byte is available, trigger the callback once
+    if (uart_is_readable(uart_id)) {
+        // Read one byte (discard or store if needed)
+        (void)uart_getc(uart_id);
+        state->rx_callback_triggered = true;
+        if (state->rx_callback) {
             state->rx_callback();
         }
-        
-        // Clear RX interrupt flag
-        hw->icr = UART_UARTICR_RXIC_BITS;
     }
-
-    // Clear any other interrupts
-    hw->icr = status;
+    
+    // Drain any remaining bytes
+    while (uart_is_readable(uart_id)) {
+        (void)uart_getc(uart_id);
+    }
 }
 
 
@@ -92,8 +102,8 @@ UART_Status_t UART_Init(const UART_Config_t* config) {
     gpio_set_function(config->tx_pin, GPIO_FUNC_UART);
     gpio_set_function(config->rx_pin, GPIO_FUNC_UART);
     
-    // Enable FIFO
-    uart_set_fifo_enabled(config->uart_id, true);
+    // Enable FIFO for buffering in polling mode
+    uart_set_fifo_enabled(config->uart_id, true);  // Changed: enable FIFO
     
     // Update internal state
     state->initialized = true;
@@ -158,14 +168,6 @@ UART_Status_t UART_Init(const UART_Config_t* config) {
     UART_Internal_State_t* state = get_uart_state(uart_id);
     if (!state || !state->initialized) return UART_ERROR_NOT_INITIALIZED;
 
-    // Disable all interrupts
-    irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
-    uart_set_irq_enables(uart_id, false, false);
-
-    uart_hw_t *hw = uart_get_hw(uart_id);
-    hw->imsc = 0;
-    hw->icr = 0x7FF;
-
     // Reset state
     state->rx_callback = NULL;
     state->interrupt_enabled = false;
@@ -177,23 +179,20 @@ UART_Status_t UART_Init(const UART_Config_t* config) {
 
     // Empty FIFO
     while (uart_is_readable(uart_id)) {
-        uart_getc(uart_id);
+        (void)uart_getc(uart_id);
     }
-
-    // Configure UART
-    hw->ifls = 0x0;  // FIFO trigger level = 1 byte
-    hw->icr = UART_UARTICR_RXIC_BITS;
     
+    // Disable FIFO for per-character interrupt handling
+    uart_set_fifo_enabled(uart_id, false);  // Disable FIFO in interrupt mode
+
     // Set handler and callback
     irq_handler_t handler = (uart_id == uart0) ? uart0_irq_handler : uart1_irq_handler;
     irq_set_exclusive_handler(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, handler);
+
     state->rx_callback = callback;
     state->interrupt_enabled = true;
 
-    // Enable only RX interrupt
-    hw->imsc = UART_UARTIMSC_RXIM_BITS;
-    
-    // Enable UART RX interrupt and NVIC
+    // Enable only RX interrupt and NVIC
     uart_set_irq_enables(uart_id, true, false);
     irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, true);
 
