@@ -1,82 +1,98 @@
 
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
 #include "UART_HAL.h"
-#include <string.h>
 #include "hardware/irq.h"
 #include <stdio.h>
 
-/** Internal state tracking structure */
-typedef struct {
-    bool initialized;
-    UART_CallbackFn_t rx_callback;
-    uint32_t last_error;
-    uart_inst_t* uart_id;
-    volatile bool interrupt_enabled;
-    volatile bool rx_callback_triggered;  // New flag
-} UART_Internal_State_t;
+/*******************************************************************************/
+/*                           PRIVATE TYPE DEFINITIONS                          */
+/*******************************************************************************/
 
+/** Internal state tracking structure */
+typedef struct
+{
+    bool initialized;                     /* Flag indicating if the UART has been initialized */
+    UART_CallbackFn_t rx_callback;        /* Function pointer to receive callback handler */
+    uint32_t last_error;                  /* Last error code recorded during operation */
+    uart_inst_t* const uart_id;           /* Pointer to the hardware UART instance */
+    volatile bool interrupt_enabled;      /* Flag indicating if interrupts are enabled */
+    volatile bool rx_callback_triggered;  /* Flag indicating if receive callback was triggered */
+} UART_Internal_State_t; 
+
+/*******************************************************************************/
+/*                            PRIVATE VARIABLES                                */
+/*******************************************************************************/
+
+/* Initial state for UART0 and UART1 */
 static UART_Internal_State_t uart0_state = {false, NULL, 0, uart0, false, false};
 static UART_Internal_State_t uart1_state = {false, NULL, 0, uart1, false, false};
 
+/*******************************************************************************/
+/*                        PRIVATE FUNCTION DECLARATIONS                        */
+/*******************************************************************************/
+
 /**
- * @brief Get internal state structure for UART instance
+ * @brief Get internal state structure for UART instance (either UART0 or UART1)
  * @param uart_id UART instance
  * @return Pointer to internal state structure
  */
-static UART_Internal_State_t* get_uart_state(uart_inst_t* uart_id) {
+static UART_Internal_State_t* get_uart_state(uart_inst_t* uart_id) 
+{
     if (uart0_state.uart_id == uart_id) return &uart0_state;
     if (uart1_state.uart_id == uart_id) return &uart1_state;
+
     return NULL;
 }
 
-UART_Status_t UART_DisableRxInterrupt(uart_inst_t* uart_id) {
+/**
+ * @brief UART Receive IRQ handler. Drains the RX FIFO and then triggers the callback.
+ *
+ * This version loops over all characters in the RX FIFO and discards them (or could store them if needed),
+ * and then, after the FIFO is completely drained, sets the callback trigger flag and calls the callback.
+ *
+ * @param uart_id Pointer to the UART instance.
+ */
+static void uart_rx_irq_handler(uart_inst_t *uart_id) 
+{
     UART_Internal_State_t* state = get_uart_state(uart_id);
-    if (!state || !state->initialized) return UART_ERROR_NOT_INITIALIZED;
+    if (!state || !state->interrupt_enabled) return;
 
-    // Disable IRQ in NVIC and UART
-    irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
-    uart_set_irq_enables(uart_id, false, false);
-    state->interrupt_enabled = false;
-    state->rx_callback = NULL;
-    state->rx_callback_triggered = false;
-    return UART_OK;
-}
-
-static void uart_irq_handler(uart_inst_t *uart_id) {
-    UART_Internal_State_t* state = get_uart_state(uart_id);
-    if (!state || !state->interrupt_enabled) {
-        return;
+    /* Drain all characters in the RX FIFO */
+    while (uart_is_readable(uart_id))  // Check whether data is waiting in the RX FIFO of the UART instance (true if FIFO not empty)
+    {
+        /* Read a single character from the UART instance (blocking until char has been read) */
+        (void)uart_getc(uart_id); // Discard the chars for now (TODO: process them if needed)
     }
-    
-    // If a byte is available, trigger the callback once
-    if (uart_is_readable(uart_id)) {
-        // Read one byte (discard or store if needed)
-        (void)uart_getc(uart_id);
+
+    /* After processing all characters, trigger the callback once */
+    if (state->rx_callback)
+    {
         state->rx_callback_triggered = true;
-        if (state->rx_callback) {
-            state->rx_callback();
-        }
-    }
-    
-    // Drain any remaining bytes
-    while (uart_is_readable(uart_id)) {
-        (void)uart_getc(uart_id);
+        state->rx_callback();
     }
 }
-
 
 /**
  * @brief UART0 IRQ handler
  */
-static void uart0_irq_handler(void) {
-    uart_irq_handler(uart0);
+static void uart0_irq_handler(void) 
+{
+    uart_rx_irq_handler(uart0);
 }
 
 /**
  * @brief UART1 IRQ handler
  */
-static void uart1_irq_handler(void) {
-    uart_irq_handler(uart1);
+static void uart1_irq_handler(void) 
+{
+    uart_rx_irq_handler(uart1);
 }
+
+/*******************************************************************************/
+/*                        GLOBAL FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
 
 UART_Status_t UART_Init(const UART_Config_t* config) {
     if (!config || !config->uart_id || 
@@ -109,7 +125,6 @@ UART_Status_t UART_Init(const UART_Config_t* config) {
     state->initialized = true;
     state->rx_callback = NULL;
     state->last_error = 0;
-    state->uart_id = config->uart_id;
     state->interrupt_enabled = false;
 
     return UART_OK;
@@ -235,4 +250,18 @@ UART_Status_t UART_Init(const UART_Config_t* config) {
     UART_Internal_State_t* state = get_uart_state(uart_id);
     if (!state) return false;
     return state->rx_callback_triggered;
+}
+
+UART_Status_t UART_DisableRxInterrupt(uart_inst_t* uart_id) 
+{
+    UART_Internal_State_t* state = get_uart_state(uart_id);
+    if (!state || !state->initialized) return UART_ERROR_NOT_INITIALIZED;
+
+    // Disable IRQ in NVIC and UART
+    irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
+    uart_set_irq_enables(uart_id, false, false);
+    state->interrupt_enabled = false;
+    state->rx_callback = NULL;
+    state->rx_callback_triggered = false;
+    return UART_OK;
 }
