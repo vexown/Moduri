@@ -37,7 +37,8 @@
     UART_ERROR_BUSY,            /**< UART busy with operation */
     UART_ERROR_TIMEOUT,         /**< Operation timed out */
     UART_ERROR_BUFFER_FULL,     /**< Buffer full error */
-    UART_ERROR_BUFFER_EMPTY     /**< Buffer empty error */
+    UART_ERROR_BUFFER_EMPTY,    /**< Buffer empty error */
+    UART_ERROR_INVALID_BAUDRATE /**< Invalid baud rate error */
  } UART_Status_t;
  
  /** Callback function type for UART events */
