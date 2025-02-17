@@ -5,6 +5,7 @@
 #include "UART_HAL.h"
 #include "hardware/irq.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /*******************************************************************************/
 /*                           PRIVATE TYPE DEFINITIONS                          */
