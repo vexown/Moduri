@@ -48,43 +48,71 @@ static UART_Internal_State_t* get_uart_state(uart_inst_t* uart_id)
 }
 
 /**
- * @brief UART Receive IRQ handler.
+ * @brief UART Receive IRQ Handler
  *
- * @details The UART RX interrupt behavior depends on FIFO mode:
+ * @details The UART RX interrupt behavior depends on FIFO mode and configuration:
  * 
- * WITH FIFO ENABLED:
+ * WITH FIFO ENABLED (FEN=1):
  * -----------------
- * Interrupt triggers based on FIFO level (UARTIFLS register):
- * - FIFO is 16 bytes deep
- * - Trigger levels:
- *   000 = 1/8  full (2 chars)    - Lowest latency, most interrupts (default)
- *   001 = 1/4  full (4 chars)
- *   010 = 1/2  full (8 chars)    - Default balance
- *   011 = 3/4  full (12 chars)
- *   100 = 7/8  full (14 chars)   - Fewest interrupts, highest latency
+ * Two types of interrupts can trigger: (see uart_set_irqs_enabled in pico-sdk for more details)
  * 
- * WITH FIFO DISABLED:
+ * 1. UARTRXINTR (Main RX interrupt):
+ *    - Triggers based on FIFO level (UARTIFLS register bits 5:3)
+ *    - FIFO is 16 bytes deep
+ *    - Trigger levels (RXIFLSEL):
+ *      000 = 1/8  full (2 chars)    - Default when using uart_set_irqs_enabled()
+ *      001 = 1/4  full (4 chars)
+ *      010 = 1/2  full (8 chars)
+ *      011 = 3/4  full (12 chars)
+ *      100 = 7/8  full (14 chars)
+ * 
+ * 2. UARTRTINTR (RX Timeout):
+ *    - Triggers when:
+ *      a) At least 1 byte in FIFO
+ *      b) No new data received for 32 bit periods
+ *    - Prevents data from being stuck below trigger level
+ *    - Always enabled when RX interrupts are enabled
+ * 
+ * This combination ensures:
+ *  - Fast response when multiple bytes arrive (UARTRXINTR)
+ *  - No data gets stuck in FIFO below trigger level (UARTRTINTR)
+ * 
+ * WITH FIFO DISABLED (FEN=0):
  * ------------------
- * - Interrupt triggers immediately when one byte is received
- * - Must read byte quickly before next arrives
- * - Higher interrupt frequency but lower latency
- * - Useful for byte-by-byte processing
+ * - Single byte buffer instead of FIFO
+ * - UARTRXINTR triggers on each byte received
+ * - UARTRTINTR (timeout) not functional
+ * - UARTIFLS register has no effect
+ * - Must read data register before next byte arrives
  * 
- * Note: RX timeout interrupt will still trigger if data sits in FIFO
- * for more than 32-bit periods, regardless of FIFO level (FIFO mode only).
+ * Note: If FIFO overruns occur (new data arrives when FIFO full),
+ * the overflow flag (OE) will be set and data will be lost.
  *
- * @param uart_id Pointer to the UART instance.
+ * @param uart Pointer to UART instance (uart0 or uart1)
  */
 static void uart_rx_irq_handler(uart_inst_t *uart_id) 
 {
     UART_Internal_State_t* state = get_uart_state(uart_id);
     if (!state || !state->interrupt_enabled) return;
 
-    /* Drain all characters in the RX FIFO or just the one byte if FIFO disabled */
-    while (uart_is_readable(uart_id))  // Check whether data is waiting in the RX FIFO of the UART instance (true if FIFO not empty)
+    /* Process all available bytes in the RX FIFO
+    *
+    * While this interrupt was most likely initially triggered by reaching the FIFO threshold
+    * (default 1/8 full = 2 bytes), we process ALL available bytes for efficiency.
+    * 
+    * This means:
+    * 1. Interrupt triggers when 2 bytes are received (FIFO threshold)
+    * 2. While processing these bytes, new data may arrive
+    * 3. The while loop continues until FIFO is empty, handling both:
+    *    - The original bytes that triggered the interrupt
+    *    - Any additional bytes that arrived during processing
+    * 
+    * This approach minimizes interrupt overhead but means we handle varying numbers
+    * of bytes per interrupt depending on incoming data rate.
+    */
+    while (uart_is_readable(uart_id)) // Check if there is data waiting in the RX FIFO
     {
-        /* Read a single character from the UART instance (blocking until char has been read) */
-        (void)uart_getc(uart_id); // Discard the chars for now (TODO: process them if needed)
+        (void)uart_getc(uart_id); // Read and discard the character
     }
 
     /* After processing all characters, trigger the callback once */
@@ -157,7 +185,7 @@ UART_Status_t UART_Init(const UART_Config_t* config)
 
     /* Disable any existing interrupts initially */
     irq_set_enabled(config->uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
-    uart_set_irq_enables(config->uart_id, false, false);
+    uart_set_irqs_enabled(config->uart_id, false, false);
     
     /* Initialize UART with default settings (8 data bits, no parity bit, one stop bit) and specified baud rate */
     uint actual_baudrate = uart_init(config->uart_id, config->baud_rate);
@@ -269,9 +297,6 @@ UART_Status_t UART_RegisterRxCallback(uart_inst_t* uart_id, UART_CallbackFn_t ca
         /* Read and discard a single character from the UART instance (blocking until char has been read) */
         (void)uart_getc(uart_id);
     }
-    
-    /* Disable FIFO for per-character interrupt handling */
-    uart_set_fifo_enabled(uart_id, false);  // Disable FIFO in interrupt mode. TODO - figure out interrupts with FIFO enabled
 
     /* Set the handler (low-level function that will directly handle the interrupt request) */
     irq_handler_t handler = (uart_id == uart0) ? uart0_irq_handler : uart1_irq_handler;
@@ -282,7 +307,7 @@ UART_Status_t UART_RegisterRxCallback(uart_inst_t* uart_id, UART_CallbackFn_t ca
     state->interrupt_enabled = true;
 
     /* Enable IRQ in UART and NVIC */
-    uart_set_irq_enables(uart_id, true, false);
+    uart_set_irqs_enabled(uart_id, true, false);
     irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, true);
 
     return UART_OK;
@@ -348,7 +373,7 @@ UART_Status_t UART_DisableRxInterrupt(uart_inst_t* uart_id)
 
     /* Disable IRQ in UART and NVIC */
     irq_set_enabled(uart_id == uart0 ? UART0_IRQ : UART1_IRQ, false);
-    uart_set_irq_enables(uart_id, false, false);
+    uart_set_irqs_enabled(uart_id, false, false);
 
     /* Reset parameters related to interrupt handling */
     state->interrupt_enabled = false;

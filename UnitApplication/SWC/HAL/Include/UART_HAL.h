@@ -195,8 +195,15 @@ void print_test_result(const char* test_name, bool passed) {
  * @brief RX callback for interrupt test
  */
 void uart_rx_callback_kek(void) {
+    static uint32_t last_time = 0;
+    uint32_t current_time = to_ms_since_boot(get_absolute_time());
+    
+    printf("IRQ at %lu ms (delta: %lu ms)\n", 
+           current_time, 
+           current_time - last_time);
+    last_time = current_time;
+    
     rx_callback_triggered = true;
-    printf("Interrupt triggered!\n"); // ADDED DEBUG PRINT
 }
 
 /**
@@ -309,9 +316,9 @@ void test_uart_interrupt(void) {
     sleep_ms(10);
     
     // Send test byte
-    uint8_t test_byte = '!';
-    printf("Sending test byte: 0x%02X\n", test_byte);
-    status = UART_Send(TEST_UART, &test_byte, 1, 100);
+    uint8_t test_byte[12] = "abcdefghijk";
+    printf("Sending test bytes: %.12s\n", test_byte); // Print first 12 bytes
+    status = UART_Send(TEST_UART, test_byte, 12, 1000);
     printf("Send status: %d\n", status);
     
     // Add delay after sending

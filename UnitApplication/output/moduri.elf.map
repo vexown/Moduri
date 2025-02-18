@@ -599,6 +599,100 @@ Discarded input sections
  .debug_frame   0x0000000000000000      0x154 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
  .ARM.attributes
                 0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+ .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.hw_timer_callback
+                0x0000000000000000       0x18 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.update_sw_timers
+                0x0000000000000000       0x8c CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.sw_timer_check_callback
+                0x0000000000000000        0xa CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_init
+                0x0000000000000000       0xe0 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_start
+                0x0000000000000000       0x50 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_stop
+                0x0000000000000000       0x24 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_reset
+                0x0000000000000000       0x1a CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_get_remaining
+                0x0000000000000000       0x4c CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text.timer_update_period
+                0x0000000000000000       0x30 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss.debug_pin_initialized.0
+                0x0000000000000000        0x1 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss.next_timer_id
+                0x0000000000000000        0x1 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss.sw_timer_check
+                0x0000000000000000       0x18 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss.sw_timer_system_initialized
+                0x0000000000000000        0x1 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .bss.sw_timers
+                0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_info    0x0000000000000000      0xcfd CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_abbrev  0x0000000000000000      0x387 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_loc     0x0000000000000000      0x707 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_aranges
+                0x0000000000000000       0x60 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_ranges  0x0000000000000000      0x130 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_line    0x0000000000000000      0x7db CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_str     0x0000000000000000      0xbda CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .comment       0x0000000000000000       0x34 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .debug_frame   0x0000000000000000      0x168 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .ARM.attributes
+                0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+ .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.get_uart_state
+                0x0000000000000000       0x24 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.verify_baudrate
+                0x0000000000000000       0x44 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.uart_rx_irq_handler
+                0x0000000000000000       0x4a CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.uart0_irq_handler
+                0x0000000000000000       0x10 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.uart1_irq_handler
+                0x0000000000000000       0x10 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_Init
+                0x0000000000000000       0xb4 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_Deinit
+                0x0000000000000000       0x26 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_Send
+                0x0000000000000000       0xe8 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_Receive
+                0x0000000000000000       0xec CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_RegisterRxCallback
+                0x0000000000000000       0xa4 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_IsTxReady
+                0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_IsRxAvailable
+                0x0000000000000000       0x20 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_FlushTx
+                0x0000000000000000       0x22 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_FlushRx
+                0x0000000000000000       0x44 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_IsCallbackTriggered
+                0x0000000000000000       0x12 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .text.UART_DisableRxInterrupt
+                0x0000000000000000       0x3c CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .data.uart0_state
+                0x0000000000000000       0x14 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .data.uart1_state
+                0x0000000000000000       0x14 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_info    0x0000000000000000     0x19f6 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_abbrev  0x0000000000000000      0x3e8 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_loc     0x0000000000000000     0x1095 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_aranges
+                0x0000000000000000       0x98 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_ranges  0x0000000000000000      0x490 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_line    0x0000000000000000     0x109f CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_str     0x0000000000000000      0xfaf CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .comment       0x0000000000000000       0x34 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .debug_frame   0x0000000000000000      0x1d0 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
+ .ARM.attributes
+                0x0000000000000000       0x38 CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
  .text          0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .data          0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
  .bss           0x0000000000000000        0x0 CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
@@ -8979,6 +9073,8 @@ LOAD CMakeFiles/moduri.dir/HAL/Source/ADC_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/PWM_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/PIO_HAL.c.o
 LOAD CMakeFiles/moduri.dir/HAL/Source/DMA_HAL.c.o
+LOAD CMakeFiles/moduri.dir/HAL/Source/timer_HAL.c.o
+LOAD CMakeFiles/moduri.dir/HAL/Source/UART_HAL.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_lwip/lwip_freertos.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_async_context/async_context_base.c.o
 LOAD CMakeFiles/moduri.dir/home/blankmcu/pico/pico-sdk/src/rp2350/pico_platform/platform.c.o
