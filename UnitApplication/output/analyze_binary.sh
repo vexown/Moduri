@@ -16,7 +16,7 @@
 #
 #########################################################################################################################################################
 #
-# Raspberry Pi Pico W Memory Map:
+# Raspberry Pi Pico 2 W Memory Map:
 # (Source - Address Map chapter in https://datasheets.raspberrypi.com/rp2350/rp2350-datasheet.pdf)
 #
 # - ROM: 0x00000000-0x00008000 (32kB)
