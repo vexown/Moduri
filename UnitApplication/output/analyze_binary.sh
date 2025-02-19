@@ -29,7 +29,7 @@
 #        accesses. Logically, there is a single 520 kB contiguous memory. Each SRAM bank is accessed via a dedicated AHB5 arbiter.
 #        This means different bus managers can access different SRAM banks in parallel, so up to six 32-bit SRAM accesses can take place 
 #        every system clock cycle (one per manager).
-# - Program Flash (XIP): 0x10000000 - 0x10200000 (2MB)
+# - Program Flash (XIP): 0x10000000 - 0x10400000 (4MB)
 #        External Flash, accessed via QSPI interface using execute-in-place (XIP) hardware. Meaning it can be addressed and accessed by the 
 #        system as it were internal memory. A 16 kB on-chip cache retains the values of recent reads and writes. This reduces the chances 
 #        that XIP bus accesses must go to external memory, improving the average throughput and latency of the XIP interface.
