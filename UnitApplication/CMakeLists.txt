@@ -72,7 +72,10 @@ set(CMAKE_CXX_STANDARD 17)
 message("########## pico_sdk_init macro - start ##########")
 pico_sdk_init()
 
-# Add a subdirectory for the software components
+# Build bootloader first
+add_subdirectory(Bootloader)
+
+# Then build main application
 add_subdirectory(SWC)
 
 message("########## TOP CMakeLists.txt - end ##########")
