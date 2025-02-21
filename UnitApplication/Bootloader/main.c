@@ -2,7 +2,55 @@
 #include "pico/stdlib.h"
 #include "hardware/flash.h"
 #include "flash_layout.h"
+#include "hardware/platform_defs.h"
+#include "hardware/sync.h"
 
+/**
+  \brief   Set Main Stack Pointer
+  \details Assigns the given value to the Main Stack Pointer (MSP). 
+           Function from cmsis_gcc.h from official ARM CMSIS_5 repository (https://github.com/ARM-software/CMSIS_5/tree/develop)
+  \param [in]    topOfMainStack  Main Stack Pointer value to set
+ */
+static inline void __set_MSP(uint32_t topOfMainStack)
+{
+  __asm volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
+}
+
+static void jump_to_application(void)
+{
+    // Disable interrupts before VTOR change
+    (void)save_and_disable_interrupts(); // Disable Interrupts but do not save the state since we jump to application so we don't need to restore it
+
+    // Clear any pending memory transactions
+    __dsb();
+    __isb();
+    
+    // Configure Security Attribution Unit (SAU) if needed
+    // Note: Only required if using TrustZone security features
+    #ifdef USE_TRUSTZONE
+    SAU->CTRL |= SAU_CTRL_ENABLE_Msk;
+    #endif
+    
+    // Set vector table location
+    scb_hw->vtor = 0x10040000;  // Application start address
+    
+    // Get application stack pointer and reset handler from vector table
+    uint32_t *app_vector_table = (uint32_t *)0x10040000;
+    uint32_t app_stack_pointer = app_vector_table[0];
+    uint32_t app_reset_handler = app_vector_table[1];
+    
+    // Set main stack pointer
+    __set_MSP(app_stack_pointer);
+    
+    // Memory barriers before jump
+    __dsb();
+    __isb();
+    
+    // Jump to application
+    typedef void (*reset_handler_t)(void);
+    reset_handler_t reset_handler = (reset_handler_t)app_reset_handler;
+    reset_handler();
+}
 
 int main() 
 {
@@ -48,6 +96,8 @@ int main()
     // 8. Jump to application
     //    - If validation fails, try backup bank
     //    - If all fails, enter recovery mode
+    
+    jump_to_application();
 
     // Should never reach here
     while (1) 
