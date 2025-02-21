@@ -61,6 +61,11 @@ cp -v ./SWC/moduri.elf.map ../output
 cp -v ./SWC/moduri.uf2     ../output
 cp -v ./SWC/moduri.bin     ../output
 
+cp -v ./Bootloader/bootloader.elf ../output
+cp -v ./Bootloader/bootloader.elf.map ../output
+cp -v ./Bootloader/bootloader.uf2 ../output
+cp -v ./Bootloader/bootloader.bin ../output
+
 echo "Done"
 
 # Prompt the user to press any key to exit
