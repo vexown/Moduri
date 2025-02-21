@@ -49,6 +49,9 @@ foreach(PIO_FILE ${PIO_SOURCE_FILES})
 pico_generate_pio_header(moduri ${PIO_FILE})
 endforeach()
 
+# Use custom linker script
+pico_set_linker_script(moduri ${CMAKE_CURRENT_SOURCE_DIR}/application.ld)
+
 # Add extra outputs specific to the Pico SDK
 pico_add_extra_outputs(moduri)
 
