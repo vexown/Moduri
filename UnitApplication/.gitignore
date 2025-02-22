@@ -1,3 +1,4 @@
 build/
 **/cmake-*/
-output/binary_analysis
+output/binary_analysis_bootloader
+output/binary_analysis_moduri
