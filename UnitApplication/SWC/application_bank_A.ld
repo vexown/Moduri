@@ -28,7 +28,6 @@ MEMORY
 {
     /* Application Banks for OTA */
     APP_FLASH_BANK_A(rx)   : ORIGIN = 0x10040000, LENGTH = 1920K  
-    APP_FLASH_BANK_B(rx) : ORIGIN = 0x10220000, LENGTH = 1920K  
 
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 512k
     SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k

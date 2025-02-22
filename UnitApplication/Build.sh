@@ -56,10 +56,15 @@ echo "Build complete."
 
 echo "Copying output files..."
 
-cp -v ./SWC/moduri.elf     ../output
-cp -v ./SWC/moduri.elf.map ../output
-cp -v ./SWC/moduri.uf2     ../output
-cp -v ./SWC/moduri.bin     ../output
+cp -v ./SWC/moduri_bank_A.elf     ../output
+cp -v ./SWC/moduri_bank_A.elf.map ../output
+cp -v ./SWC/moduri_bank_A.uf2     ../output
+cp -v ./SWC/moduri_bank_A.bin     ../output
+
+cp -v ./SWC/moduri_bank_B.elf     ../output
+cp -v ./SWC/moduri_bank_B.elf.map ../output
+cp -v ./SWC/moduri_bank_B.uf2     ../output
+cp -v ./SWC/moduri_bank_B.bin     ../output
 
 cp -v ./Bootloader/bootloader.elf ../output
 cp -v ./Bootloader/bootloader.elf.map ../output

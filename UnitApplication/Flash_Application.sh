@@ -10,7 +10,7 @@ $OPENOCD_PATH/src/openocd \
     -f "$OPENOCD_PATH/tcl/interface/cmsis-dap.cfg" \
     -f "$OPENOCD_PATH/tcl/target/rp2350.cfg" \
     -c "adapter speed 5000" \
-    -c "program output/moduri.elf verify reset exit"
+    -c "program output/moduri_bank_A.elf verify reset exit"
 
 # Prompt the user to press any key to exit
 echo "Press any key to exit the script."

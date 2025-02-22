@@ -214,10 +214,10 @@ else
 fi
 
 # Check application files
-if [ ! -f "moduri.elf" ] || [ ! -f "moduri.bin" ]; then
+if [ ! -f "moduri_bank_A.elf" ] || [ ! -f "moduri_bank_A.bin" ]; then
     echo "Warning: Application (moduri) files not found"
 else
-    analyze_binary "moduri.bin" "moduri.elf" "moduri"
+    analyze_binary "moduri_bank_A.bin" "moduri_bank_A.elf" "moduri"
 fi
 
 echo "All analyses complete. Check the binary_analysis_* directories for results."
