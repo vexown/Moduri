@@ -4,7 +4,7 @@
  * in the pico-sdk (located in pico-sdk/src/rp2_common/pico_crt0/crt0.S)
  * 
  * The boot process is as follows:
- *  Boot ROM -> boot2 (2nd stage boot code) -> crt0.S (startup code) -> main()
+ *  Boot ROM -> boot2 (2nd stage boot code) -> OTA bootloader -> jump to application reset handler -> crt0.S (startup code) -> main()
  * 
  *  Boot ROM:
  *  - Location: Physically inside RP2350 chip
@@ -23,6 +23,11 @@
  *      > QMI (QSPI Memory Interface) setup - sets timing parameters, configures read command format, sets up quad I/O mode
  *      > Flash initialization - performs dummy transfer, disables command prefix for subsequent reads, sets up continuous read mode
  *      > Finalization - On RP2350 boot stage2 is always called as a regular function, and should return normally
+ * 
+ * OTA Bootloader:
+ * - Size: 256KB
+ * - Source: my own code - see UnitApplication/Bootloader
+ * - Purpose: Over-the-air update bootloader, responsible for updating the application firmware and jumping to it
  * 
  *  crt0.S:
  *  - Size: 1KB
