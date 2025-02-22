@@ -1,10 +1,74 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
-#include "hardware/flash.h"
+#include "hardware/platform_defs.h"
 #include "flash_layout.h"
 #include "flash_operations.h"
-#include "hardware/platform_defs.h"
-#include "hardware/sync.h"
+#include "metadata.h"
+
+/* Validation */
+static_assert((APP_BANK_A_START & 0xFFFF) == 0, "Bank A must be 64KB aligned");
+static_assert((APP_BANK_B_START & 0xFFFF) == 0, "Bank B must be 64KB aligned");
+
+/* RAM copy of metadata */
+static boot_metadata_t ram_current_metadata = 
+{
+    .magic = 0xFFFFFFFF, // Set to invalid value initially
+    .active_bank = BANK_A,
+    .version = 0,
+    .app_size = 0,
+    .app_crc = 0,
+    .update_pending = false,
+    .boot_attempts = 0
+};
+
+bool validate_bank(uint32_t bank_start)
+{
+    // Check vector table
+    const uint32_t* vector_table = (const uint32_t*)bank_start;
+    
+    // Stack pointer should be in RAM
+    if (vector_table[0] < 0x20000000 || vector_table[0] > 0x20082000) return false;
+    
+    // Reset vector should be in flash
+    if (vector_table[1] < 0x10000000 || vector_table[1] > 0x10400000) return false;
+    
+    return true;
+}
+
+bool find_valid_application(void)
+{
+    /* First try to read existing metadata */
+    if (read_metadata_from_flash(&ram_current_metadata)) 
+    {
+        return true;  /* Valid metadata found */
+    }
+
+    /* No valid metadata - try to recover */
+    if (validate_bank(APP_BANK_A_START)) 
+    {
+        /* Bank A seems valid - create new metadata */
+        ram_current_metadata.magic = BOOT_METADATA_MAGIC;
+        ram_current_metadata.active_bank = BANK_A;
+        ram_current_metadata.version = 0;  /* Start from 0 */
+        ram_current_metadata.boot_attempts = 0;
+        
+        return write_metadata_to_flash(&ram_current_metadata);
+    }
+    
+    if (validate_bank(APP_BANK_B_START)) 
+    {
+        /* Bank B seems valid - create new metadata */
+        ram_current_metadata.magic = BOOT_METADATA_MAGIC;
+        ram_current_metadata.active_bank = BANK_B;
+        ram_current_metadata.version = 0;  /* Start from 0 */
+        ram_current_metadata.boot_attempts = 0;
+        
+        return write_metadata_to_flash(&ram_current_metadata);
+    }
+
+    /* No valid banks found */
+    return false;
+}
 
 /**
   \brief   Set Main Stack Pointer
@@ -61,23 +125,21 @@ static void jump_to_application(uint32_t app_bank_address)
 int main() 
 {
     // TODO - below is a general flow of the bootloader, just to give an idea, correct it as needed
+    
+    stdio_init_all();
 
     // 2. Read boot metadata from reserved flash sector
     //    - Magic number validation
     //    - CRC check on metadata
     //    - Version information
     //    - Active/Backup bank status
-    /* Initialize the metadata structure */
-    boot_metadata_t current_metadata =
+    // Find and validate application
+    if (!find_valid_application()) 
     {
-        .magic = BOOT_METADATA_MAGIC,
-        .active_bank = BANK_A,
-        .version = 0,
-        .app_size = 0,
-        .app_crc = 0,
-        .update_pending = false,
-        .boot_attempts = 0
-    };
+        //enter_recovery_mode(); TODO - implement recovery mode
+        while(1) tight_loop_contents(); // For now, just loop forever
+    }
+
 
     // 3. Check for update trigger
     //    - New firmware flag
@@ -109,7 +171,7 @@ int main()
     //    - If validation fails, try backup bank
     //    - If all fails, enter recovery mode
     
-    if (current_metadata.active_bank == BANK_A) 
+    if (ram_current_metadata.active_bank == BANK_A) 
     {
         jump_to_application(APP_BANK_A_START);
     } 

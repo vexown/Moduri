@@ -23,8 +23,4 @@
 #define APP_BANK_SIZE               0x1E0000     // 1920KB (so 2 banks take up 3840KB)
 #define APP_BANK_B_START            (APP_BANK_A_START + APP_BANK_SIZE)  
 
-/* Validation */
-static_assert((APP_BANK_A_START & 0xFFFF) == 0, "Bank A must be 64KB aligned");
-static_assert((APP_BANK_B_START & 0xFFFF) == 0, "Bank B must be 64KB aligned");
-
 #endif // FLASH_LAYOUT_H

@@ -1,4 +1,4 @@
-#include "flash_operations.h"
+#include "metadata.h"
 
 __attribute__((section(".boot_config"))) 
 const boot_metadata_t initial_metadata = 

@@ -54,7 +54,7 @@ add_custom_target(metadata ALL
 # Define the executable target for the bootloader and specify the source files
 add_executable(bootloader
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    Source/flash_operations.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/flash_operations.c
 )
 
 # Specify the include directories

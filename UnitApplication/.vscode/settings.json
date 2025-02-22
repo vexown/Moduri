@@ -27,6 +27,9 @@
         "wifi_common.h": "c",
         "wifi_transmit.h": "c",
         "wifi_tcp.h": "c",
-        "common.h": "c"
+        "common.h": "c",
+        "flash_layout.h": "c",
+        "flash_operations.h": "c",
+        "metadata.h": "c"
     }
 }
