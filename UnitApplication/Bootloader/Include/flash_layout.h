@@ -19,16 +19,16 @@
 #define BOOT_CONFIG_START           (BOOTLOADER_START + BOOTLOADER_SIZE)
 #define BOOT_CONFIG_SIZE            0x1000       // 4KB
 
-#define APP_BANK_ACTIVE_START       (FLASH_BASE + BOOTLOADER_SIZE + BOOT_CONFIG_SIZE)   
+#define APP_BANK_A_START           (FLASH_BASE + BOOTLOADER_SIZE + BOOT_CONFIG_SIZE)   
 #define APP_BANK_SIZE               0x1A0000     // 1664KB
-#define APP_BANK_INACTIVE_START     (APP_BANK_ACTIVE_START + APP_BANK_SIZE)  
+#define APP_BANK_B_START           (APP_BANK_A_START + APP_BANK_SIZE)  
 
-#define RESERVED_START              (APP_BANK_INACTIVE_START + APP_BANK_SIZE)
+#define RESERVED_START              (APP_BANK_B_START + APP_BANK_SIZE)
 #define RESERVED_SIZE               0x80000      // 4MB - 256KB - 1664KB - 1664KB = 512KB
 
 /* Validation */
-static_assert((APP_BANK_ACTIVE_START & 0xFFFF) == 0, "Active Bank must be 64KB aligned");
-static_assert((APP_BANK_INACTIVE_START & 0xFFFF) == 0, "Inactive Bank must be 64KB aligned");
-static_assert(APP_BANK_INACTIVE_START + APP_BANK_SIZE <= RESERVED_START, "Banks must not overlap reserved area");
+static_assert((APP_BANK_A_START & 0xFFFF) == 0, "Bank A must be 64KB aligned");
+static_assert((APP_BANK_B_START & 0xFFFF) == 0, "Bank B must be 64KB aligned");
+static_assert(APP_BANK_B_START + APP_BANK_SIZE <= RESERVED_START, "Banks must not overlap reserved area");
 
 #endif // FLASH_LAYOUT_H

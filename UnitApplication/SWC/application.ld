@@ -27,8 +27,8 @@
 MEMORY
 {
     /* Application Banks for OTA */
-    APP_FLASH_ACTIVE(rx)   : ORIGIN = 0x10040000, LENGTH = 1920K    /* Active bank */
-    APP_FLASH_INACTIVE(rx) : ORIGIN = 0x10220000, LENGTH = 1920K    /* Update bank */
+    APP_FLASH_BANK_A(rx)   : ORIGIN = 0x10040000, LENGTH = 1920K  
+    APP_FLASH_BANK_B(rx) : ORIGIN = 0x10220000, LENGTH = 1920K  
 
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 512k
     SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k
@@ -41,7 +41,7 @@ SECTIONS
 {
     .flash_begin : {
         __flash_binary_start = .;
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
 
     /* The bootrom will enter the image at the point indicated in your
        IMAGE_DEF, which is usually the reset handler of your vector table.
@@ -104,7 +104,7 @@ SECTIONS
 
         *(.eh_frame*)
         . = ALIGN(4);
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
 
     /* Note the boot2 section is optional, and should be discarded if there is
        no reference to it *inside* the binary, as it is not called by the
@@ -122,7 +122,7 @@ SECTIONS
         __boot2_start__ = .;
         *(.boot2)
         __boot2_end__ = .;
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
 
     ASSERT(__boot2_end__ - __boot2_start__ <= 256,
         "ERROR: Pico second stage bootloader must be no more than 256 bytes in size")
@@ -133,18 +133,18 @@ SECTIONS
         . = ALIGN(4);
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
         . = ALIGN(4);
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
 
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
 
     __exidx_start = .;
     .ARM.exidx :
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
     __exidx_end = .;
 
     /* Machine inspectable binary information */
@@ -154,7 +154,7 @@ SECTIONS
     {
         KEEP(*(.binary_info.keep.*))
         *(.binary_info.*)
-    } > APP_FLASH_ACTIVE
+    } > APP_FLASH_BANK_A
     __binary_info_end = .;
     . = ALIGN(4);
 
@@ -193,14 +193,14 @@ SECTIONS
 
         *(.jcr)
         . = ALIGN(4);
-    } > RAM AT> APP_FLASH_ACTIVE
+    } > RAM AT> APP_FLASH_BANK_A
 
     .tdata : {
         . = ALIGN(4);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
         __tdata_end = .;
-    } > RAM AT> APP_FLASH_ACTIVE
+    } > RAM AT> APP_FLASH_BANK_A
     PROVIDE(__data_end__ = .);
 
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
@@ -244,7 +244,7 @@ SECTIONS
         *(.scratch_x.*)
         . = ALIGN(4);
         __scratch_x_end__ = .;
-    } > SCRATCH_X AT > APP_FLASH_ACTIVE
+    } > SCRATCH_X AT > APP_FLASH_BANK_A
     __scratch_x_source__ = LOADADDR(.scratch_x);
 
     .scratch_y : {
@@ -252,7 +252,7 @@ SECTIONS
         *(.scratch_y.*)
         . = ALIGN(4);
         __scratch_y_end__ = .;
-    } > SCRATCH_Y AT > APP_FLASH_ACTIVE
+    } > SCRATCH_Y AT > APP_FLASH_BANK_A
     __scratch_y_source__ = LOADADDR(.scratch_y);
 
     /* .stack*_dummy section doesn't contains any symbols. It is only
@@ -276,7 +276,7 @@ SECTIONS
     .flash_end : {
         KEEP(*(.embedded_end_block*))
         PROVIDE(__flash_binary_end = .);
-    } > APP_FLASH_ACTIVE =0xaa
+    } > APP_FLASH_BANK_A =0xaa
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
     __StackLimit = ORIGIN(RAM) + LENGTH(RAM);
