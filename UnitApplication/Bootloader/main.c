@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 #include "hardware/flash.h"
 #include "flash_layout.h"
+#include "flash_operations.h"
 #include "hardware/platform_defs.h"
 #include "hardware/sync.h"
 
@@ -13,29 +14,34 @@
  */
 static inline void __set_MSP(uint32_t topOfMainStack)
 {
-  __asm volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
+    __asm volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
 }
 
-static void jump_to_application(void)
+static void jump_to_application(uint32_t app_bank_address)
 {
+    // Validate bank address
+    if (app_bank_address != APP_BANK_A_START && 
+        app_bank_address != APP_BANK_B_START) {
+        // Invalid bank address - could add error handling here
+        return;
+    }
+
     // Disable interrupts before VTOR change
-    (void)save_and_disable_interrupts(); // Disable Interrupts but do not save the state since we jump to application so we don't need to restore it
+    (void)save_and_disable_interrupts();
 
     // Clear any pending memory transactions
     __dsb();
     __isb();
     
-    // Configure Security Attribution Unit (SAU) if needed
-    // Note: Only required if using TrustZone security features
     #ifdef USE_TRUSTZONE
     SAU->CTRL |= SAU_CTRL_ENABLE_Msk;
     #endif
     
-    // Set vector table location
-    scb_hw->vtor = 0x10040000;  // Application start address
+    // Set vector table location to specified bank
+    scb_hw->vtor = app_bank_address;
     
     // Get application stack pointer and reset handler from vector table
-    uint32_t *app_vector_table = (uint32_t *)0x10040000;
+    uint32_t *app_vector_table = (uint32_t *)app_bank_address;
     uint32_t app_stack_pointer = app_vector_table[0];
     uint32_t app_reset_handler = app_vector_table[1];
     
@@ -55,17 +61,23 @@ static void jump_to_application(void)
 int main() 
 {
     // TODO - below is a general flow of the bootloader, just to give an idea, correct it as needed
-    
-    // 1. Initialize critical hardware
-    //    - Configure clocks
-    //    - Setup watchdog
-    //    - Initialize flash interface
 
     // 2. Read boot metadata from reserved flash sector
     //    - Magic number validation
     //    - CRC check on metadata
     //    - Version information
     //    - Active/Backup bank status
+    /* Initialize the metadata structure */
+    boot_metadata_t current_metadata =
+    {
+        .magic = BOOT_METADATA_MAGIC,
+        .active_bank = BANK_A,
+        .version = 0,
+        .app_size = 0,
+        .app_crc = 0,
+        .update_pending = false,
+        .boot_attempts = 0
+    };
 
     // 3. Check for update trigger
     //    - New firmware flag
@@ -82,7 +94,7 @@ int main()
     //    - Check CRC/signature
     //    - Validate vector table
     //    - Check firmware version
-    
+
     // 6. Pre-boot tasks
     //    - Update boot counters
     //    - Clear update flags if needed
@@ -97,7 +109,14 @@ int main()
     //    - If validation fails, try backup bank
     //    - If all fails, enter recovery mode
     
-    jump_to_application();
+    if (current_metadata.active_bank == BANK_A) 
+    {
+        jump_to_application(APP_BANK_A_START);
+    } 
+    else 
+    {
+        jump_to_application(APP_BANK_B_START);
+    }
 
     // Should never reach here
     while (1) 

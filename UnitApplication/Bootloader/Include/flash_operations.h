@@ -7,8 +7,12 @@
 // Magic value for metadata validation
 #define BOOT_METADATA_MAGIC 0xB007B007
 
+#define BANK_A 0
+#define BANK_B 1
+
 // Metadata structure - TODO - this is a general idea for metadata needed for OTA updates, verify and correct it if needed
-typedef struct {
+typedef struct 
+{
     uint32_t magic;           // Magic number for validation
     uint8_t active_bank;      // 0 = Bank A, 1 = Bank B
     uint32_t version;         // Firmware version
