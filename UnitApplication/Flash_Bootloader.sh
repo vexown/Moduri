@@ -1,19 +1,30 @@
 #!/bin/bash
 
-echo "Flashing the board using Picoprobe and OpenOCD"
+echo "Flashing bootloader and metadata using Picoprobe and OpenOCD..."
 
-# Set the path to the OpenOCD installation directory - we are using the OpenOCD version from RPi repository https://github.com/raspberrypi/openocd
+# Set the path to the OpenOCD installation directory
 OPENOCD_PATH="/home/blankmcu/pico/openocd"
 
+# Flash both components in a single OpenOCD session
+echo "Flashing bootloader and metadata..."
 $OPENOCD_PATH/src/openocd \
-    -s "/home/blankmcu/pico/openocd/tcl" \
+    -s "$OPENOCD_PATH/tcl" \
     -f "$OPENOCD_PATH/tcl/interface/cmsis-dap.cfg" \
     -f "$OPENOCD_PATH/tcl/target/rp2350.cfg" \
     -c "adapter speed 5000" \
-    -c "program output/bootloader.elf verify reset exit"
+    -c "init" \
+    -c "halt" \
+    -c "program output/bootloader.elf verify" \
+    -c "program output/metadata.bin 0x1003F000 verify" \
+    -c "reset" \
+    -c "shutdown"
 
-# Prompt the user to press any key to exit
+if [ $? -ne 0 ]; then
+    echo "Error: Flashing failed"
+    exit 1
+fi
+
+echo "All components flashed successfully!"
 echo "Press any key to exit the script."
-read -n 1 -s  # Read a single keypress silently
+read -n 1 -s
 echo "Exiting the script."
-

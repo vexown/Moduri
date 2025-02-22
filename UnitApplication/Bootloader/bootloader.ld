@@ -29,9 +29,6 @@ MEMORY
     /* Main bootloader code (252KB) */
     BOOTLOADER_FLASH(rx) : ORIGIN = 0x10000000, LENGTH = 252K
 
-    /* Configuration sector (4KB) */
-    BOOT_CONFIG(rx)      : ORIGIN = 0x1003F000, LENGTH = 4K
-
     RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 512k
     SCRATCH_X(rwx) : ORIGIN = 0x20080000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20081000, LENGTH = 4k
@@ -44,11 +41,6 @@ SECTIONS
     .flash_begin : {
         __flash_binary_start = .;
     } > BOOTLOADER_FLASH
-
-    .boot_config : {
-        KEEP(*(.boot_config))
-        . = ALIGN(4);
-    } > BOOT_CONFIG
 
     /* The bootrom will enter the image at the point indicated in your
        IMAGE_DEF, which is usually the reset handler of your vector table.

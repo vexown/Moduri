@@ -71,6 +71,8 @@ cp -v ./Bootloader/bootloader.elf.map ../output
 cp -v ./Bootloader/bootloader.uf2 ../output
 cp -v ./Bootloader/bootloader.bin ../output
 
+cp -v ./Bootloader/metadata.bin ../output
+
 echo "Done"
 
 # Prompt the user to press any key to exit
