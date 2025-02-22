@@ -106,8 +106,8 @@ launch_openocd
 sleep 1
 
 # Launch GDB for core0
-launch_gdb 0 "./Tools/GDB_and_OpenOCD/StartGDB_Core0.sh"
+launch_gdb 0 "./Tools/GDB_and_OpenOCD/StartGDB_Core0_boot.sh"
 
 # Launch GDB for core1
-#launch_gdb 1 "./Tools/GDB_and_OpenOCD/StartGDB_Core1.sh" //TODO - core 1 not working properly right now, only core 0 supported
+#launch_gdb 1 "./Tools/GDB_and_OpenOCD/StartGDB_Core1_boot.sh" //TODO - core 1 not working properly right now, only core 0 supported
 
