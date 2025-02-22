@@ -23,6 +23,7 @@ static boot_metadata_t ram_current_metadata =
 
 bool validate_bank(uint32_t bank_start)
 {
+    // TODO - this has only basic validation, add more checks such as CRC, signature, etc.
     // Check vector table
     const uint32_t* vector_table = (const uint32_t*)bank_start;
     
@@ -68,6 +69,34 @@ bool find_valid_application(void)
 
     /* No valid banks found */
     return false;
+}
+
+/**
+ * @brief Handles a pending firmware update by validating and switching banks
+ * @return true if update handled successfully, false if error occurred
+ */
+static bool handle_pending_update(void)
+{
+    /* Get the inactive bank address */
+    uint32_t inactive_bank = (ram_current_metadata.active_bank == BANK_A) ? 
+                            APP_BANK_B_START : APP_BANK_A_START;
+    
+    /* Validate the inactive bank (where update should be) */
+    if (!validate_bank(inactive_bank)) 
+    {
+        /* Update validation failed - clear pending flag and keep current bank */
+        ram_current_metadata.update_pending = false;
+        ram_current_metadata.boot_attempts = 0;
+        return write_metadata_to_flash(&ram_current_metadata);
+    }
+
+    /* Update is valid - switch banks */
+    ram_current_metadata.active_bank = (ram_current_metadata.active_bank == BANK_A) ? BANK_B : BANK_A;
+    ram_current_metadata.update_pending = false;
+    ram_current_metadata.boot_attempts = 0;
+    
+    /* Save new metadata */
+    return write_metadata_to_flash(&ram_current_metadata);
 }
 
 /**
@@ -124,52 +153,21 @@ static void jump_to_application(uint32_t app_bank_address)
 
 int main() 
 {
-    // TODO - below is a general flow of the bootloader, just to give an idea, correct it as needed
-    
     stdio_init_all();
 
-    // 2. Read boot metadata from reserved flash sector
-    //    - Magic number validation
-    //    - CRC check on metadata
-    //    - Version information
-    //    - Active/Backup bank status
     // Find and validate application
+    // TODO - add authentication and integrity checks
     if (!find_valid_application()) 
     {
         //enter_recovery_mode(); TODO - implement recovery mode
         while(1) tight_loop_contents(); // For now, just loop forever
     }
 
-
-    // 3. Check for update trigger
-    //    - New firmware flag
-    //    - Force update command
-    //    - Previous boot failures counter
-
-    // 4. Determine which bank to boot
-    //    - Check active bank status
-    //    - Verify backup bank if update pending
-    //    - Handle fallback logic
-
-    // 5. Validate application image
-    //    - Verify header magic
-    //    - Check CRC/signature
-    //    - Validate vector table
-    //    - Check firmware version
-
-    // 6. Pre-boot tasks
-    //    - Update boot counters
-    //    - Clear update flags if needed
-    //    - Save any diagnostic info
-
-    // 7. Boot preparation
-    //    - Disable interrupts
-    //    - Configure vector table
-    //    - Setup initial stack pointer
-
-    // 8. Jump to application
-    //    - If validation fails, try backup bank
-    //    - If all fails, enter recovery mode
+    // TODO - add version checks, anti-rollback, etc.
+    if (ram_current_metadata.update_pending) 
+    {
+        handle_pending_update();
+    }
     
     if (ram_current_metadata.active_bank == BANK_A) 
     {
