@@ -26,6 +26,27 @@ set -o pipefail
 echo "########## Build.sh - start ##########"
 echo "Building all components with CMake"
 
+# Parse command line arguments
+CLEAN_BUILD=0
+for arg in "$@"
+do
+    case $arg in
+        --clean)
+        CLEAN_BUILD=1
+        shift # Remove --clean from processing
+        ;;
+    esac
+done
+
+# Handle clean build if requested
+if [ $CLEAN_BUILD -eq 1 ]; then
+    echo "Performing clean build..."
+    if [ -d "build" ]; then
+        rm -rf build
+        echo "Removed existing build directory"
+    fi
+fi
+
 # Create build directory if it does not exist
 if [ ! -d "build" ]; then
     mkdir build
