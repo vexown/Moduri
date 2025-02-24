@@ -15,16 +15,16 @@
 /*******************************************************************************/
 
 /* This option decides if TCP stack on the Pico is set up as TCP server or TCP client */
-#define PICO_W_AS_TCP_SERVER   ON
+#define PICO_W_AS_TCP_SERVER   OFF
 
 /* This option decides if HTTP is enabled on the Pico, it is then included within the TCP stack */
-#define HTTP_ENABLED           ON
+#define HTTP_ENABLED           OFF
 
 /* Enable this option if you want to set the IP address of the Pico to a static value PICO_W_STATIC_IP_ADDRESS. Otherwise DHCP is used */
 #define USE_STATIC_IP          ON
 
 /* Use this option if you're running the Pico as an Access Point with a TCP server */
-#define PICO_AS_ACCESS_POINT   ON
+#define PICO_AS_ACCESS_POINT   OFF
 #if (PICO_AS_ACCESS_POINT == ON)
     #if (PICO_W_AS_TCP_SERVER == OFF) 
     #error "PICO_AS_ACCESS_POINT requires PICO_W_AS_TCP_SERVER to be ON" 
@@ -43,6 +43,9 @@
 /* Watchdog timer (WDT) is fundamentally a hardware timer that requires periodic "kicks" or "refreshes" from the software to confirm 
  * that the system is running as expected. If the timer expires (i.e., the software fails to refresh it in time), it triggers a 
    predefined action, typically a system reset (which is our case) */
-#define WATCHDOG_ENABLED        ON
+#define WATCHDOG_ENABLED        OFF //TODO - reenable this once you figure out how to pet it during TLS operations during OTA
+
+/* Enables the OTA (Over-The-Air) firmware update feature. A TCP client will connect to specified server and download updated firmware if available */
+#define OTA_ENABLED             ON
 
 #endif // MODURICONFIG_H
