@@ -64,6 +64,11 @@
 /* OS includes */
 #include "OS_manager.h"
 
+/* Flash includes */
+#include "flash_layout.h"
+#include "flash_operations.h"
+#include "metadata.h"
+
 /* Misc includes */
 #include "Common.h"
 
@@ -89,6 +94,9 @@
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
 #define STACK_1024_BYTES					(configSTACK_DEPTH_TYPE)(256) 
 #define STACK_2048_BYTES					(configSTACK_DEPTH_TYPE)(512) 
+#define STACK_4096_BYTES					(configSTACK_DEPTH_TYPE)(1024)
+#define STACK_8192_BYTES					(configSTACK_DEPTH_TYPE)(2048)
+#define STACK_16384_BYTES					(configSTACK_DEPTH_TYPE)(4096)
 
 /* Watchdog settings */
 #define MAX_WATCHDOG_RESETS 				3
@@ -110,6 +118,7 @@ void OS_start(void);
 #if (WATCHDOG_ENABLED == ON)
 static void checkResetReason(void);
 #endif
+static void check_running_bank(void);
 /***************************** Tasks declarations ******************************/
 static void aliveTask(__unused void *taskParams);
 static void cyw43initTask(__unused void *taskParams);
@@ -167,6 +176,40 @@ static void checkResetReason(void)
 }
 #endif
 
+/* 
+ * Function: check_running_bank
+ * 
+ * Description: Check which bank the application is running from based on the metadata from flash
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+static void check_running_bank(void)
+{
+    boot_metadata_t current_metadata;
+    if (read_metadata_from_flash(&current_metadata)) 
+    {
+        if(current_metadata.active_bank == BANK_A)
+        {
+            LOG("Running from Bank A \n");
+        }
+        else if(current_metadata.active_bank == BANK_B)
+        {
+            LOG("Running from Bank B \n");
+        }
+        else
+        {
+            LOG("Invalid active bank \n");
+        }
+    }
+    else
+    {
+        LOG("Failed to read metadata from flash or it is corrupted \n"); // TODO - critical error handling
+    }
+}
+
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
@@ -210,7 +253,7 @@ void OS_start( void )
 										NULL,                       /* The parameter passed to the task - not used in this case. */
 										ALIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
 										NULL );                     /* The task handle, if not needed put NULL */
-	taskCreationStatus[1] = xTaskCreate( networkTask, "Network", STACK_2048_BYTES, NULL, NETWORK_TASK_PRIORITY, NULL);
+	taskCreationStatus[1] = xTaskCreate( networkTask, "Network", STACK_8192_BYTES, NULL, NETWORK_TASK_PRIORITY, NULL);
 	taskCreationStatus[2] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY, &monitorTaskHandle);
 	taskCreationStatus[3] = xTaskCreate( cyw43initTask, "CYW43_Init", STACK_1024_BYTES, NULL, CYW43_INIT_TASK_PRIORITY, NULL); // Must be highest priority, will be deleted after it runs
 
@@ -237,6 +280,9 @@ void OS_start( void )
 			CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_TASK_FAILED_TO_CREATE);
 		}
 	}
+
+    /* Check which bank is the application running from */
+    check_running_bank();
 
 	LOG("RTOS configuration finished, starting the scheduler... \n");
 	vTaskStartScheduler();
