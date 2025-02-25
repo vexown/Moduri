@@ -1,5 +1,7 @@
 Archive member included to satisfy reference by file (symbol)
 
+../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                              CMakeFiles/bootloader.dir/main.c.o (read_metadata_from_flash)
 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
                               CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_float/float_math.c.o (sqrtf)
 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-ef_sqrt.o)
@@ -165,9 +167,6 @@ Discarded input sections
  .text          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/main.c.o
  .data          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/main.c.o
  .bss           0x0000000000000000        0x0 CMakeFiles/bootloader.dir/main.c.o
- .text          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .data          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .bss           0x0000000000000000        0x0 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
  .text          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o
  .data          0x0000000000000000        0x0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o
  .bss           0x0000000000000000        0x0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o
@@ -1552,6 +1551,9 @@ Discarded input sections
  .boot2         0x0000000000000000      0x100 ../pico-sdk/src/rp2350/boot_stage2/CMakeFiles/bs2_default_library.dir/bs2_default_padded_checksummed.S.o
  .ARM.attributes
                 0x0000000000000000       0x22 ../pico-sdk/src/rp2350/boot_stage2/CMakeFiles/bs2_default_library.dir/bs2_default_padded_checksummed.S.o
+ .text          0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .data          0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .bss           0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .text          0x0000000000000000       0x58 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
  .data          0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
@@ -2498,7 +2500,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
 .flash_begin    0x0000000010000000        0x0
                 0x0000000010000000                __flash_binary_start = .
 
-.text           0x0000000010000000     0x336c
+.text           0x0000000010000000     0x33c4
                 0x0000000010000000                __logical_binary_start = .
  *(.vectors)
  .vectors       0x0000000010000000      0x124 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
@@ -2593,361 +2595,360 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
  .text.find_valid_application
                 0x0000000010000324       0x60 CMakeFiles/bootloader.dir/main.c.o
                 0x0000000010000324                find_valid_application
- .text.main     0x0000000010000384       0x3c CMakeFiles/bootloader.dir/main.c.o
+ .text.main     0x0000000010000384       0x8c CMakeFiles/bootloader.dir/main.c.o
                 0x0000000010000384                main
- .text.read_metadata_from_flash
-                0x00000000100003c0       0x40 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
-                0x00000000100003c0                read_metadata_from_flash
- .text.write_metadata_to_flash
-                0x0000000010000400       0x46 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
-                0x0000000010000400                write_metadata_to_flash
- *fill*         0x0000000010000446        0x2 
  .text.gpio_set_function
-                0x0000000010000448       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
-                0x0000000010000448                gpio_set_function
- .text.panic    0x0000000010000480       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
-                0x0000000010000480                panic
+                0x0000000010000410       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+                0x0000000010000410                gpio_set_function
+ .text.panic    0x0000000010000448       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+                0x0000000010000448                panic
  .text.hw_claim_lock
-                0x00000000100004b0       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
-                0x00000000100004b0                hw_claim_lock
+                0x0000000010000478       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+                0x0000000010000478                hw_claim_lock
  .text.hw_claim_unlock
-                0x00000000100004d4       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
-                0x00000000100004d4                hw_claim_unlock
+                0x000000001000049c       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+                0x000000001000049c                hw_claim_unlock
  .text.hw_claim_or_assert
-                0x00000000100004e8       0x32 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
-                0x00000000100004e8                hw_claim_or_assert
- *fill*         0x000000001000051a        0x2 
+                0x00000000100004b0       0x32 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+                0x00000000100004b0                hw_claim_or_assert
+ *fill*         0x00000000100004e2        0x2 
  .text.next_striped_spin_lock_num
-                0x000000001000051c       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
-                0x000000001000051c                next_striped_spin_lock_num
+                0x00000000100004e4       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+                0x00000000100004e4                next_striped_spin_lock_num
  .text.spinlock_set_extexclall
-                0x0000000010000538        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- *fill*         0x0000000010000546        0x2 
+                0x0000000010000500        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ *fill*         0x000000001000050e        0x2 
  .text.spin_locks_reset
-                0x0000000010000548       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
-                0x0000000010000548                spin_locks_reset
+                0x0000000010000510       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+                0x0000000010000510                spin_locks_reset
  .text.set_raw_irq_handler_and_unlock
-                0x0000000010000564       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x000000001000052c       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .text.nvic_ipr0
-                0x0000000010000588        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010000550        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .text.runtime_init_per_core_irq_priorities
-                0x0000000010000590       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000590                runtime_init_per_core_irq_priorities
- *fill*         0x00000000100005aa        0x2 
+                0x0000000010000558       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010000558                runtime_init_per_core_irq_priorities
+ *fill*         0x0000000010000572        0x2 
  .text.make_j_16
-                0x00000000100005ac       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010000574       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .text.insert_bl_32
-                0x00000000100005e8       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x00000000100005b0       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .text.irq_is_enabled
-                0x0000000010000624       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000624                irq_is_enabled
+                0x00000000100005ec       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x00000000100005ec                irq_is_enabled
  .text.irq_set_mask_n_enabled
-                0x0000000010000644       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000644                irq_set_mask_n_enabled
+                0x000000001000060c       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x000000001000060c                irq_set_mask_n_enabled
  .text.irq_set_enabled
-                0x0000000010000664       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000664                irq_set_enabled
+                0x000000001000062c       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x000000001000062c                irq_set_enabled
  .text.irq_get_vtable_handler
-                0x0000000010000678       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000678                irq_get_vtable_handler
+                0x0000000010000640       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010000640                irq_get_vtable_handler
  .text.irq_set_exclusive_handler
-                0x0000000010000688       0x60 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000688                irq_set_exclusive_handler
+                0x0000000010000650       0x60 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010000650                irq_set_exclusive_handler
  .text.irq_remove_handler
-                0x00000000100006e8      0x1ac CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x00000000100006e8                irq_remove_handler
+                0x00000000100006b0      0x1ac CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x00000000100006b0                irq_remove_handler
  .text.irq_add_tail_to_free_list
-                0x0000000010000894      0x100 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010000894                irq_add_tail_to_free_list
+                0x000000001000085c      0x100 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x000000001000085c                irq_add_tail_to_free_list
  .text.lock_init
-                0x0000000010000994        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
-                0x0000000010000994                lock_init
+                0x000000001000095c        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+                0x000000001000095c                lock_init
  .text.mutex_init
-                0x00000000100009a0       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
-                0x00000000100009a0                mutex_init
+                0x0000000010000968       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x0000000010000968                mutex_init
  .text.recursive_mutex_init
-                0x00000000100009ba       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
-                0x00000000100009ba                recursive_mutex_init
+                0x0000000010000982       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x0000000010000982                recursive_mutex_init
  .text.runtime_init_mutex
-                0x00000000100009d8       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
-                0x00000000100009d8                runtime_init_mutex
+                0x00000000100009a0       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x00000000100009a0                runtime_init_mutex
  .text.make_alarm_id
-                0x0000000010000a24        0x6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- *fill*         0x0000000010000a2a        0x2 
+                0x00000000100009ec        0x6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ *fill*         0x00000000100009f2        0x2 
  .text.sleep_until_callback
-                0x0000000010000a2c       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x00000000100009f4       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
  .text.alarm_pool_irq_handler
-                0x0000000010000a68      0x300 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000a30      0x300 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
  .text.alarm_pool_post_alloc_init
-                0x0000000010000d68       0xa4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000d30       0xa4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
  .text.alarm_pool_get_default
-                0x0000000010000e0c       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010000e0c                alarm_pool_get_default
+                0x0000000010000dd4       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000dd4                alarm_pool_get_default
  .text.alarm_pool_add_alarm_at_force_in_context
-                0x0000000010000e34       0xba CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010000e34                alarm_pool_add_alarm_at_force_in_context
+                0x0000000010000dfc       0xba CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000dfc                alarm_pool_add_alarm_at_force_in_context
  .text.alarm_pool_add_alarm_at
-                0x0000000010000eee       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010000eee                alarm_pool_add_alarm_at
+                0x0000000010000eb6       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000eb6                alarm_pool_add_alarm_at
  .text.alarm_pool_cancel_alarm
-                0x0000000010000f26       0x72 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010000f26                alarm_pool_cancel_alarm
+                0x0000000010000eee       0x72 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000eee                alarm_pool_cancel_alarm
  .text.best_effort_wfe_or_timeout
-                0x0000000010000f98      0x110 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010000f98                best_effort_wfe_or_timeout
+                0x0000000010000f60      0x110 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010000f60                best_effort_wfe_or_timeout
  .text.alarm_pool_get_default_timer
-                0x00000000100010a8        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x00000000100010a8                alarm_pool_get_default_timer
+                0x0000000010001070        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010001070                alarm_pool_get_default_timer
  .text.runtime_init_default_alarm_pool
-                0x00000000100010b0       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x00000000100010b0                runtime_init_default_alarm_pool
+                0x0000000010001078       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x0000000010001078                runtime_init_default_alarm_pool
  .text.timer_hardware_alarm_claim
-                0x00000000100010e4       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x00000000100010e4                timer_hardware_alarm_claim
+                0x00000000100010ac       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000100010ac                timer_hardware_alarm_claim
  .text.timer_time_us_64
-                0x0000000010001108       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x0000000010001108                timer_time_us_64
+                0x00000000100010d0       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000100010d0                timer_time_us_64
  .text.timer_busy_wait_until
-                0x0000000010001118       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x0000000010001118                timer_busy_wait_until
+                0x00000000100010e0       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000100010e0                timer_busy_wait_until
  .text.timer_busy_wait_us
-                0x0000000010001132       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x0000000010001132                timer_busy_wait_us
- *fill*         0x000000001000115a        0x2 
+                0x00000000100010fa       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000100010fa                timer_busy_wait_us
+ *fill*         0x0000000010001122        0x2 
  .text.time_us_64
-                0x000000001000115c       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x000000001000115c                time_us_64
+                0x0000000010001124       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x0000000010001124                time_us_64
  .text.busy_wait_us
-                0x000000001000116c       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
-                0x000000001000116c                busy_wait_us
+                0x0000000010001134       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x0000000010001134                busy_wait_us
  .text.uart_disable_before_lcr_write
-                0x0000000010001180       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x0000000010001148       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
  .text.uart_write_lcr_bits_masked
-                0x00000000100011c0       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x0000000010001188       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
  .text.uart_set_baudrate
-                0x00000000100011dc       0x52 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
-                0x00000000100011dc                uart_set_baudrate
- *fill*         0x000000001000122e        0x2 
+                0x00000000100011a4       0x52 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x00000000100011a4                uart_set_baudrate
+ *fill*         0x00000000100011f6        0x2 
  .text.uart_set_translate_crlf
-                0x0000000010001230       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
-                0x0000000010001230                uart_set_translate_crlf
+                0x00000000100011f8       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x00000000100011f8                uart_set_translate_crlf
  .text.uart_init
-                0x0000000010001254       0x7c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
-                0x0000000010001254                uart_init
+                0x000000001000121c       0x7c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x000000001000121c                uart_init
  .text.clock_configure_internal
-                0x00000000100012d0       0xb4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+                0x0000000010001298       0xb4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
  .text.clock_configure_undivided
-                0x0000000010001384       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
-                0x0000000010001384                clock_configure_undivided
- *fill*         0x0000000010001396        0x2 
+                0x000000001000134c       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+                0x000000001000134c                clock_configure_undivided
+ *fill*         0x000000001000135e        0x2 
  .text.clock_get_hz
-                0x0000000010001398        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
-                0x0000000010001398                clock_get_hz
+                0x0000000010001360        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+                0x0000000010001360                clock_get_hz
  .text.pll_init
-                0x00000000100013a4      0x108 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
-                0x00000000100013a4                pll_init
+                0x000000001000136c      0x108 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+                0x000000001000136c                pll_init
  .text.tick_start
-                0x00000000100014ac       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
-                0x00000000100014ac                tick_start
+                0x0000000010001474       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+                0x0000000010001474                tick_start
  .text.rom_func_lookup
-                0x00000000100014c8       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
-                0x00000000100014c8                rom_func_lookup
+                0x0000000010001490       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+                0x0000000010001490                rom_func_lookup
  .text.rom_data_lookup
-                0x00000000100014e6        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
-                0x00000000100014e6                rom_data_lookup
- *fill*         0x00000000100014f2        0x2 
+                0x00000000100014ae        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+                0x00000000100014ae                rom_data_lookup
+ *fill*         0x00000000100014ba        0x2 
  .text.runtime_init_bootrom_locking_enable
-                0x00000000100014f4       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
-                0x00000000100014f4                runtime_init_bootrom_locking_enable
+                0x00000000100014bc       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+                0x00000000100014bc                runtime_init_bootrom_locking_enable
  .text.boot_locks_reset
-                0x0000000010001508       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
-                0x0000000010001508                boot_locks_reset
+                0x00000000100014d0       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+                0x00000000100014d0                boot_locks_reset
  .text.runtime_init_boot_locks_reset
-                0x0000000010001528        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
-                0x0000000010001528                runtime_init_boot_locks_reset
+                0x00000000100014f0        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+                0x00000000100014f0                runtime_init_boot_locks_reset
  .text.xosc_init
-                0x0000000010001530       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
-                0x0000000010001530                xosc_init
+                0x00000000100014f8       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+                0x00000000100014f8                xosc_init
  .text.runtime_run_initializers_from
-                0x0000000010001558       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+                0x0000000010001520       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
  .text.first_per_core_initializer
-                0x0000000010001570        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- *fill*         0x0000000010001572        0x2 
+                0x0000000010001538        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ *fill*         0x000000001000153a        0x2 
  .text.runtime_run_initializers
-                0x0000000010001574       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
-                0x0000000010001574                runtime_run_initializers
+                0x000000001000153c       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+                0x000000001000153c                runtime_run_initializers
  .text.runtime_init_early_resets
-                0x0000000010001584       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010001584                runtime_init_early_resets
+                0x000000001000154c       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x000000001000154c                runtime_init_early_resets
  .text.runtime_init_usb_power_down
-                0x00000000100015b0       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x00000000100015b0                runtime_init_usb_power_down
+                0x0000000010001578       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010001578                runtime_init_usb_power_down
  .text.runtime_init_per_core_enable_coprocessors
-                0x00000000100015d0       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x00000000100015d0                runtime_init_per_core_enable_coprocessors
+                0x0000000010001598       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010001598                runtime_init_per_core_enable_coprocessors
  .text.runtime_init_post_clock_resets
-                0x00000000100015ec       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x00000000100015ec                runtime_init_post_clock_resets
+                0x00000000100015b4       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100015b4                runtime_init_post_clock_resets
  .text.runtime_init_bootrom_reset
-                0x000000001000160c       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x000000001000160c                runtime_init_bootrom_reset
+                0x00000000100015d4       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100015d4                runtime_init_bootrom_reset
  .text.runtime_init_per_core_bootrom_reset
-                0x000000001000161e       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x000000001000161e                runtime_init_per_core_bootrom_reset
+                0x00000000100015e6       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100015e6                runtime_init_per_core_bootrom_reset
  .text.runtime_init_spin_locks_reset
-                0x0000000010001630        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010001630                runtime_init_spin_locks_reset
+                0x00000000100015f8        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100015f8                runtime_init_spin_locks_reset
  .text.runtime_init_install_ram_vector_table
-                0x0000000010001638       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010001638                runtime_init_install_ram_vector_table
+                0x0000000010001600       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010001600                runtime_init_install_ram_vector_table
  .text.start_all_ticks
-                0x0000000010001658       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+                0x0000000010001620       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
  .text.runtime_init_clocks
-                0x0000000010001680       0xc4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
-                0x0000000010001680                runtime_init_clocks
+                0x0000000010001648       0xc4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+                0x0000000010001648                runtime_init_clocks
  .text.__rp2350_dcp_engaged_state_save_restore
-                0x0000000010001744       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
- *fill*         0x000000001000177e        0x2 
+                0x000000001000170c       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ *fill*         0x0000000010001746        0x2 
  .text.__wrap___aeabi_dadd
-                0x0000000010001780       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x0000000010001788                __wrap___aeabi_dadd
+                0x0000000010001748       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000010001750                __wrap___aeabi_dadd
  .text.__wrap___aeabi_dsub
-                0x00000000100017a8       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100017b0                __wrap___aeabi_dsub
+                0x0000000010001770       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000010001778                __wrap___aeabi_dsub
  .text.__wrap___aeabi_dmul
-                0x00000000100017d0       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100017d8                __wrap___aeabi_dmul
+                0x0000000010001798       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100017a0                __wrap___aeabi_dmul
  .text.__wrap___aeabi_ddiv
-                0x000000001000181c       0x9c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x0000000010001824                __wrap___aeabi_ddiv
+                0x00000000100017e4       0x9c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100017ec                __wrap___aeabi_ddiv
  .text.__wrap___aeabi_i2d
-                0x00000000100018b8       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100018c0                __wrap___aeabi_i2d
+                0x0000000010001880       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000010001888                __wrap___aeabi_i2d
  .text.__wrap___aeabi_ui2d
-                0x00000000100018dc       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100018e4                __wrap___aeabi_ui2d
+                0x00000000100018a4       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100018ac                __wrap___aeabi_ui2d
  .text.__wrap___aeabi_d2iz
-                0x0000000010001900       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x0000000010001908                __wrap___aeabi_d2iz
+                0x00000000100018c8       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100018d0                __wrap___aeabi_d2iz
  .text.__wrap___aeabi_d2uiz
-                0x0000000010001924       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x000000001000192c                __wrap___aeabi_d2uiz
+                0x00000000100018ec       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100018f4                __wrap___aeabi_d2uiz
  .text.__wrap___aeabi_dcmpun
-                0x0000000010001948       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x0000000010001950                __wrap___aeabi_dcmpun
+                0x0000000010001910       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000010001918                __wrap___aeabi_dcmpun
  .text.__wrap___aeabi_dcmplt
-                0x000000001000196c       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x0000000010001974                __wrap___aeabi_dcmplt
+                0x0000000010001934       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x000000001000193c                __wrap___aeabi_dcmplt
  .text.__wrap___aeabi_dcmple
-                0x0000000010001994       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x000000001000199c                __wrap___aeabi_dcmple
+                0x000000001000195c       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000010001964                __wrap___aeabi_dcmple
  .text.__wrap___aeabi_dcmpge
-                0x00000000100019bc       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100019c4                __wrap___aeabi_dcmpge
+                0x0000000010001984       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x000000001000198c                __wrap___aeabi_dcmpge
  .text.__wrap___aeabi_dcmpgt
-                0x00000000100019e4       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
-                0x00000000100019ec                __wrap___aeabi_dcmpgt
+                0x00000000100019ac       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x00000000100019b4                __wrap___aeabi_dcmpgt
  .text._out_null
-                0x0000000010001a0c        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x00000000100019d4        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._out_fct
-                0x0000000010001a0e        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .text._atoi    0x0000000010001a1c       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x00000000100019d6        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .text._atoi    0x00000000100019e4       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._out_rev
-                0x0000000010001a40       0x7e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010001a08       0x7e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._ntoa_format
-                0x0000000010001abe      0x138 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010001a86      0x138 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._ntoa_long
-                0x0000000010001bf6       0x94 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010001bbe       0x94 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._ntoa_long_long
-                0x0000000010001c8a       0xc6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .text._etoa    0x0000000010001d50      0x41c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- *fill*         0x000000001000216c        0x4 
- .text._ftoa    0x0000000010002170      0x398 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010001c52       0xc6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .text._etoa    0x0000000010001d18      0x41c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ *fill*         0x0000000010002134        0x4 
+ .text._ftoa    0x0000000010002138      0x398 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text._vsnprintf
-                0x0000000010002508      0x680 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x00000000100024d0      0x680 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .text.vfctprintf
-                0x0000000010002b88       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
-                0x0000000010002b88                vfctprintf
- .text._exit    0x0000000010002bac        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
-                0x0000000010002bac                _exit
- .text.exit     0x0000000010002bb0        0x6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
-                0x0000000010002bb0                exit
- *fill*         0x0000000010002bb6        0x2 
+                0x0000000010002b50       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010002b50                vfctprintf
+ .text._exit    0x0000000010002b74        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000010002b74                _exit
+ .text.exit     0x0000000010002b78        0x6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000010002b78                exit
+ *fill*         0x0000000010002b7e        0x2 
  .text.__assert_func
-                0x0000000010002bb8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
-                0x0000000010002bb8                __assert_func
+                0x0000000010002b80       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000010002b80                __assert_func
  .text.runtime_init
-                0x0000000010002bf0       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
-                0x0000000010002bf0                runtime_init
+                0x0000000010002bb8       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000010002bb8                runtime_init
  .text.stdio_out_chars_no_crlf
-                0x0000000010002c1c        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- *fill*         0x0000000010002c2a        0x2 
+                0x0000000010002be4        0xe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ *fill*         0x0000000010002bf2        0x2 
  .text.stdio_out_chars_crlf
-                0x0000000010002c2c       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002bf4       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
  .text.stdio_stack_buffer_flush
-                0x0000000010002cac       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002c74       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
  .text.stdio_buffered_printer
-                0x0000000010002cec       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002cb4       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
  .text.stdout_serialize_begin
-                0x0000000010002d0c       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002d0c                stdout_serialize_begin
+                0x0000000010002cd4       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002cd4                stdout_serialize_begin
  .text.stdout_serialize_end
-                0x0000000010002d38       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002d38                stdout_serialize_end
+                0x0000000010002d00       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002d00                stdout_serialize_end
  .text.stdio_put_string
-                0x0000000010002d48       0x8c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002d48                stdio_put_string
+                0x0000000010002d10       0x8c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002d10                stdio_put_string
  .text.stdio_set_driver_enabled
-                0x0000000010002dd4       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002dd4                stdio_set_driver_enabled
+                0x0000000010002d9c       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002d9c                stdio_set_driver_enabled
  .text.stdio_flush
-                0x0000000010002dfc       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002dfc                stdio_flush
+                0x0000000010002dc4       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002dc4                stdio_flush
  .text.stdio_init_all
-                0x0000000010002e18        0xa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002e18                stdio_init_all
+                0x0000000010002de0        0xa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002de0                stdio_init_all
  .text.__wrap_puts
-                0x0000000010002e22       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002e22                __wrap_puts
-                0x0000000010002e22                stdio_puts
+                0x0000000010002dea       0x1e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002dea                __wrap_puts
+                0x0000000010002dea                stdio_puts
  .text.__wrap_vprintf
-                0x0000000010002e40       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002e40                __wrap_vprintf
-                0x0000000010002e40                stdio_vprintf
+                0x0000000010002e08       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002e08                __wrap_vprintf
+                0x0000000010002e08                stdio_vprintf
  .text.__wrap_printf
-                0x0000000010002e7c       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
-                0x0000000010002e7c                stdio_printf
-                0x0000000010002e7c                __wrap_printf
+                0x0000000010002e44       0x1c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000010002e44                stdio_printf
+                0x0000000010002e44                __wrap_printf
  .text.stdio_uart_out_chars
-                0x0000000010002e98       0x8c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010002e60       0x8c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .text.stdio_uart_in_chars
-                0x0000000010002f24       0x7c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
-                0x0000000010002f24                stdio_uart_in_chars
+                0x0000000010002eec       0x7c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010002eec                stdio_uart_in_chars
  .text.on_uart_rx
-                0x0000000010002fa0       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010002f68       0x24 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .text.stdio_uart_out_flush
-                0x0000000010002fc4       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010002f8c       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .text.stdio_uart_set_chars_available_callback
-                0x0000000010002fd8       0x88 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010002fa0       0x88 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .text.stdio_uart_init_full
-                0x0000000010003060       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
-                0x0000000010003060                stdio_uart_init_full
+                0x0000000010003028       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003028                stdio_uart_init_full
  .text.stdio_uart_init
-                0x00000000100030b0       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
-                0x00000000100030b0                stdio_uart_init
+                0x0000000010003078       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003078                stdio_uart_init
  .text.flash_devinfo_ptr
-                0x00000000100030e0       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .text          0x000000001000310c       0xec /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
-                0x000000001000310c                memcpy
- .text          0x00000000100031f8       0xa4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
-                0x00000000100031f8                memset
- .text          0x000000001000329c       0x5c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
-                0x000000001000329c                strlen
+                0x00000000100030a8       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .text.read_metadata_from_flash
+                0x00000000100030d4       0x40 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                0x00000000100030d4                read_metadata_from_flash
+ .text.write_metadata_to_flash
+                0x0000000010003114       0x50 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                0x0000000010003114                write_metadata_to_flash
+ .text          0x0000000010003164       0xec /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+                0x0000000010003164                memcpy
+ .text          0x0000000010003250       0xa4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+                0x0000000010003250                memset
+ .text          0x00000000100032f4       0x5c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+                0x00000000100032f4                strlen
  *(.fini)
- .fini          0x00000000100032f8        0x4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crti.o
-                0x00000000100032f8                _fini
- *fill*         0x00000000100032fc        0x4 
- .fini.__stub   0x0000000010003300       0x28 linker stubs
+ .fini          0x0000000010003350        0x4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crti.o
+                0x0000000010003350                _fini
+ *fill*         0x0000000010003354        0x4 
+ .fini.__stub   0x0000000010003358       0x28 linker stubs
  *crtbegin.o(.ctors)
  *crtbegin?.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o *crtend?.o) .ctors)
@@ -2958,260 +2959,262 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
  *(EXCLUDE_FILE(*crtend.o *crtend?.o) .dtors)
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
-                0x0000000010003328                . = ALIGN (0x4)
-                0x0000000010003328                PROVIDE (__preinit_array_start = .)
+                0x0000000010003380                . = ALIGN (0x4)
+                0x0000000010003380                PROVIDE (__preinit_array_start = .)
  *(SORT_BY_NAME(.preinit_array.*))
  .preinit_array.00050
-                0x0000000010003328        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003328                __pre_init_runtime_init_bootrom_reset
+                0x0000000010003380        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010003380                __pre_init_runtime_init_bootrom_reset
  .preinit_array.00100
-                0x000000001000332c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x000000001000332c                __pre_init_runtime_init_early_resets
+                0x0000000010003384        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010003384                __pre_init_runtime_init_early_resets
  .preinit_array.00101
-                0x0000000010003330        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003330                __pre_init_runtime_init_usb_power_down
+                0x0000000010003388        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010003388                __pre_init_runtime_init_usb_power_down
  .preinit_array.00500
-                0x0000000010003334        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003334                __pre_init_runtime_init_clocks
+                0x000000001000338c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x000000001000338c                __pre_init_runtime_init_clocks
  .preinit_array.00600
-                0x0000000010003338        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003338                __pre_init_runtime_init_post_clock_resets
+                0x0000000010003390        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010003390                __pre_init_runtime_init_post_clock_resets
  .preinit_array.01000
-                0x000000001000333c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
-                0x000000001000333c                __pre_init_runtime_init_boot_locks_reset
+                0x0000000010003394        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+                0x0000000010003394                __pre_init_runtime_init_boot_locks_reset
  .preinit_array.01000
-                0x0000000010003340        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003340                __pre_init_runtime_init_spin_locks_reset
+                0x0000000010003398        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000010003398                __pre_init_runtime_init_spin_locks_reset
  .preinit_array.01010
-                0x0000000010003344        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
-                0x0000000010003344                __pre_init_runtime_init_bootrom_locking_enable
+                0x000000001000339c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+                0x000000001000339c                __pre_init_runtime_init_bootrom_locking_enable
  .preinit_array.01100
-                0x0000000010003348        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
-                0x0000000010003348                __pre_init_runtime_init_mutex
+                0x00000000100033a0        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x00000000100033a0                __pre_init_runtime_init_mutex
  .preinit_array.10080
-                0x000000001000334c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x000000001000334c                __pre_init_runtime_init_install_ram_vector_table
+                0x00000000100033a4        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100033a4                __pre_init_runtime_init_install_ram_vector_table
  .preinit_array.11000
-                0x0000000010003350        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
-                0x0000000010003350                __pre_init_runtime_init_default_alarm_pool
+                0x00000000100033a8        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x00000000100033a8                __pre_init_runtime_init_default_alarm_pool
  .preinit_array.YYYYY
-                0x0000000010003354        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
-                0x0000000010003354                __pre_init_first_per_core_initializer
+                0x00000000100033ac        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+                0x00000000100033ac                __pre_init_first_per_core_initializer
  .preinit_array.ZZZZZ.00051
-                0x0000000010003358        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x0000000010003358                __pre_init_runtime_init_per_core_bootrom_reset
+                0x00000000100033b0        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100033b0                __pre_init_runtime_init_per_core_bootrom_reset
  .preinit_array.ZZZZZ.00200
-                0x000000001000335c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
-                0x000000001000335c                __pre_init_runtime_init_per_core_enable_coprocessors
+                0x00000000100033b4        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x00000000100033b4                __pre_init_runtime_init_per_core_enable_coprocessors
  .preinit_array.ZZZZZ.01000
-                0x0000000010003360        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
-                0x0000000010003360                __pre_init_spinlock_set_extexclall
+                0x00000000100033b8        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+                0x00000000100033b8                __pre_init_spinlock_set_extexclall
  .preinit_array.ZZZZZ.01200
-                0x0000000010003364        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
-                0x0000000010003364                __pre_init_runtime_init_per_core_irq_priorities
+                0x00000000100033bc        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x00000000100033bc                __pre_init_runtime_init_per_core_irq_priorities
  *(.preinit_array)
-                0x0000000010003368                PROVIDE (__preinit_array_end = .)
-                0x0000000010003368                . = ALIGN (0x4)
-                0x0000000010003368                PROVIDE (__init_array_start = .)
+                0x00000000100033c0                PROVIDE (__preinit_array_end = .)
+                0x00000000100033c0                . = ALIGN (0x4)
+                0x00000000100033c0                PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array)
- .init_array    0x0000000010003368        0x4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
-                0x000000001000336c                PROVIDE (__init_array_end = .)
-                0x000000001000336c                . = ALIGN (0x4)
-                0x000000001000336c                PROVIDE (__fini_array_start = .)
+ .init_array    0x00000000100033c0        0x4 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
+                0x00000000100033c4                PROVIDE (__init_array_end = .)
+                0x00000000100033c4                . = ALIGN (0x4)
+                0x00000000100033c4                PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array)
-                0x000000001000336c                PROVIDE (__fini_array_end = .)
+                0x00000000100033c4                PROVIDE (__fini_array_end = .)
  *(.eh_frame*)
- .eh_frame      0x000000001000336c        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
-                0x000000001000336c                . = ALIGN (0x4)
+ .eh_frame      0x00000000100033c4        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
+                0x00000000100033c4                . = ALIGN (0x4)
 
-.glue_7         0x000000001000336c        0x0
- .glue_7        0x000000001000336c        0x0 linker stubs
+.glue_7         0x00000000100033c4        0x0
+ .glue_7        0x00000000100033c4        0x0 linker stubs
 
-.glue_7t        0x000000001000336c        0x0
- .glue_7t       0x000000001000336c        0x0 linker stubs
+.glue_7t        0x00000000100033c4        0x0
+ .glue_7t       0x00000000100033c4        0x0 linker stubs
 
-.vfp11_veneer   0x000000001000336c        0x0
- .vfp11_veneer  0x000000001000336c        0x0 linker stubs
+.vfp11_veneer   0x00000000100033c4        0x0
+ .vfp11_veneer  0x00000000100033c4        0x0 linker stubs
 
-.v4_bx          0x000000001000336c        0x0
- .v4_bx         0x000000001000336c        0x0 linker stubs
+.v4_bx          0x00000000100033c4        0x0
+ .v4_bx         0x00000000100033c4        0x0 linker stubs
 
-.iplt           0x000000001000336c        0x0
- .iplt          0x000000001000336c        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
+.iplt           0x00000000100033c4        0x0
+ .iplt          0x00000000100033c4        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
 
-.boot2          0x000000001000336c        0x0
-                0x000000001000336c                __boot2_start__ = .
+.boot2          0x00000000100033c4        0x0
+                0x00000000100033c4                __boot2_start__ = .
  *(.boot2)
-                0x000000001000336c                __boot2_end__ = .
+                0x00000000100033c4                __boot2_end__ = .
                 0x0000000000000001                ASSERT (((__boot2_end__ - __boot2_start__) <= 0x100), ERROR: Pico second stage bootloader must be no more than 256 bytes in size)
 
-.rodata         0x0000000010003370      0x8f0
+.rodata         0x00000000100033c8      0xa28
  *(EXCLUDE_FILE(*libm.a: *libc.a:*lib_a-mem*.o *libgcc.a:) .rodata*)
+ .rodata.main.str1.4
+                0x00000000100033c8      0x13c CMakeFiles/bootloader.dir/main.c.o
  .rodata.panic.str1.4
-                0x0000000010003370       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- *fill*         0x0000000010003382        0x2 
+                0x0000000010003504       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ *fill*         0x0000000010003516        0x2 
  .rodata.make_j_16.str1.4
-                0x0000000010003384       0x6f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100033f3        0x1 
+                0x0000000010003518       0x6f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x0000000010003587        0x1 
  .rodata.insert_bl_32.str1.4
-                0x00000000100033f4       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000010003588       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .rodata.irq_set_exclusive_handler.str1.4
-                0x0000000010003404       0x36 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x000000001000343a        0x2 
+                0x0000000010003598       0x36 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x00000000100035ce        0x2 
  .rodata.irq_add_shared_handler.str1.4
-                0x000000001000343c       0xe9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x0000000010003525        0x3 
+                0x00000000100035d0       0xe9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x00000000100036b9        0x3 
  .rodata.irq_remove_handler.str1.4
-                0x0000000010003528       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x0000000010003562        0x2 
+                0x00000000100036bc       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x00000000100036f6        0x2 
  .rodata.irq_add_tail_to_free_list.str1.4
-                0x0000000010003564       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x000000001000359e        0x2 
+                0x00000000100036f8       0x3a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x0000000010003732        0x2 
  .rodata.__func__.0
-                0x00000000100035a0       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100035ba        0x2 
+                0x0000000010003734       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x000000001000374e        0x2 
  .rodata.__func__.1
-                0x00000000100035bc        0xd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100035c9        0x3 
+                0x0000000010003750        0xd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x000000001000375d        0x3 
  .rodata.__func__.2
-                0x00000000100035cc       0x13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100035df        0x1 
+                0x0000000010003760       0x13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x0000000010003773        0x1 
  .rodata.__func__.3
-                0x00000000100035e0        0xa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100035ea        0x2 
+                0x0000000010003774        0xa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x000000001000377e        0x2 
  .rodata.__func__.4
-                0x00000000100035ec        0xd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x00000000100035f9        0x3 
+                0x0000000010003780        0xd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x000000001000378d        0x3 
  .rodata.__func__.6
-                0x00000000100035fc       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- *fill*         0x0000000010003616        0x2 
+                0x0000000010003790       0x1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ *fill*         0x00000000100037aa        0x2 
  .rodata.runtime_init_mutex.str1.4
-                0x0000000010003618       0x5a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- *fill*         0x0000000010003672        0x2 
+                0x00000000100037ac       0x5a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ *fill*         0x0000000010003806        0x2 
  .rodata.str1.4
-                0x0000000010003674       0x51 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- *fill*         0x00000000100036c5        0x3 
+                0x0000000010003808       0x51 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ *fill*         0x0000000010003859        0x3 
  .rodata.__func__.1
-                0x00000000100036c8        0xb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- *fill*         0x00000000100036d3        0x1 
+                0x000000001000385c        0xb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ *fill*         0x0000000010003867        0x1 
  .rodata.__func__.3
-                0x00000000100036d4       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x0000000010003868       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
  .rodata.__func__.6
-                0x00000000100036ec       0x13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- *fill*         0x00000000100036ff        0x1 
+                0x0000000010003880       0x13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ *fill*         0x0000000010003893        0x1 
  .rodata.alarm_pool_irq_handler.str1.4
-                0x0000000010003700       0x65 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- *fill*         0x0000000010003765        0x3 
+                0x0000000010003894       0x65 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ *fill*         0x00000000100038f9        0x3 
  .rodata.alarm_pool_get_default.str1.4
-                0x0000000010003768       0x21 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- *fill*         0x0000000010003789        0x3 
+                0x00000000100038fc       0x21 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ *fill*         0x000000001000391d        0x3 
  .rodata.__func__.1
-                0x000000001000378c       0x17 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- *fill*         0x00000000100037a3        0x1 
+                0x0000000010003920       0x17 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ *fill*         0x0000000010003937        0x1 
  .rodata.__func__.2
-                0x00000000100037a4       0x17 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- *fill*         0x00000000100037bb        0x1 
+                0x0000000010003938       0x17 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ *fill*         0x000000001000394f        0x1 
  .rodata.timer_hardware_alarm_claim.str1.4
-                0x00000000100037bc       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- *fill*         0x00000000100037de        0x2 
+                0x0000000010003950       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ *fill*         0x0000000010003972        0x2 
  .rodata.pll_init.str1.4
-                0x00000000100037e0      0x114 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+                0x0000000010003974      0x114 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
  .rodata.__func__.0
-                0x00000000100038f4        0x9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- *fill*         0x00000000100038fd        0x3 
+                0x0000000010003a88        0x9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ *fill*         0x0000000010003a91        0x3 
  .rodata.str1.4
-                0x0000000010003900       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003a94       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_26
-                0x0000000010003940        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003ad4        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_34
-                0x000000001000394c        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003ae0        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_42
-                0x0000000010003958        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003aec        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_48
-                0x0000000010003964        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003af8        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_54
-                0x0000000010003970        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003b04        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_78
-                0x000000001000397c        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003b10        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata.__bi_84
-                0x0000000010003988        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003b1c        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .rodata._ftoa.str1.4
-                0x0000000010003994       0x15 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- *fill*         0x00000000100039a9        0x7 
+                0x0000000010003b28       0x15 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ *fill*         0x0000000010003b3d        0x3 
  .rodata.pow10.0
-                0x00000000100039b0       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000010003b40       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .rodata.__assert_func.str1.4
-                0x0000000010003a00       0x3f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000010003b90       0x3f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
                                          0x43 (size before relaxing)
- *fill*         0x0000000010003a3f        0x1 
+ *fill*         0x0000000010003bcf        0x1 
  .rodata.crlf_str.0
-                0x0000000010003a40        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- *fill*         0x0000000010003a42        0x2 
+                0x0000000010003bd0        0x2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ *fill*         0x0000000010003bd2        0x2 
  .rodata.str1.4
-                0x0000000010003a44       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003bd4       0x2c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .rodata.__bi_45.4
-                0x0000000010003a70        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003c00        0xc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .rodata.__bi_49.5
-                0x0000000010003a7c        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003c0c        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .rodata.__bi_50.6
-                0x0000000010003a84        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003c14        0x8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .rodata.flash_devinfo_ptr.str1.4
-                0x0000000010003a8c       0x47 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- *fill*         0x0000000010003ad3        0x1 
+                0x0000000010003c1c       0x47 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ *fill*         0x0000000010003c63        0x1 
  .rodata.str1.4
-                0x0000000010003ad4      0x14d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- *fill*         0x0000000010003c21        0x3 
+                0x0000000010003c64      0x14d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ *fill*         0x0000000010003db1        0x3 
  .rodata.__func__.0
-                0x0000000010003c24       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- *fill*         0x0000000010003c36        0x2 
+                0x0000000010003db4       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ *fill*         0x0000000010003dc6        0x2 
  .rodata.__func__.2
-                0x0000000010003c38       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+                0x0000000010003dc8       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .rodata.__func__.3
-                0x0000000010003c4c       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+                0x0000000010003ddc       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  *(.srodata*)
-                0x0000000010003c60                . = ALIGN (0x4)
- *fill*         0x0000000010003c5e        0x2 
+                0x0000000010003df0                . = ALIGN (0x4)
+ *fill*         0x0000000010003dee        0x2 
  *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
-                0x0000000010003c60                . = ALIGN (0x4)
+                0x0000000010003df0                . = ALIGN (0x4)
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x0000000010003c60                __exidx_start = .
+                0x0000000010003df0                __exidx_start = .
 
-.ARM.exidx      0x0000000010003c60        0x8
+.ARM.exidx      0x0000000010003df0        0x8
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x0000000010003c60        0x8 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
-                0x0000000010003c68                __exidx_end = .
-                0x0000000010003c68                . = ALIGN (0x4)
-                0x0000000010003c68                __binary_info_start = .
+ .ARM.exidx     0x0000000010003df0        0x8 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+                0x0000000010003df8                __exidx_end = .
+                0x0000000010003df8                . = ALIGN (0x4)
+                0x0000000010003df8                __binary_info_start = .
 
-.binary_info    0x0000000010003c68       0x28
+.binary_info    0x0000000010003df8       0x28
  *(.binary_info.keep.*)
  .binary_info.keep.__bi_ptr26
-                0x0000000010003c68        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003df8        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr34
-                0x0000000010003c6c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003dfc        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr42
-                0x0000000010003c70        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003e00        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr48
-                0x0000000010003c74        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003e04        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr54
-                0x0000000010003c78        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003e08        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr78
-                0x0000000010003c7c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003e0c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .binary_info.keep.__bi_ptr84
-                0x0000000010003c80        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x0000000010003e10        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  *(.binary_info.*)
  .binary_info.__bi_ptr45
-                0x0000000010003c84        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003e14        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .binary_info.__bi_ptr49
-                0x0000000010003c88        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003e18        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .binary_info.__bi_ptr50
-                0x0000000010003c8c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
-                0x0000000010003c90                __binary_info_end = .
-                0x0000000010003c90                . = ALIGN (0x4)
+                0x0000000010003e1c        0x4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000010003e20                __binary_info_end = .
+                0x0000000010003e20                . = ALIGN (0x4)
 
 .ram_vector_table
                 0x0000000020000000      0x110
@@ -3225,7 +3228,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
                 0x0000000020000110                . = ALIGN (0x4)
  *(.uninitialized_data*)
 
-.data           0x0000000020000110      0x834 load address 0x0000000010003c90
+.data           0x0000000020000110      0x834 load address 0x0000000010003e20
                 0x0000000020000110                __data_start__ = .
  *(vtable)
  *(.time_critical*)
@@ -3307,23 +3310,23 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
                 0x0000000020000944                . = ALIGN (0x4)
 
 .tm_clone_table
-                0x0000000020000944        0x0 load address 0x00000000100044c4
+                0x0000000020000944        0x0 load address 0x0000000010004654
  .tm_clone_table
                 0x0000000020000944        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
  .tm_clone_table
                 0x0000000020000944        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtend.o
 
-.igot.plt       0x0000000020000944        0x0 load address 0x00000000100044c4
+.igot.plt       0x0000000020000944        0x0 load address 0x0000000010004654
  .igot.plt      0x0000000020000944        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
 
-.tdata          0x0000000020000944        0x0 load address 0x00000000100044c4
+.tdata          0x0000000020000944        0x0 load address 0x0000000010004654
                 0x0000000020000944                . = ALIGN (0x4)
  *(.tdata .tdata.* .gnu.linkonce.td.*)
                 0x0000000020000944                __tdata_end = .
                 0x0000000020000944                PROVIDE (__data_end__ = .)
-                0x0000000010003c90                __etext = LOADADDR (.data)
+                0x0000000010003e20                __etext = LOADADDR (.data)
 
-.tbss           0x0000000020000944        0x0 load address 0x00000000100044c4
+.tbss           0x0000000020000944        0x0 load address 0x0000000010004654
                 0x0000000020000944                . = ALIGN (0x4)
                 0x0000000020000944                __bss_start__ = .
                 0x0000000020000944                __tls_base = .
@@ -3331,7 +3334,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
  *(.tcommon)
                 0x0000000020000944                __tls_end = .
 
-.bss            0x0000000020000948      0x328 load address 0x00000000100044c4
+.bss            0x0000000020000948      0x328 load address 0x0000000010004654
                 0x0000000020000948                . = ALIGN (0x4)
                 0x0000000020000948                __tbss_end = .
  *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
@@ -3372,26 +3375,26 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
  *fill*         0x0000000020000c6e        0x2 
                 0x0000000020000c70                __bss_end__ = .
 
-.heap           0x0000000020000c70      0x800 load address 0x00000000100044c4
+.heap           0x0000000020000c70      0x800 load address 0x0000000010004654
                 0x0000000020000c70                __end__ = .
                 0x0000000020000c70                end = __end__
  *(.heap*)
  .heap          0x0000000020000c70      0x800 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
                 0x0000000020080000                __HeapLimit = (ORIGIN (RAM) + LENGTH (RAM))
 
-.scratch_x      0x0000000020080000        0x0 load address 0x00000000100044c4
+.scratch_x      0x0000000020080000        0x0 load address 0x0000000010004654
                 0x0000000020080000                __scratch_x_start__ = .
  *(.scratch_x.*)
                 0x0000000020080000                . = ALIGN (0x4)
                 0x0000000020080000                __scratch_x_end__ = .
-                0x00000000100044c4                __scratch_x_source__ = LOADADDR (.scratch_x)
+                0x0000000010004654                __scratch_x_source__ = LOADADDR (.scratch_x)
 
-.scratch_y      0x0000000020081000        0x0 load address 0x00000000100044c4
+.scratch_y      0x0000000020081000        0x0 load address 0x0000000010004654
                 0x0000000020081000                __scratch_y_start__ = .
  *(.scratch_y.*)
                 0x0000000020081000                . = ALIGN (0x4)
                 0x0000000020081000                __scratch_y_end__ = .
-                0x00000000100044c4                __scratch_y_source__ = LOADADDR (.scratch_y)
+                0x0000000010004654                __scratch_y_source__ = LOADADDR (.scratch_y)
 
 .stack1_dummy   0x0000000020080000        0x0
  *(.stack1*)
@@ -3400,11 +3403,11 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
  *(.stack*)
  .stack         0x0000000020081000      0x800 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
 
-.flash_end      0x00000000100044c4       0x14
+.flash_end      0x0000000010004654       0x14
  *(.embedded_end_block*)
  .embedded_end_block
-                0x00000000100044c4       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
-                0x00000000100044d8                PROVIDE (__flash_binary_end = .)
+                0x0000000010004654       0x14 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+                0x0000000010004668                PROVIDE (__flash_binary_end = .)
                 0x0000000020080000                __StackLimit = (ORIGIN (RAM) + LENGTH (RAM))
                 0x0000000020081000                __StackOneTop = (ORIGIN (SCRATCH_X) + LENGTH (SCRATCH_X))
                 0x0000000020082000                __StackTop = (ORIGIN (SCRATCH_Y) + LENGTH (SCRATCH_Y))
@@ -3422,7 +3425,6 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.mai
                 0x0000000000000001                ASSERT (((__binary_info_header_end - __logical_binary_start) <= 0x400), Binary info must be in first 1024 bytes of the binary)
                 0x0000000000000001                ASSERT (((__embedded_block_end - __logical_binary_start) <= 0x1000), Embedded block must be in first 4096 bytes of the binary)
 LOAD CMakeFiles/bootloader.dir/main.c.o
-LOAD CMakeFiles/bootloader.dir/Source/flash_operations.c.o
 LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdlib/stdlib.c.o
 LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
 LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2350/pico_platform/platform.c.o
@@ -3480,6 +3482,7 @@ LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_s
 LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
 LOAD CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
 LOAD ../pico-sdk/src/rp2350/boot_stage2/CMakeFiles/bs2_default_library.dir/bs2_default_padded_checksummed.S.o
+LOAD ../Common/FlashUtils/libflash_utils.a
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libstdc++.a
 LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a
 START GROUP
@@ -3497,8 +3500,8 @@ LOAD /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtn.o
 OUTPUT(bootloader.elf elf32-littlearm)
 LOAD linker stubs
 
-.rel.dyn        0x00000000100044d8        0x0
- .rel.iplt      0x00000000100044d8        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
+.rel.dyn        0x0000000010004668        0x0
+ .rel.iplt      0x0000000010004668        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
 
 .ARM.attributes
                 0x0000000000000000       0x34
@@ -3509,69 +3512,69 @@ LOAD linker stubs
  .ARM.attributes
                 0x0000000000000058       0x38 CMakeFiles/bootloader.dir/main.c.o
  .ARM.attributes
-                0x0000000000000090       0x38 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
+                0x0000000000000090       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .ARM.attributes
-                0x00000000000000c8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+                0x00000000000000c8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
  .ARM.attributes
-                0x0000000000000100       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+                0x0000000000000100       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
  .ARM.attributes
-                0x0000000000000138       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+                0x0000000000000138       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
  .ARM.attributes
-                0x0000000000000170       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+                0x0000000000000170       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
  .ARM.attributes
-                0x00000000000001a8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+                0x00000000000001a8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .ARM.attributes
-                0x00000000000001e0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x00000000000001e0       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq_handler_chain.S.o
  .ARM.attributes
-                0x0000000000000218       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq_handler_chain.S.o
+                0x0000000000000208       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
  .ARM.attributes
-                0x0000000000000240       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+                0x0000000000000240       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
  .ARM.attributes
-                0x0000000000000278       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x0000000000000278       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
  .ARM.attributes
-                0x00000000000002b0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x00000000000002b0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
  .ARM.attributes
-                0x00000000000002e8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000000002e8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
  .ARM.attributes
-                0x0000000000000320       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x0000000000000320       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
  .ARM.attributes
-                0x0000000000000358       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+                0x0000000000000358       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
  .ARM.attributes
-                0x0000000000000390       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+                0x0000000000000390       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
  .ARM.attributes
-                0x00000000000003c8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+                0x00000000000003c8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
  .ARM.attributes
-                0x0000000000000400       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+                0x0000000000000400       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
  .ARM.attributes
-                0x0000000000000438       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+                0x0000000000000438       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
  .ARM.attributes
-                0x0000000000000470       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+                0x0000000000000470       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
  .ARM.attributes
-                0x00000000000004a8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+                0x00000000000004a8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
  .ARM.attributes
-                0x00000000000004e0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+                0x00000000000004e0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
  .ARM.attributes
-                0x0000000000000518       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000000000518       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
  .ARM.attributes
-                0x0000000000000550       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+                0x0000000000000550       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
  .ARM.attributes
-                0x0000000000000588       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000000000578       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .ARM.attributes
-                0x00000000000005b0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x00000000000005b0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .ARM.attributes
-                0x00000000000005e8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x00000000000005e8       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
  .ARM.attributes
-                0x0000000000000620       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+                0x0000000000000610       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
  .ARM.attributes
-                0x0000000000000648       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000000000648       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
  .ARM.attributes
-                0x0000000000000680       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000000000680       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .ARM.attributes
-                0x00000000000006b8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x00000000000006b8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .ARM.attributes
-                0x00000000000006f0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+                0x00000000000006f0       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
  .ARM.attributes
-                0x0000000000000728       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+                0x0000000000000728       0x38 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .ARM.attributes
                 0x0000000000000760       0x22 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
  .ARM.attributes
@@ -3591,7 +3594,6 @@ LOAD linker stubs
  .comment       0x0000000000000000       0x33 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtbegin.o
                                          0x34 (size before relaxing)
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/main.c.o
- .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
@@ -3620,188 +3622,189 @@ LOAD linker stubs
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .comment       0x0000000000000033       0x34 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .comment       0x0000000000000033       0x34 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtend.o
 
-.debug_info     0x0000000000000000    0x1c68e
- .debug_info    0x0000000000000000      0x92a CMakeFiles/bootloader.dir/main.c.o
- .debug_info    0x000000000000092a      0x272 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_info    0x0000000000000b9c     0x1c0e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_info    0x00000000000027aa      0x19b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- .debug_info    0x0000000000002945      0x73d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_info    0x0000000000003082      0x404 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_info    0x0000000000003486     0x170f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_info    0x0000000000004b95     0x2358 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_info    0x0000000000006eed      0x1c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_info    0x00000000000070b5     0x1f97 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_info    0x000000000000904c     0x3863 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_info    0x000000000000c8af     0x1ded CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_info    0x000000000000e69c     0x13fa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_info    0x000000000000fa96     0x1583 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_info    0x0000000000011019      0x67c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_info    0x0000000000011695      0x2ce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_info    0x0000000000011963      0x8cb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_info    0x000000000001222e      0x1ba CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
- .debug_info    0x00000000000123e8      0x2ff CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_info    0x00000000000126e7      0x1ac CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_info    0x0000000000012893      0x1a6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_info    0x0000000000012a39     0x1dbd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_info    0x00000000000147f6      0x749 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_info    0x0000000000014f3f       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
- .debug_info    0x0000000000014f61      0x2cb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
- .debug_info    0x000000000001522c     0x199b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_info    0x0000000000016bc7       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
- .debug_info    0x0000000000016be9      0xc51 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_info    0x000000000001783a     0x1625 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_info    0x0000000000018e5f     0x15c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_info    0x000000000001a427     0x153a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_info    0x000000000001b961      0x3b1 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_info    0x000000000001bd12       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_info    0x000000000001bd38      0x717 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_info    0x000000000001c44f       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
- .debug_info    0x000000000001c475       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
- .debug_info    0x000000000001c49b      0x137 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_info    0x000000000001c5d2       0xbc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+.debug_info     0x0000000000000000    0x1c7eb
+ .debug_info    0x0000000000000000      0x9ed CMakeFiles/bootloader.dir/main.c.o
+ .debug_info    0x00000000000009ed     0x1c0e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_info    0x00000000000025fb      0x19b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_info    0x0000000000002796      0x73d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_info    0x0000000000002ed3      0x404 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_info    0x00000000000032d7     0x170f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_info    0x00000000000049e6     0x2358 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_info    0x0000000000006d3e      0x1c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_info    0x0000000000006f06     0x1f97 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_info    0x0000000000008e9d     0x3863 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_info    0x000000000000c700     0x1ded CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_info    0x000000000000e4ed     0x13fa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_info    0x000000000000f8e7     0x1583 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_info    0x0000000000010e6a      0x67c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_info    0x00000000000114e6      0x2ce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_info    0x00000000000117b4      0x8cb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_info    0x000000000001207f      0x1ba CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_info    0x0000000000012239      0x2ff CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_info    0x0000000000012538      0x1ac CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_info    0x00000000000126e4      0x1a6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_info    0x000000000001288a     0x1dbd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_info    0x0000000000014647      0x749 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_info    0x0000000000014d90       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ .debug_info    0x0000000000014db2      0x2cb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+ .debug_info    0x000000000001507d     0x199b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_info    0x0000000000016a18       0x22 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+ .debug_info    0x0000000000016a3a      0xc51 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_info    0x000000000001768b     0x1625 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_info    0x0000000000018cb0     0x15c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_info    0x000000000001a278     0x153a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_info    0x000000000001b7b2      0x3b1 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_info    0x000000000001bb63      0x30c ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_info    0x000000000001be6f       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_info    0x000000000001be95      0x717 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_info    0x000000000001c5ac       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x000000000001c5d2       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_info    0x000000000001c5f8      0x137 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_info    0x000000000001c72f       0xbc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_abbrev   0x0000000000000000     0x55a4
- .debug_abbrev  0x0000000000000000      0x25b CMakeFiles/bootloader.dir/main.c.o
- .debug_abbrev  0x000000000000025b      0x11a CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_abbrev  0x0000000000000375      0x479 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_abbrev  0x00000000000007ee       0xf4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- .debug_abbrev  0x00000000000008e2      0x312 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_abbrev  0x0000000000000bf4      0x1e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_abbrev  0x0000000000000ddc      0x2a3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_abbrev  0x000000000000107f      0x5b7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_abbrev  0x0000000000001636      0x12e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_abbrev  0x0000000000001764      0x3d9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_abbrev  0x0000000000001b3d      0x59d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_abbrev  0x00000000000020da      0x47d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_abbrev  0x0000000000002557      0x2f9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_abbrev  0x0000000000002850      0x3e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_abbrev  0x0000000000002c38      0x202 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_abbrev  0x0000000000002e3a      0x14e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_abbrev  0x0000000000002f88      0x368 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_abbrev  0x00000000000032f0      0x124 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
- .debug_abbrev  0x0000000000003414      0x207 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_abbrev  0x000000000000361b      0x108 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_abbrev  0x0000000000003723      0x11c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_abbrev  0x000000000000383f      0x2b3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_abbrev  0x0000000000003af2      0x25b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_abbrev  0x0000000000003d4d       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
- .debug_abbrev  0x0000000000003d5f       0xad CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
- .debug_abbrev  0x0000000000003e0c      0x3a2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_abbrev  0x00000000000041ae       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
- .debug_abbrev  0x00000000000041c0      0x33c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_abbrev  0x00000000000044fc      0x48d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_abbrev  0x0000000000004989      0x403 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_abbrev  0x0000000000004d8c      0x3de CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_abbrev  0x000000000000516a      0x16e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_abbrev  0x00000000000052d8       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_abbrev  0x00000000000052ec      0x163 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_abbrev  0x000000000000544f       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
- .debug_abbrev  0x0000000000005463       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
- .debug_abbrev  0x0000000000005477       0xb4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_abbrev  0x000000000000552b       0x79 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+.debug_abbrev   0x0000000000000000     0x562b
+ .debug_abbrev  0x0000000000000000      0x26c CMakeFiles/bootloader.dir/main.c.o
+ .debug_abbrev  0x000000000000026c      0x479 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_abbrev  0x00000000000006e5       0xf4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_abbrev  0x00000000000007d9      0x312 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_abbrev  0x0000000000000aeb      0x1e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_abbrev  0x0000000000000cd3      0x2a3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_abbrev  0x0000000000000f76      0x5b7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_abbrev  0x000000000000152d      0x12e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_abbrev  0x000000000000165b      0x3d9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_abbrev  0x0000000000001a34      0x59d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_abbrev  0x0000000000001fd1      0x47d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_abbrev  0x000000000000244e      0x2f9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_abbrev  0x0000000000002747      0x3e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_abbrev  0x0000000000002b2f      0x202 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_abbrev  0x0000000000002d31      0x14e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_abbrev  0x0000000000002e7f      0x368 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_abbrev  0x00000000000031e7      0x124 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_abbrev  0x000000000000330b      0x207 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_abbrev  0x0000000000003512      0x108 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_abbrev  0x000000000000361a      0x11c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_abbrev  0x0000000000003736      0x2b3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_abbrev  0x00000000000039e9      0x25b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_abbrev  0x0000000000003c44       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ .debug_abbrev  0x0000000000003c56       0xad CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+ .debug_abbrev  0x0000000000003d03      0x3a2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_abbrev  0x00000000000040a5       0x12 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+ .debug_abbrev  0x00000000000040b7      0x33c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_abbrev  0x00000000000043f3      0x48d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_abbrev  0x0000000000004880      0x403 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_abbrev  0x0000000000004c83      0x3de CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_abbrev  0x0000000000005061      0x16e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_abbrev  0x00000000000051cf      0x190 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_abbrev  0x000000000000535f       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_abbrev  0x0000000000005373      0x163 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_abbrev  0x00000000000054d6       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x00000000000054ea       0x14 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_abbrev  0x00000000000054fe       0xb4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_abbrev  0x00000000000055b2       0x79 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_loc      0x0000000000000000     0xfedf
+.debug_loc      0x0000000000000000     0xff1e
  .debug_loc     0x0000000000000000      0x184 CMakeFiles/bootloader.dir/main.c.o
- .debug_loc     0x0000000000000184       0x86 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_loc     0x000000000000020a     0x131a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_loc     0x0000000000001524      0x3d3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_loc     0x00000000000018f7      0x13f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_loc     0x0000000000001a36       0xff CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_loc     0x0000000000001b35     0x13fa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_loc     0x0000000000002f2f       0x15 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_loc     0x0000000000002f44     0x13ae CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_loc     0x00000000000042f2     0x2b6c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_loc     0x0000000000006e5e     0x1197 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_loc     0x0000000000007ff5      0x9c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_loc     0x00000000000089bd      0xd07 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_loc     0x00000000000096c4      0x4cf CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_loc     0x0000000000009b93       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_loc     0x0000000000009c33      0x6c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_loc     0x000000000000a2fb       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_loc     0x000000000000a3c9       0x71 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_loc     0x000000000000a43a       0x78 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_loc     0x000000000000a4b2      0x19c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_loc     0x000000000000a64e       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_loc     0x000000000000a6e6     0x1d1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_loc     0x000000000000c400      0x62f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_loc     0x000000000000ca2f      0xa32 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_loc     0x000000000000d461      0x9df CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_loc     0x000000000000de40      0xd16 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_loc     0x000000000000eb56      0x152 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_loc     0x000000000000eca8      0xfe6 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_loc     0x000000000000fc8e      0x22c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_loc     0x000000000000feba       0x25 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_loc     0x0000000000000184     0x131a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_loc     0x000000000000149e      0x3d3 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_loc     0x0000000000001871      0x13f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_loc     0x00000000000019b0       0xff CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_loc     0x0000000000001aaf     0x13fa CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_loc     0x0000000000002ea9       0x15 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_loc     0x0000000000002ebe     0x13ae CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_loc     0x000000000000426c     0x2b6c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_loc     0x0000000000006dd8     0x1197 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_loc     0x0000000000007f6f      0x9c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_loc     0x0000000000008937      0xd07 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_loc     0x000000000000963e      0x4cf CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_loc     0x0000000000009b0d       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_loc     0x0000000000009bad      0x6c8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_loc     0x000000000000a275       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_loc     0x000000000000a343       0x71 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_loc     0x000000000000a3b4       0x78 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_loc     0x000000000000a42c      0x19c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_loc     0x000000000000a5c8       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_loc     0x000000000000a660     0x1d1a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_loc     0x000000000000c37a      0x62f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_loc     0x000000000000c9a9      0xa32 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_loc     0x000000000000d3db      0x9df CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_loc     0x000000000000ddba      0xd16 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_loc     0x000000000000ead0      0x152 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_loc     0x000000000000ec22       0xc5 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_loc     0x000000000000ece7      0xfe6 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_loc     0x000000000000fccd      0x22c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_loc     0x000000000000fef9       0x25 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
 .debug_aranges  0x0000000000000000      0xe28
  .debug_aranges
                 0x0000000000000000       0x40 CMakeFiles/bootloader.dir/main.c.o
  .debug_aranges
-                0x0000000000000040       0x28 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
+                0x0000000000000040      0x128 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_aranges
-                0x0000000000000068      0x128 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+                0x0000000000000168       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
  .debug_aranges
-                0x0000000000000190       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+                0x0000000000000190       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
  .debug_aranges
-                0x00000000000001b8       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+                0x00000000000001d8       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
  .debug_aranges
-                0x0000000000000200       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+                0x0000000000000220       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
  .debug_aranges
-                0x0000000000000248       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+                0x0000000000000250       0xd8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
  .debug_aranges
-                0x0000000000000278       0xd8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+                0x0000000000000328       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
  .debug_aranges
-                0x0000000000000350       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+                0x0000000000000348       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
  .debug_aranges
-                0x0000000000000370       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+                0x00000000000003e0       0xf0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
  .debug_aranges
-                0x0000000000000408       0xf0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+                0x00000000000004d0       0xf0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
  .debug_aranges
-                0x00000000000004f8       0xf0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+                0x00000000000005c0       0x68 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
  .debug_aranges
-                0x00000000000005e8       0x68 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+                0x0000000000000628       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
  .debug_aranges
-                0x0000000000000650       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+                0x00000000000006c8       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
  .debug_aranges
-                0x00000000000006f0       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+                0x00000000000006f0       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
  .debug_aranges
-                0x0000000000000718       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+                0x0000000000000720       0x58 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
  .debug_aranges
-                0x0000000000000748       0x58 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+                0x0000000000000778       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
  .debug_aranges
-                0x00000000000007a0       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+                0x0000000000000798       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
  .debug_aranges
-                0x00000000000007c0       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+                0x00000000000007c8       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
  .debug_aranges
-                0x00000000000007f0       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+                0x00000000000007f8       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
  .debug_aranges
-                0x0000000000000820       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+                0x0000000000000838       0x58 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
  .debug_aranges
-                0x0000000000000860       0x58 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+                0x0000000000000890       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
  .debug_aranges
-                0x00000000000008b8       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+                0x00000000000008b8       0xd8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
  .debug_aranges
-                0x00000000000008e0       0xd8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+                0x0000000000000990       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
  .debug_aranges
-                0x00000000000009b8       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+                0x00000000000009a8       0x90 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
  .debug_aranges
-                0x00000000000009d0       0x90 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+                0x0000000000000a38       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
  .debug_aranges
-                0x0000000000000a60       0x28 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+                0x0000000000000a60       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
  .debug_aranges
-                0x0000000000000a88       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+                0x0000000000000b00       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
  .debug_aranges
-                0x0000000000000b28       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+                0x0000000000000bd0       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_aranges
-                0x0000000000000bf8       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+                0x0000000000000c50       0xa8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_aranges
-                0x0000000000000c78       0xa8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+                0x0000000000000cf8       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
  .debug_aranges
-                0x0000000000000d20       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+                0x0000000000000d40       0x28 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .debug_aranges
                 0x0000000000000d68       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
  .debug_aranges
@@ -3817,186 +3820,186 @@ LOAD linker stubs
 
 .debug_ranges   0x0000000000000000     0x33c0
  .debug_ranges  0x0000000000000000       0x30 CMakeFiles/bootloader.dir/main.c.o
- .debug_ranges  0x0000000000000030       0x18 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_ranges  0x0000000000000048      0x1a8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_ranges  0x00000000000001f0       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- .debug_ranges  0x0000000000000208       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_ranges  0x00000000000002d8       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_ranges  0x0000000000000328       0x68 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_ranges  0x0000000000000390      0x418 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_ranges  0x00000000000007a8       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_ranges  0x00000000000007b8      0xa50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_ranges  0x0000000000001208      0xbb0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_ranges  0x0000000000001db8      0x438 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_ranges  0x00000000000021f0      0x210 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_ranges  0x0000000000002400      0x170 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_ranges  0x0000000000002570       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_ranges  0x00000000000025b8       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_ranges  0x00000000000025d8       0xc0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_ranges  0x0000000000002698       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
- .debug_ranges  0x00000000000026d8       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_ranges  0x0000000000002770       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_ranges  0x0000000000002790       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_ranges  0x00000000000027c0       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_ranges  0x0000000000002858       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_ranges  0x0000000000002870       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
- .debug_ranges  0x0000000000002940      0x138 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_ranges  0x0000000000002a78       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
- .debug_ranges  0x0000000000002a98      0x118 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_ranges  0x0000000000002bb0      0x238 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_ranges  0x0000000000002de8      0x2f0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_ranges  0x00000000000030d8      0x1b8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_ranges  0x0000000000003290       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_ranges  0x0000000000000030      0x1a8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_ranges  0x00000000000001d8       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_ranges  0x00000000000001f0       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_ranges  0x00000000000002c0       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_ranges  0x0000000000000310       0x68 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_ranges  0x0000000000000378      0x418 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_ranges  0x0000000000000790       0x10 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_ranges  0x00000000000007a0      0xa50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_ranges  0x00000000000011f0      0xbb0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_ranges  0x0000000000001da0      0x438 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_ranges  0x00000000000021d8      0x210 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_ranges  0x00000000000023e8      0x170 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_ranges  0x0000000000002558       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_ranges  0x00000000000025a0       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_ranges  0x00000000000025c0       0xc0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_ranges  0x0000000000002680       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_ranges  0x00000000000026c0       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_ranges  0x0000000000002758       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_ranges  0x0000000000002778       0x30 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_ranges  0x00000000000027a8       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_ranges  0x0000000000002840       0x18 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_ranges  0x0000000000002858       0xd0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ .debug_ranges  0x0000000000002928      0x138 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_ranges  0x0000000000002a60       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+ .debug_ranges  0x0000000000002a80      0x118 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_ranges  0x0000000000002b98      0x238 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_ranges  0x0000000000002dd0      0x2f0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_ranges  0x00000000000030c0      0x1b8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_ranges  0x0000000000003278       0x38 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_ranges  0x00000000000032b0       0x18 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .debug_ranges  0x00000000000032c8       0xe8 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
  .debug_ranges  0x00000000000033b0       0x10 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_line     0x0000000000000000     0xf3f9
- .debug_line    0x0000000000000000      0x584 CMakeFiles/bootloader.dir/main.c.o
- .debug_line    0x0000000000000584      0x1e6 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_line    0x000000000000076a      0xe53 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_line    0x00000000000015bd      0x18b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- .debug_line    0x0000000000001748      0x4b4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_line    0x0000000000001bfc      0x324 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_line    0x0000000000001f20      0x315 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_line    0x0000000000002235     0x10d7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_line    0x000000000000330c      0x1cd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_line    0x00000000000034d9      0xf7b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_line    0x0000000000004454     0x1c0f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_line    0x0000000000006063      0xef6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_line    0x0000000000006f59      0x945 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_line    0x000000000000789e      0xb41 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_line    0x00000000000083df      0x501 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_line    0x00000000000088e0      0x273 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_line    0x0000000000008b53      0x5ae CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_line    0x0000000000009101      0x2e9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
- .debug_line    0x00000000000093ea      0x320 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_line    0x000000000000970a      0x2ab CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_line    0x00000000000099b5      0x20a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_line    0x0000000000009bbf      0x4f1 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_line    0x000000000000a0b0      0x4a7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_line    0x000000000000a557      0x24d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
- .debug_line    0x000000000000a7a4      0x166 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
- .debug_line    0x000000000000a90a     0x1133 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_line    0x000000000000ba3d       0xc4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
- .debug_line    0x000000000000bb01      0x73f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_line    0x000000000000c240      0xd13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_line    0x000000000000cf53      0xb9e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_line    0x000000000000daf1      0xbea CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_line    0x000000000000e6db      0x321 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_line    0x000000000000e9fc       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_line    0x000000000000ea5c      0x5c7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_line    0x000000000000f023       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
- .debug_line    0x000000000000f083       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
- .debug_line    0x000000000000f144      0x1c1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_line    0x000000000000f305       0xf4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+.debug_line     0x0000000000000000     0xf4ac
+ .debug_line    0x0000000000000000      0x5a6 CMakeFiles/bootloader.dir/main.c.o
+ .debug_line    0x00000000000005a6      0xe53 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_line    0x00000000000013f9      0x18b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_line    0x0000000000001584      0x4b4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_line    0x0000000000001a38      0x324 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_line    0x0000000000001d5c      0x315 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_line    0x0000000000002071     0x10d7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_line    0x0000000000003148      0x1cd CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_line    0x0000000000003315      0xf7b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_line    0x0000000000004290     0x1c0f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_line    0x0000000000005e9f      0xef6 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_line    0x0000000000006d95      0x945 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_line    0x00000000000076da      0xb41 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_line    0x000000000000821b      0x501 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_line    0x000000000000871c      0x273 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_line    0x000000000000898f      0x5ae CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_line    0x0000000000008f3d      0x2e9 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_line    0x0000000000009226      0x320 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_line    0x0000000000009546      0x2ab CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_line    0x00000000000097f1      0x20a CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_line    0x00000000000099fb      0x4f1 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_line    0x0000000000009eec      0x4a7 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_line    0x000000000000a393      0x24d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ .debug_line    0x000000000000a5e0      0x166 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+ .debug_line    0x000000000000a746     0x1133 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_line    0x000000000000b879       0xc4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+ .debug_line    0x000000000000b93d      0x73f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_line    0x000000000000c07c      0xd13 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_line    0x000000000000cd8f      0xb9e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_line    0x000000000000d92d      0xbea CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_line    0x000000000000e517      0x321 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_line    0x000000000000e838      0x277 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_line    0x000000000000eaaf       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_line    0x000000000000eb0f      0x5c7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_line    0x000000000000f0d6       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_line    0x000000000000f136       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_line    0x000000000000f1f7      0x1c1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_line    0x000000000000f3b8       0xf4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_str      0x0000000000000000     0x63a4
- .debug_str     0x0000000000000000      0x9eb CMakeFiles/bootloader.dir/main.c.o
-                                        0xa68 (size before relaxing)
- .debug_str     0x00000000000009eb       0xd1 CMakeFiles/bootloader.dir/Source/flash_operations.c.o
-                                        0x2fe (size before relaxing)
- .debug_str     0x0000000000000abc      0x854 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+.debug_str      0x0000000000000000     0x6411
+ .debug_str     0x0000000000000000      0x9fa CMakeFiles/bootloader.dir/main.c.o
+                                        0xa7c (size before relaxing)
+ .debug_str     0x00000000000009fa      0x854 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
                                         0xd04 (size before relaxing)
- .debug_str     0x0000000000001310       0x83 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_str     0x000000000000124e       0x83 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
                                         0x216 (size before relaxing)
- .debug_str     0x0000000000001393      0x1ad CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_str     0x00000000000012d1      0x1ad CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
                                         0x399 (size before relaxing)
- .debug_str     0x0000000000001540       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_str     0x000000000000147e       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
                                         0x336 (size before relaxing)
- .debug_str     0x000000000000160e      0x8da CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_str     0x000000000000154c      0x8da CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
                                         0xbea (size before relaxing)
- .debug_str     0x0000000000001ee8      0x437 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_str     0x0000000000001e26      0x437 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
                                         0xba7 (size before relaxing)
- .debug_str     0x000000000000231f       0x5e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_str     0x000000000000225d       0x5e CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
                                         0x238 (size before relaxing)
- .debug_str     0x000000000000237d      0x275 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_str     0x00000000000022bb      0x275 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
                                         0x8e5 (size before relaxing)
- .debug_str     0x00000000000025f2      0xa06 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_str     0x0000000000002530      0xa06 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
                                        0x12ec (size before relaxing)
- .debug_str     0x0000000000002ff8      0x1e4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_str     0x0000000000002f36      0x1e4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
                                         0xb95 (size before relaxing)
- .debug_str     0x00000000000031dc      0x4fb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_str     0x000000000000311a      0x4fb CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
                                         0xe46 (size before relaxing)
- .debug_str     0x00000000000036d7      0x42b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_str     0x0000000000003615      0x42b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
                                         0xb4a (size before relaxing)
- .debug_str     0x0000000000003b02       0x77 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_str     0x0000000000003a40       0x77 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
                                         0x4c0 (size before relaxing)
- .debug_str     0x0000000000003b79       0xfe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_str     0x0000000000003ab7       0xfe CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
                                         0x2df (size before relaxing)
- .debug_str     0x0000000000003c77      0x26b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_str     0x0000000000003bb5      0x26b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
                                         0x6ad (size before relaxing)
- .debug_str     0x0000000000003ee2       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_str     0x0000000000003e20       0xce CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
                                         0x2c7 (size before relaxing)
- .debug_str     0x0000000000003fb0       0x96 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_str     0x0000000000003eee       0x96 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
                                         0x2b3 (size before relaxing)
- .debug_str     0x0000000000004046       0x77 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_str     0x0000000000003f84       0x77 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
                                         0x24a (size before relaxing)
- .debug_str     0x00000000000040bd      0x103 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_str     0x0000000000003ffb      0x103 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
                                         0x2a6 (size before relaxing)
- .debug_str     0x00000000000041c0      0x382 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_str     0x00000000000040fe      0x382 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
                                        0x11d1 (size before relaxing)
- .debug_str     0x0000000000004542       0x64 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_str     0x0000000000004480       0x64 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
                                         0x4bb (size before relaxing)
- .debug_str     0x00000000000045a6       0x57 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
+ .debug_str     0x00000000000044e4       0x57 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_double/double_aeabi_dcp.S.o
                                          0x94 (size before relaxing)
- .debug_str     0x00000000000045fd      0x24b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
+ .debug_str     0x000000000000453b      0x24b CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.o
                                         0x3fb (size before relaxing)
- .debug_str     0x0000000000004848      0x240 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_str     0x0000000000004786      0x240 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
                                         0x461 (size before relaxing)
- .debug_str     0x0000000000004a88       0x3d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
+ .debug_str     0x00000000000049c6       0x3d CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_crt0/crt0.S.o
                                          0x86 (size before relaxing)
- .debug_str     0x0000000000004ac5      0x309 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_str     0x0000000000004a03      0x309 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
                                         0x8c1 (size before relaxing)
- .debug_str     0x0000000000004dce      0x2de CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_str     0x0000000000004d0c      0x2de CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
                                         0xfef (size before relaxing)
- .debug_str     0x00000000000050ac      0x3d2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_str     0x0000000000004fea      0x3d2 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
                                        0x1163 (size before relaxing)
- .debug_str     0x000000000000547e      0x569 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_str     0x00000000000053bc      0x58f CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
                                         0x862 (size before relaxing)
- .debug_str     0x00000000000059e7      0x191 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_str     0x000000000000594b      0x191 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
                                         0x35d (size before relaxing)
- .debug_str     0x0000000000005b78       0xac /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_str     0x0000000000005c24      0x545 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_str     0x0000000000005adc      0x109 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                                        0x347 (size before relaxing)
+ .debug_str     0x0000000000005be5       0xac /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x0000000000005c91      0x545 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
                                         0x653 (size before relaxing)
- .debug_str     0x0000000000006169       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_str     0x00000000000061d6       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
                                          0xb0 (size before relaxing)
- .debug_str     0x0000000000006199       0xab /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_str     0x0000000000006206       0xab /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
                                          0xb7 (size before relaxing)
- .debug_str     0x0000000000006244      0x11f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_str     0x00000000000062b1      0x11f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
                                         0x1c9 (size before relaxing)
- .debug_str     0x0000000000006363       0x41 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_str     0x00000000000063d0       0x41 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
                                         0x1c7 (size before relaxing)
 
 .debug_frame    0x0000000000000000     0x20fc
  .debug_frame   0x0000000000000000       0x80 CMakeFiles/bootloader.dir/main.c.o
- .debug_frame   0x0000000000000080       0x4c CMakeFiles/bootloader.dir/Source/flash_operations.c.o
- .debug_frame   0x00000000000000cc      0x304 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
- .debug_frame   0x00000000000003d0       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
- .debug_frame   0x000000000000041c       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
- .debug_frame   0x00000000000004b4       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
- .debug_frame   0x0000000000000554       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
- .debug_frame   0x000000000000059c      0x248 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
- .debug_frame   0x00000000000007e4       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
- .debug_frame   0x0000000000000804      0x1bc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
- .debug_frame   0x00000000000009c0      0x2e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
- .debug_frame   0x0000000000000ca8      0x2c0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
- .debug_frame   0x0000000000000f68       0xf8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
- .debug_frame   0x0000000000001060      0x1e4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
- .debug_frame   0x0000000000001244       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
- .debug_frame   0x0000000000001280       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
- .debug_frame   0x00000000000012c0      0x100 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
- .debug_frame   0x00000000000013c0       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
- .debug_frame   0x00000000000013e0       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
- .debug_frame   0x0000000000001430       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
- .debug_frame   0x0000000000001470       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
- .debug_frame   0x00000000000014f0       0xb4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
- .debug_frame   0x00000000000015a4       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
- .debug_frame   0x00000000000015f0      0x244 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
- .debug_frame   0x0000000000001834      0x18c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
- .debug_frame   0x00000000000019c0      0x2a4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
- .debug_frame   0x0000000000001c64      0x160 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
- .debug_frame   0x0000000000001dc4      0x1f0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
- .debug_frame   0x0000000000001fb4       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_frame   0x0000000000000080      0x304 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
+ .debug_frame   0x0000000000000384       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
+ .debug_frame   0x00000000000003d0       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/hardware_claim/claim.c.o
+ .debug_frame   0x0000000000000468       0xa0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync/sync.c.o
+ .debug_frame   0x0000000000000508       0x48 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.o
+ .debug_frame   0x0000000000000550      0x248 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_irq/irq.c.o
+ .debug_frame   0x0000000000000798       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/lock_core.c.o
+ .debug_frame   0x00000000000007b8      0x1bc CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_sync/mutex.c.o
+ .debug_frame   0x0000000000000974      0x2e8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/common/pico_time/time.c.o
+ .debug_frame   0x0000000000000c5c      0x2c0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_timer/timer.c.o
+ .debug_frame   0x0000000000000f1c       0xf8 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_uart/uart.c.o
+ .debug_frame   0x0000000000001014      0x1e4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_clocks/clocks.c.o
+ .debug_frame   0x00000000000011f8       0x3c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_pll/pll.c.o
+ .debug_frame   0x0000000000001234       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_ticks/ticks.c.o
+ .debug_frame   0x0000000000001274      0x100 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom.c.o
+ .debug_frame   0x0000000000001374       0x20 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_bootrom/bootrom_lock.c.o
+ .debug_frame   0x0000000000001394       0x50 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_boot_lock/boot_lock.c.o
+ .debug_frame   0x00000000000013e4       0x40 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xosc/xosc.c.o
+ .debug_frame   0x0000000000001424       0x80 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime/runtime.c.o
+ .debug_frame   0x00000000000014a4       0xb4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c.o
+ .debug_frame   0x0000000000001558       0x4c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.o
+ .debug_frame   0x00000000000015a4      0x244 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_printf/printf.c.o
+ .debug_frame   0x00000000000017e8      0x18c CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_clib_interface/newlib_interface.c.o
+ .debug_frame   0x0000000000001974      0x2a4 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio/stdio.c.o
+ .debug_frame   0x0000000000001c18      0x160 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
+ .debug_frame   0x0000000000001d78      0x1f0 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
+ .debug_frame   0x0000000000001f68       0x98 CMakeFiles/bootloader.dir/home/blankmcu/pico/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
+ .debug_frame   0x0000000000002000       0x4c ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .debug_frame   0x000000000000204c       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
  .debug_frame   0x0000000000002078       0x38 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
  .debug_frame   0x00000000000020b0       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
