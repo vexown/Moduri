@@ -56,17 +56,24 @@
 /* Memory alignment for the lwIP stack. Usually set to match the system's architecture. */
 #define MEM_ALIGNMENT               4
 
-/* Size of the heap for memory allocation (in bytes). Adjust based on application needs. */
-#define MEM_SIZE                    4000
+/* Size of the heap for memory allocation (in bytes). Adjust based on application needs.
+   This value determines the total amount of memory available for lwIP’s dynamic allocations. */
+#define MEM_SIZE                    (32 * 1024) // 32KB heap
 
-/* Number of TCP segments that can be queued. Increase for more simultaneous TCP connections. */
-#define MEMP_NUM_TCP_SEG            32
+/* Number of TCP segments that can be queued. Increase for more simultaneous TCP connections. 
+   This value is calculated based on the size of the TCP send buffer (TCP_SND_BUF) and the maximum segment size (TCP_MSS) 
+   The factor of 4 ensures there are enough segments to handle retransmissions and window scaling. */
+#define MEMP_NUM_TCP_SEG           ((4 * TCP_SND_BUF) / TCP_MSS)
 
 /* Number of entries in the ARP queue. Increase for high ARP traffic environments. */
 #define MEMP_NUM_ARP_QUEUE          10
 
-/* Number of buffers in the packet buffer pool. Adjust based on expected network traffic. */
+/* Number of buffers in the packet buffer pool. Adjust based on expected network traffic. 
+   A higher number allows more simultaneous packets to be processed but uses more memory. */
 #define PBUF_POOL_SIZE              24
+/* Size of each buffer (pbuf) in the packet buffer pool. 
+   This ensures most packets can be stored in a single pbuf without fragmentation */
+#define PBUF_POOL_BUFSIZE           1536 //  1536 bytes is chosen to accommodate a full Ethernet frame (1500 bytes payload + headers).
 
 /* Enable ARP functionality (1). Required for Ethernet and IPv4. */
 #define LWIP_ARP                    1
@@ -80,17 +87,30 @@
 /* Enable raw API support (1) for custom low-level protocol handling. */
 #define LWIP_RAW                    1
 
-/* TCP receive window size in bytes. Increase for better throughput. */
-#define TCP_WND                     (8 * TCP_MSS)
+/* Enable window scaling */
+#define LWIP_WND_SCALE              0
 
-/* Maximum segment size for TCP. */
-#define TCP_MSS                     1460
+/* If window scaling is enabled, set the scale factor. */
+#if (LWIP_WND_SCALE == 1)
+/* Use a moderate scale factor (2^TCP_RCV_SCALE = 2^2 = 4x multiplier) */
+#define TCP_RCV_SCALE               2
+#endif
+
+/* Maximum segment size for TCP.
+   1460 bytes is chosen to fit within the standard Ethernet MTU (1500 bytes) minus the IP (20 bytes) and TCP (20 bytes) headers. */
+#define TCP_MSS                     1460 
+
+/* TCP Receive Window Size in bytes (Increase for better throughput) */
+#define TCP_WND                     (32 * 1024)  // 32KB base
 
 /* Size of the TCP send buffer in bytes. Increase for larger TCP transmissions. */
-#define TCP_SND_BUF                 (8 * TCP_MSS)
+#define TCP_SND_BUF                 (TCP_WND/2) // Half of the receive window is a good default
+
+/* Threshold for updating the TCP window size. */
+#define TCP_WND_UPDATE_THRESHOLD    (TCP_WND/4)
 
 /* Length of the TCP send queue. Determines how many segments can be queued for sending. */
-#define TCP_SND_QUEUELEN            ((4 * (TCP_SND_BUF) + (TCP_MSS - 1)) / (TCP_MSS))
+#define TCP_SND_QUEUELEN           ((4 * TCP_SND_BUF) / TCP_MSS)
 
 /* Enable callback for network interface status changes (1). */
 #define LWIP_NETIF_STATUS_CALLBACK  1
