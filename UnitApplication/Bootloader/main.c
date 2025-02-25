@@ -10,6 +10,16 @@
 #include "metadata.h"
 
 /*******************************************************************************/
+/*                                 DEFINES                                     */
+/*******************************************************************************/
+/* Enable printf only in Debug builds */
+#ifdef DEBUG_BUILD
+    #define LOG printf
+#else /* RELEASE_BUILD or build type not defined (or defined with invalid type) */
+    #define LOG(...)
+#endif
+
+/*******************************************************************************/
 /*                             STATIC ASSERTIONS                               */
 /*******************************************************************************/
 static_assert((APP_BANK_A_START & 0xFFFF) == 0, "Bank A must be 64KB aligned");
@@ -206,23 +216,34 @@ int main()
 {
     stdio_init_all();
 
+    LOG("Bootloader started - looking for valid application...\n");
     if (!find_valid_application()) // TODO - add authentication and integrity checks
     {
+        LOG("No valid application found - entering recovery mode\n");
         //enter_recovery_mode(); TODO - implement recovery mode
         while(1) tight_loop_contents(); // For now, just loop forever
     }
 
+    LOG("Valid application found - checking for pending update...\n");
     if (ram_current_metadata.update_pending) // TODO - add version checks, anti-rollback, etc.
     {
+        LOG("Pending update found - applying update...\n");
         handle_pending_update();
     }
+    else
+    {
+        LOG("No pending update - booting application...\n");
+    }
     
+    LOG("Jumping to application...\n");
     if (ram_current_metadata.active_bank == BANK_A) 
     {
+        LOG("Going to Bank A\n");
         jump_to_application(APP_BANK_A_START);
     } 
     else 
     {
+        LOG("Going to Bank B\n");
         jump_to_application(APP_BANK_B_START);
     }
 
