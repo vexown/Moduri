@@ -35,6 +35,9 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
         return false;  /* Must be aligned to 4096-byte sectors */
     }
 
+    /* Disable interrupts during flash operations */
+    uint32_t ints = save_and_disable_interrupts();
+
     /* flash_offset - Offset into flash, in bytes, to start the erase. Must be aligned to a 4096-byte flash sector.
        size_in_bytes - How many bytes to erase. Must be a multiple of 4096 bytes (one sector) */
     flash_range_erase(flash_offset, size_in_bytes);
@@ -51,6 +54,7 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
     /* Validate offset alignment */
     if ((flash_offset & 0xFF) != 0) 
     {
+        restore_interrupts(ints);
         return false;  /* Must be aligned to 256-byte pages */
     }
 
@@ -60,6 +64,10 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
     flash_range_program(BOOT_CONFIG_START - FLASH_BASE, 
                        (const uint8_t*)aligned_buffer,
                        sizeof(boot_metadata_t)); 
+
+    /* Re-enable interrupts */
+    restore_interrupts(ints);
+
     return true;
 }
 

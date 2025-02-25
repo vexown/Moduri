@@ -7,6 +7,9 @@ add_library(metadata_obj OBJECT
     Source/initial_metadata.c
 )
 
+# Link the flash utils library to the metadata object
+target_link_libraries(metadata_obj PRIVATE flash_utils)
+
 # Specify the include directories
 target_include_directories(metadata_obj PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Include
@@ -54,8 +57,10 @@ add_custom_target(metadata ALL
 # Define the executable target for the bootloader and specify the source files
 add_executable(bootloader
     ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Source/flash_operations.c
 )
+
+# Link the flash utils library to the bootloader
+target_link_libraries(bootloader PRIVATE flash_utils)
 
 # Specify the include directories
 target_include_directories(bootloader PRIVATE

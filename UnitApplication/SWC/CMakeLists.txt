@@ -19,6 +19,9 @@ function(create_moduri_target target_name linker_script)
         ${HAL_SOURCE_FILES}
     )
 
+    # Link the flash utils library to the target
+    target_link_libraries(${target_name} PRIVATE flash_utils)
+
     # Set compile definitions if needed
     target_compile_definitions(${target_name} PRIVATE)
 
@@ -32,16 +35,26 @@ function(create_moduri_target target_name linker_script)
     )
 
     # Link libraries and dependencies
-    target_link_libraries(${target_name} 
-        pico_cyw43_arch_lwip_sys_freertos
+    target_link_libraries(${target_name} PRIVATE
+        # Core system libraries
         pico_stdlib
+        pico_cyw43_arch_lwip_sys_freertos
+        
+        # Network stack
         pico_lwip_iperf
+        
+        # Security libraries
+        pico_mbedtls
+
+        # Hardware peripherals
         hardware_i2c
         hardware_adc
         hardware_spi
         hardware_pwm
         hardware_pio
         hardware_dma
+        
+        # RTOS
         FreeRTOS-Kernel-Heap4
     )
 

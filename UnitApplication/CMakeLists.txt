@@ -66,11 +66,19 @@ project(Moduri C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+# Enable SSL support in pico-sdk
+set(PICO_ENABLE_SSL 1 CACHE INTERNAL "")
+# Set the user-defined mbedtls configuration file
+set(MBEDTLS_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/SWC/OS/Include/mbedtls_config.h" CACHE STRING "" FORCE)
+
 # Initialize the Pico SDK
 # This macro sets up the Pico SDK and prepares it for use.
 # Take note of the board configuration parameters set in https://github.com/raspberrypi/pico-sdk/blob/master/src/boards/include/boards/pico2_w.h
 message("########## pico_sdk_init macro - start ##########")
 pico_sdk_init()
+
+# Add the FlashUtils library as a common dependency
+add_subdirectory(Common/FlashUtils)
 
 # Build bootloader first
 add_subdirectory(Bootloader)
