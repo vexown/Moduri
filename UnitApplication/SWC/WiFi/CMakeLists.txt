@@ -10,6 +10,7 @@ set(WIFI_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_TCP.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_Init.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_main.c 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/WiFi_OTA_download.c
     )
 
 # Define the path to the include directory for WiFi

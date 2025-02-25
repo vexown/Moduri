@@ -31,6 +31,7 @@
 #include "WiFi_HTTP.h"
 #include "WiFi_DHCP_server.h"
 #include "WiFi_DNS_server.h"
+#include "WiFi_OTA_download.h"
 
 /* Misc includes */
 #include "Common.h"
@@ -39,8 +40,9 @@
 /*                               STATIC VARIABLES                              */
 /*******************************************************************************/
 static tcpServerType *tcpServerGlobal;
-static TCP_Client_t *clientGlobal;
+TCP_Client_t *clientGlobal;
 static SemaphoreHandle_t bufferMutex;
+static SemaphoreHandle_t tcp_data_available_semaphore = NULL;
 
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
@@ -244,6 +246,62 @@ err_t tcp_server_send(const char *data, uint16_t length)
 }
 
 #else
+
+// Function to connect TCP client
+bool tcp_client_connect(void *client, const char *host, uint16_t port) {
+    TCP_Client_t *tcpClient = (TCP_Client_t *)client;
+    ip_addr_t server_ip;
+    
+    if (ipaddr_aton(host, &server_ip) == 0) {
+        LOG("Invalid IP address: %s\n", host);
+        return false;
+    }
+    
+    err_t err = tcp_connect(tcpClient->pcb, &server_ip, port, tcp_client_connected_callback);
+    if (err != ERR_OK) {
+        LOG("Failed to connect to server: %d\n", err);
+        return false;
+    }
+
+    // Wait for connection to establish
+    uint32_t timeout = 10000; // 10 seconds timeout
+    uint32_t start = to_ms_since_boot(get_absolute_time());
+    while (!tcpClient->is_connected && !tcpClient->is_closing) {
+        if (to_ms_since_boot(get_absolute_time()) - start > timeout) {
+            LOG("Connection timeout\n");
+            return false;
+        }
+        // Give LWIP time to process
+        cyw43_arch_poll();
+        sleep_ms(10);
+    }
+    
+    return tcpClient->is_connected;
+}
+
+// Function to disconnect TCP client
+void tcp_client_disconnect(void *client) {
+    TCP_Client_t *tcpClient = (TCP_Client_t *)client;
+    
+    if (tcpClient && tcpClient->pcb) {
+        tcp_arg(tcpClient->pcb, NULL);
+        tcp_recv(tcpClient->pcb, NULL);
+        tcp_err(tcpClient->pcb, NULL);
+        tcp_sent(tcpClient->pcb, NULL);
+        
+        err_t err = tcp_close(tcpClient->pcb);
+        if (err != ERR_OK) {
+            LOG("Error closing TCP connection: %d\n", err);
+            // Force abort if close failed
+            tcp_abort(tcpClient->pcb);
+        }
+        
+        tcpClient->pcb = NULL;
+        tcpClient->is_connected = false;
+        tcpClient->is_closing = false;
+    }
+}
+
 /* 
  * Function: start_TCP_client
  * 
@@ -269,7 +327,20 @@ bool start_TCP_client(void)
         LOG("Failed to create mutex\n");
         status = false;
     }
-    
+
+    // Wait for connection to establish
+    int timeout = 100;  // 10 seconds (100 * 100ms)
+    while (!clientGlobal->is_connected && timeout > 0) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+        timeout--;
+    }
+    if (!clientGlobal->is_connected) {
+        LOG("TCP connection timed out\n");
+        status = false;
+    } else {
+        LOG("TCP connection established\n");
+    }
+        
     return status;
 }
 
@@ -332,7 +403,7 @@ err_t tcp_client_send(const char *data, uint16_t length) {
 void tcp_client_process_recv_message(uint8_t *received_command) 
 {
     // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
     {
         // Access the receive buffer
         uint8_t *buffer = clientGlobal->receive_buffer;
@@ -733,60 +804,50 @@ static bool tcp_server_open(void)
  *            (e.g., ERR_MEM if the received data exceeds the buffer size 
  *            or other error codes related to handling the incoming data).
  */
-static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb,
-                                    struct pbuf *p, err_t err) {
-    TCP_Client_t *client = (TCP_Client_t*)arg;
+static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err) {
+    TCP_Client_t* client = (TCP_Client_t*)arg;
     
-    // Check if connection closed by remote host
     if (p == NULL) {
+        // Connection closed by remote host
         client->is_connected = false;
         return ERR_OK;
     }
-    
-    // Handle receive error
+
     if (err != ERR_OK) {
         pbuf_free(p);
         return err;
     }
 
-    // Check if received data fits our buffer
-    if (p->tot_len > TCP_RECV_BUFFER_SIZE) {
-        pbuf_free(p);
-        return ERR_MEM;
-    }
-
-    // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
-    {
-        // Copy received data to our buffer
-        memcpy(client->receive_buffer, p->payload, p->tot_len);
-        client->receive_length = p->tot_len;
-        client->receive_buffer[p->tot_len] = '\0';  // Null terminate, assuming the received data will be used as string
-
-        // Print received data (for testing)
-        //LOG("Received: %s\n", client->receive_buffer);
-
-#if (HTTP_ENABLED == ON)
-        // Process the HTTP response
-        //process_HTTP_response(arg, client->receive_buffer, client->receive_length, tpcb); TODO - implement HTTP response processing for TCP client
-#endif
-        // Release the mutex after finishing with the buffer
+    // Handle incoming data
+    if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+        if (p->tot_len + client->receive_length <= TCP_RECV_BUFFER_SIZE) {
+            // Copy data from pbuf to our buffer
+            pbuf_copy_partial(p, client->receive_buffer + client->receive_length, p->tot_len, 0);
+            client->receive_length += p->tot_len;
+            
+            LOG("Appended %d bytes to receive_buffer, total %d\n", 
+                p->tot_len, client->receive_length);
+            
+            // Signal that data is available
+            xSemaphoreGive(tcp_data_available_semaphore);
+        } 
+        else 
+        {
+            LOG("Receive buffer overflow: %d + %d > %d\n", 
+                client->receive_length, p->tot_len, TCP_RECV_BUFFER_SIZE);
+        }
+        
         xSemaphoreGive(bufferMutex);
-    } 
-    else 
-    {
-        LOG("Failed to take mutex\n");
     }
-
+    
+    // Always acknowledge the data
+    tcp_recved(tpcb, p->tot_len);
+    
     // Free the pbuf
     pbuf_free(p);
-
-    // Send acknowledgment to tcp
-    tcp_recved(tpcb, p->tot_len);
-
+    
     return ERR_OK;
 }
-
 /* 
  * Function: tcp_client_connected_callback
  * 
@@ -849,10 +910,19 @@ TCP_Client_t* tcp_client_init(void) {
         return NULL;
     }
 
+    tcp_data_available_semaphore = xSemaphoreCreateBinary();
+    if (tcp_data_available_semaphore == NULL) 
+    {
+        LOG("Failed to create semaphore\n");
+        vPortFree(client);
+        return NULL;
+    }
+
     // Initialize client structure
     client->pcb = NULL;
     client->receive_length = 0;
     client->is_connected = false;
+    client->is_closing = false;
 
     // Create new TCP PCB
     client->pcb = tcp_new();
@@ -865,15 +935,19 @@ TCP_Client_t* tcp_client_init(void) {
     // Set client structure as argument for callbacks
     tcp_arg(client->pcb, client);
 
+#if (OTA_ENABLED == ON)
+    // Set up the TCP client to connect to the external server
+    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
+#else
     // Convert server IP string to IP address structure
     ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &server_ip);
-
     // Connect to server
-#if (HTTP_ENABLED == ON)
-    err_t err = tcp_connect(client->pcb, &server_ip, TCP_HTTP_PORT, tcp_client_connected_callback);
-#else
     err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
 #endif
+
+
     if (err != ERR_OK) {
         LOG("TCP connect failed: %d\n", err);
         tcp_close(client->pcb);
@@ -882,6 +956,84 @@ TCP_Client_t* tcp_client_init(void) {
     }
 
     return client;
+}
+
+// Custom send function for Mbed TLS
+int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len) 
+{
+    TCP_Client_t *client = (TCP_Client_t *)ctx;
+
+    // Check if the client is valid and connected
+    if (client == NULL || !client->is_connected || client->pcb == NULL) {
+        LOG("Cannot send - client not connected\n");
+        return MBEDTLS_ERR_NET_SEND_FAILED;
+    }
+
+    // Use your existing tcp_client_send function
+    err_t err = tcp_client_send((const char *)buf, len);
+    if (err != ERR_OK) {
+        LOG("tcp_client_send failed: %d\n", err);
+        return MBEDTLS_ERR_NET_SEND_FAILED;
+    }
+
+    // Since tcp_client_send doesn't return bytes sent, assume full send on success
+    // Note: lwIP's tcp_write is non-blocking, but tcp_output flushes, so this is usually safe
+    LOG("Sent %u bytes\n", len); 
+    return (int)len;
+}
+
+// Custom receive function for Mbed TLS
+int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
+    TCP_Client_t *client = (TCP_Client_t*)ctx;
+    size_t bytes_to_read = 0;
+    TickType_t start_time = xTaskGetTickCount();
+    
+    // Wait for data with timeout (5 seconds)
+    while (bytes_to_read == 0) {
+        // Check for timeout
+        if ((xTaskGetTickCount() - start_time) > pdMS_TO_TICKS(5000)) {
+            return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_TIMEOUT;
+        }
+        
+        // Check if connection closed
+        if (!client->is_connected || client->is_closing) {
+            return MBEDTLS_ERR_NET_CONN_RESET;
+        }
+        
+        // Check if we already have data in the buffer
+        if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            if (client->receive_length > 0) {
+                // Copy data to caller's buffer
+                bytes_to_read = client->receive_length > len ? len : client->receive_length;
+                memcpy(buf, client->receive_buffer, bytes_to_read);
+                
+                // If there's more data left, move it to the beginning of the buffer
+                if (bytes_to_read < client->receive_length) {
+                    memmove(client->receive_buffer, 
+                            client->receive_buffer + bytes_to_read, 
+                            client->receive_length - bytes_to_read);
+                    client->receive_length -= bytes_to_read;
+                    
+                    // Signal that there's still data available
+                    xSemaphoreGive(tcp_data_available_semaphore);
+                } else {
+                    // All data consumed - reset buffer
+                    client->receive_length = 0;
+                }
+            }
+            xSemaphoreGive(bufferMutex);
+        }
+        
+        // If no data was read and we need to wait
+        if (bytes_to_read == 0) {
+            // Wait for data notification
+            if (xSemaphoreTake(tcp_data_available_semaphore, pdMS_TO_TICKS(100)) != pdTRUE) {
+                // No data yet, continue waiting loop
+            }
+        }
+    }
+    
+    return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_WANT_READ;
 }
 
 #endif

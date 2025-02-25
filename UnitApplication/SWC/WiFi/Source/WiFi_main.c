@@ -21,9 +21,15 @@
 #include "WiFi_UDP.h"
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
+#include "WiFi_OTA_download.h"
 
 /* OS includes */
 #include "OS_manager.h"
+
+/* Flash includes */
+#include "flash_layout.h"
+#include "flash_operations.h"
+#include "metadata.h"
 
 /* Misc includes */
 #include "Common.h"
@@ -47,7 +53,8 @@ typedef enum {
     INIT = 0,
     LISTENING = 1,
     ACTIVE_SEND_AND_RECEIVE = 2,
-    MONITOR = 3
+    MONITOR = 3,
+    UPDATE = 4
 } WiFiStateType;
 
 /*******************************************************************************/
@@ -72,6 +79,7 @@ static void WiFi_ListenState(void);
 static void WiFi_ActiveState(void);
 static void WiFi_MonitorState(void);
 static void WiFi_InitCommunication(void);
+static void WiFi_UpdateState(void);
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -102,6 +110,9 @@ void WiFi_MainFunction(void)
             break;
         case MONITOR:
             WiFi_MonitorState();
+            break;
+        case UPDATE:
+            WiFi_UpdateState();
             break;
         default: /* INIT */
             WiFi_InitCommunication();
@@ -146,6 +157,10 @@ static void WiFi_ProcessCommand(uint8_t command)
         case PICO_TRANSITION_TO_MONITOR_MODE:
             LOG("Transitioning to Monitor Mode...\n");
             WiFiState = MONITOR;
+            break;
+        case PICO_TRANSITION_TO_UPDATE_MODE:
+            LOG("Transitioning to Update Mode...\n");
+            WiFiState = UPDATE;
             break;
         default:
             LOG("Command not supported \n");
@@ -328,7 +343,65 @@ static void WiFi_InitCommunication(void)
     }
 }
 
+static void WiFi_UpdateState(void)
+{
+    LOG("Initiating firmware download...\n");
+    int download_result = download_firmware();
+    
+    if (download_result == 0) 
+    {
+        LOG("Firmware download successful, preparing to apply update\n");
+        
+        /* Set the update pending flag in metadata */
+        boot_metadata_t current_metadata;
+        if (read_metadata_from_flash(&current_metadata)) 
+        {
+            current_metadata.update_pending = true;
+            if (write_metadata_to_flash(&current_metadata)) 
+            {
+                /* Verify the write by reading back */
+                boot_metadata_t verify_metadata;
+                read_metadata_from_flash(&verify_metadata);
+                LOG("Metadata written to flash: active bank %d, update pending %d\n", verify_metadata.active_bank, verify_metadata.update_pending);
+            }
+            else
+            {
+                LOG("Failed to write metadata to flash\n");
+            }
+        }
+        else 
+        {
+            LOG("Failed to read metadata from flash or it is corrupted\n");
+            /* Attempt to recover by erasing the metadata and writing a clean one */
+            current_metadata.magic = BOOT_METADATA_MAGIC;
+            current_metadata.active_bank = BANK_A;
+            current_metadata.version = 0;
+            current_metadata.app_size = 0;
+            current_metadata.app_crc = 0;
+            current_metadata.update_pending = true;
+            current_metadata.boot_attempts = 0;
 
+            write_metadata_to_flash(&current_metadata);
+        }
+        //restart_device(); //TODO - implement restart_device function
+
+        while(1)
+        { /* should never reach here - update should be applied and device restarted */
+            tight_loop_contents(); 
+        }
+        
+    } 
+    else if (download_result > 0) 
+    {
+        LOG("Partial firmware download (%d bytes). Aborting the update. \n", download_result); //TODO - add retry mechanism
+        WiFiState = LISTENING;
+    } 
+    else 
+    {
+        LOG("Failed to download firmware: error %d\n", download_result); //TODO - add retry mechanism
+        WiFiState = LISTENING;
+    }
+}
 
 
 
