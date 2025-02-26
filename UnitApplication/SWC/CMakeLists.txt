@@ -6,6 +6,7 @@ add_subdirectory(Misc)
 add_subdirectory(WiFi)
 add_subdirectory(Monitor)
 add_subdirectory(HAL)
+add_subdirectory(Drivers)
 add_subdirectory(PIO)
 
 # Helper function to create a moduri target for a given bank
@@ -17,6 +18,7 @@ function(create_moduri_target target_name linker_script)
         ${WIFI_SOURCE_FILES}
         ${MONITOR_SOURCE_FILES}
         ${HAL_SOURCE_FILES}
+        ${DRIVERS_SOURCE_FILES}
     )
 
     # Link the flash utils library to the target
@@ -32,6 +34,7 @@ function(create_moduri_target target_name linker_script)
         ${WIFI_INCLUDE_DIR}
         ${MONITOR_INCLUDE_DIR}
         ${HAL_INCLUDE_DIR}
+        ${DRIVERS_INCLUDE_DIR}
     )
 
     # Link libraries and dependencies
