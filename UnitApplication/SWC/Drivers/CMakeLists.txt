@@ -1,8 +1,14 @@
 message("########## Drivers/CMakeLists.txt - start ##########")
 
+# Enable C++ support
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Define the path to the source files for Drivers
 set(DRIVERS_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/SSD1306_HAL.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/MMC56x3.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/MMC56x3_wrapper.cpp
     )
 
 # Define the path to the include directory for Drivers
