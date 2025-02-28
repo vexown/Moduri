@@ -44,20 +44,32 @@
 /* Expected product ID */
 #define MMC56X3_PRODUCT_ID 0x10
 
+/* Class definition (defines a cohesive unit composed of data (member variables) and functions (member methods)) */
 class MMC56x3 
 {
+    /* Public section contains members that can be accessed from outside the class 
+       This is part of C++ encapsulation - controlling access to class members */
     public:
-        /* Structure to hold magnetometer data */
-        struct MagData {
+
+        /*******************************  Nested structure declaration  *******************************/
+        /* Structure to hold magnetometer data 
+        In C++, you can define types within classes to logically group them together */
+        struct MagData 
+        {
             float x;
             float y;
             float z;
             float temperature;
         };
 
-        /* Constructor */
+        /*******************************  Constructor declaration  *******************************/
+
+        /* Constructor declaration 
+           It's a special function that gets called when creating objects (defined outside the class) 
+           The function name must match the class name exactly. Constructor has no return type (not even void) */
         MMC56x3(i2c_inst_t* i2c_instance, uint8_t address = MMC56X3_I2C_ADDR);
 
+        /*******************************  Member function declarations  *******************************/
         /* Initialize the sensor */
         bool begin();
 
@@ -80,11 +92,16 @@ class MMC56x3
         void setContinuousMode(bool mode);
         bool isContinuousMode();
 
+    /* Private section contains members that can only be accessed from within the class
+       This hides implementation details and protects data from accidental modification */
     private:
+        /* Member variables (attributes/fields) that store the object's state
+           The underscore prefix (_) is a common convention to distinguish member variables */
         i2c_inst_t* _i2c;
         uint8_t _addr;
         uint8_t _ctrl2_cache;
         
+        /* Private helper functions  - internal implementation that users don't need to see */
         bool readRegister(uint8_t reg, uint8_t* data);
         bool writeRegister(uint8_t reg, uint8_t data);
         bool readRegisters(uint8_t reg, uint8_t* data, size_t length);

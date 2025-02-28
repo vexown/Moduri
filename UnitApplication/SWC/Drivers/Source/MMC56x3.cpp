@@ -4,9 +4,13 @@
 #include <cmath>
 #include <cstdio>
 
-MMC56x3::MMC56x3(i2c_inst_t* i2c_instance, uint8_t address) : 
-    _i2c(i2c_instance), _addr(address), _ctrl2_cache(0) 
-{/* Do nothing, just initialize members */}
+/* Constructor definition */
+MMC56x3::MMC56x3(i2c_inst_t* i2c_instance, uint8_t address) :
+    /* Initialize members (runs before constructor body) */
+    _i2c(i2c_instance), 
+    _addr(address),
+    _ctrl2_cache(0) 
+{/* Do nothing */}
 
 bool MMC56x3::begin() 
 {
@@ -41,21 +45,21 @@ bool MMC56x3::begin()
 
 void MMC56x3::reset() 
 {
-    // Perform software reset
+    /* Perform software reset */
     writeRegister(MMC56X3_REG_CTRL1, MMC56X3_CTRL1_SW_RST);
-    sleep_ms(20); // Wait for reset to complete
+    sleep_ms(20); // Wait for reset to complete 
     
-    // Reset cache values
+    /* Reset cache values */
     _ctrl2_cache = 0;
 }
 
 void MMC56x3::magnetSetReset() 
 {
-    // Set magnetization
+    /* Set magnetization */
     writeRegister(MMC56X3_REG_CTRL0, MMC56X3_CTRL_SET);
     sleep_ms(1);
     
-    // Reset magnetization
+    /* Reset magnetization */
     writeRegister(MMC56X3_REG_CTRL0, MMC56X3_CTRL_RESET);
     sleep_ms(1);
 }
