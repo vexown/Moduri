@@ -196,9 +196,9 @@ bool MMC56x3::readData(MagData& data)
     }
     
     /* Combine bytes to make 20-bit values for X, Y, Z */
-    x_raw = ((uint32_t)buffer[0] << 12) | ((uint32_t)buffer[1] << 4) | (buffer[6] >> 4);
-    y_raw = ((uint32_t)buffer[2] << 12) | ((uint32_t)buffer[3] << 4) | (buffer[7] >> 4);
-    z_raw = ((uint32_t)buffer[4] << 12) | ((uint32_t)buffer[5] << 4) | (buffer[8] >> 4);
+    x_raw = ((uint32_t)buffer[0] << 12) | ((uint32_t)buffer[1] << 4) | ((buffer[6] & 0xF0) >> 4);
+    y_raw = ((uint32_t)buffer[2] << 12) | ((uint32_t)buffer[3] << 4) | ((buffer[7] & 0xF0) >> 4);
+    z_raw = ((uint32_t)buffer[4] << 12) | ((uint32_t)buffer[5] << 4) | ((buffer[8] & 0xF0) >> 4);
     
     /* Fix center offsets */
     x_raw -= (uint32_t)1 << 19;
@@ -210,6 +210,12 @@ bool MMC56x3::readData(MagData& data)
     data.x = (float)x_raw * scaling;
     data.y = (float)y_raw * scaling;
     data.z = (float)z_raw * scaling;
+
+    /* Safety check for unreasonable values (emprically determined, change as needed) */
+    const float MAX_REASONABLE_FIELD = 1000.0f;
+    if (fabs(data.x) > MAX_REASONABLE_FIELD) data.x = 0.0f;
+    if (fabs(data.y) > MAX_REASONABLE_FIELD) data.y = 0.0f;
+    if (fabs(data.z) > MAX_REASONABLE_FIELD) data.z = 0.0f;
     
     /* Read temperature too */
     data.temperature = readTemperature();
