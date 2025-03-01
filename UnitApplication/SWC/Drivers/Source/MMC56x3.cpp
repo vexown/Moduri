@@ -211,8 +211,8 @@ bool MMC56x3::readData(MagData& data)
     data.y = (float)y_raw * scaling;
     data.z = (float)z_raw * scaling;
 
-    /* Safety check for unreasonable values (emprically determined, change as needed) */
-    const float MAX_REASONABLE_FIELD = 1000.0f;
+    /* Safety check for unreasonable values */
+    const float MAX_REASONABLE_FIELD = 3277.0f;  // ±3277 µT is the actual sensor range
     if (fabs(data.x) > MAX_REASONABLE_FIELD) data.x = 0.0f;
     if (fabs(data.y) > MAX_REASONABLE_FIELD) data.y = 0.0f;
     if (fabs(data.z) > MAX_REASONABLE_FIELD) data.z = 0.0f;
