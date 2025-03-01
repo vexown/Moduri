@@ -152,7 +152,7 @@ float MMC56x3::readTemperature()
 
 bool MMC56x3::readData(MagData& data) 
 {
-    uint32_t x_raw, y_raw, z_raw;
+    int32_t x_raw, y_raw, z_raw;
     
     /* If not in continuous mode, trigger a measurement */
     if (!isContinuousMode()) 
@@ -196,14 +196,14 @@ bool MMC56x3::readData(MagData& data)
     }
     
     /* Combine bytes to make 20-bit values for X, Y, Z */
-    x_raw = ((uint32_t)buffer[0] << 12) | ((uint32_t)buffer[1] << 4) | ((buffer[6] & 0xF0) >> 4);
-    y_raw = ((uint32_t)buffer[2] << 12) | ((uint32_t)buffer[3] << 4) | ((buffer[7] & 0xF0) >> 4);
-    z_raw = ((uint32_t)buffer[4] << 12) | ((uint32_t)buffer[5] << 4) | ((buffer[8] & 0xF0) >> 4);
+    x_raw = ((int32_t)buffer[0] << 12) | ((int32_t)buffer[1] << 4) | ((buffer[6] & 0xF0) >> 4);
+    y_raw = ((int32_t)buffer[2] << 12) | ((int32_t)buffer[3] << 4) | ((buffer[7] & 0xF0) >> 4);
+    z_raw = ((int32_t)buffer[4] << 12) | ((int32_t)buffer[5] << 4) | ((buffer[8] & 0xF0) >> 4);
     
     /* Fix center offsets */
-    x_raw -= (uint32_t)1 << 19;
-    y_raw -= (uint32_t)1 << 19;
-    z_raw -= (uint32_t)1 << 19;
+    x_raw -= (int32_t)1 << 19;
+    y_raw -= (int32_t)1 << 19;
+    z_raw -= (int32_t)1 << 19;
     
     /* Convert to microtesla (scaling factor 0.00625 µT/LSB per datasheet) */
     const float scaling = 0.00625f;
