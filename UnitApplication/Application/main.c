@@ -100,4 +100,3 @@ static void setupHardware(void)
 {
     stdio_init_all();
 }
-

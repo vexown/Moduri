@@ -69,7 +69,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Enable SSL support in pico-sdk
 set(PICO_ENABLE_SSL 1 CACHE INTERNAL "")
 # Set the user-defined mbedtls configuration file
-set(MBEDTLS_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/SWC/OS/Include/mbedtls_config.h" CACHE STRING "" FORCE)
+set(MBEDTLS_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Application/OS/Include/mbedtls_config.h" CACHE STRING "" FORCE)
 
 # Initialize the Pico SDK
 # This macro sets up the Pico SDK and prepares it for use.
@@ -84,6 +84,6 @@ add_subdirectory(Common/FlashUtils)
 add_subdirectory(Bootloader)
 
 # Then build main application
-add_subdirectory(SWC)
+add_subdirectory(Application)
 
 message("########## TOP CMakeLists.txt - end ##########")
