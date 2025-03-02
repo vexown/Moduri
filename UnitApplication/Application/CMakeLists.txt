@@ -1,5 +1,10 @@
 message("########## Application/Standard CMakeLists.txt - start ##########")
 
+# Define the main source file with a default value (original application main.c)
+# This is used to give a possibility to the user to change the main.c source file to a one from Examples folder by calling a special build command
+set(MAIN_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/main.c" CACHE FILEPATH "Path to the main.c file to use")
+message(STATUS "Using main source: ${MAIN_SOURCE}")
+
 # Add subdirectories of the Software Components
 add_subdirectory(OS)
 add_subdirectory(Misc)
@@ -12,7 +17,7 @@ add_subdirectory(PIO)
 # Helper function to create a moduri target for a given bank
 function(create_moduri_target target_name linker_script)
     add_executable(${target_name}
-        main.c
+        ${MAIN_SOURCE} 
         ${OS_SOURCE_FILES}
         ${MISC_SOURCE_FILES}
         ${WIFI_SOURCE_FILES}

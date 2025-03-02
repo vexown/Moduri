@@ -9,11 +9,18 @@
 # 1. Checks if the 'build' directory exists and creates it if not.
 # 2. Configures the build directory by running CMake.
 # 3. Builds the project using CMake.
-# 4. Prompts the user to press 'X' or 'x' to exit the script.
+# 4. Copies output files to the output directory.
+# 5. Prompts the user to press any key to exit the script.
 #
 # Usage:
-# Run this script from the root directory of the project. It assumes that
-# CMake is installed and available in the system PATH.
+# Run this script from the root directory of the project:
+#   ./Build.sh                          # Build the default application
+#   ./Build.sh --clean                  # Clean and rebuild
+#   ./Build.sh --example=list           # List available examples
+#   ./Build.sh --example=ExampleName    # Build a specific example
+#   ./Build.sh --clean --example=ExampleName  # Clean and build an example
+#
+# The script assumes that CMake is installed and available in the system PATH.
 #
 # ****************************************************************************
 
@@ -28,15 +35,30 @@ echo "Building all components with CMake"
 
 # Parse command line arguments
 CLEAN_BUILD=0
+EXAMPLE_NAME=""
+
 for arg in "$@"
 do
-    case $arg in
-        --clean)
+    # Check for --clean flag
+    if [[ "$arg" == "--clean" ]]; then
         CLEAN_BUILD=1
-        shift # Remove --clean from processing
-        ;;
-    esac
+    fi
+    
+    # Check for --example flag with value
+    if [[ "$arg" == --example=* ]]; then
+        EXAMPLE_NAME="${arg#*=}"
+    fi
 done
+
+# List available examples if requested
+if [[ "$EXAMPLE_NAME" == "list" ]]; then
+    echo "Available examples:"
+    for dir in Examples/*/; do
+        basename "$dir"
+    done
+    echo "To build an example: ./Build.sh --example=<example_name>"
+    exit 0
+fi
 
 # Handle clean build if requested
 if [ $CLEAN_BUILD -eq 1 ]; then
@@ -59,13 +81,28 @@ fi
 echo "Configuring the build directory..."
 cd build
 
+# Set CMake arguments based on whether an example is selected
+CMAKE_ARGS=".."
+
+# Check if an example was specified
+if [[ ! -z "$EXAMPLE_NAME" ]]; then
+    if [[ -f "../Examples/$EXAMPLE_NAME/main.c" ]]; then
+        echo "Building with example: $EXAMPLE_NAME"
+        # Add the MAIN_SOURCE parameter to CMake arguments
+        CMAKE_ARGS="$CMAKE_ARGS -DMAIN_SOURCE=../Examples/$EXAMPLE_NAME/main.c"
+    else
+        echo "Warning: Example '$EXAMPLE_NAME' not found. Using default main.c"
+        echo "Run ./Build.sh --example=list to see available examples"
+    fi
+fi
+
 # Run CMake to configure the build system
 # This command generates the necessary build files in the 'build' directory.
 # These files include:
 # - Makefiles or project files for the chosen build system (e.g., Make, Ninja, Visual Studio).
 # - Configuration files that define how the project should be built.
 # - Dependency files that track which files need to be recompiled when changes are made.
-cmake ..
+cmake $CMAKE_ARGS
 
 # Build the project using the generated build files
 # This command compiles the project based on the configuration done by the previous cmake command.
