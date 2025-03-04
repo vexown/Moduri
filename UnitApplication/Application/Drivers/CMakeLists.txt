@@ -9,6 +9,7 @@ set(DRIVERS_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/SSD1306_HAL.c
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/MMC56x3.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/MMC56x3_wrapper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/UBLOX_GPS_HAL.c
     )
 
 # Define the path to the include directory for Drivers
