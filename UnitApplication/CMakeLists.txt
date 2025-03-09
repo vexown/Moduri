@@ -66,6 +66,9 @@ project(Moduri C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+# Export the compile commands for analysis and use by other tools
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Enable SSL support in pico-sdk
 set(PICO_ENABLE_SSL 1 CACHE INTERNAL "")
 # Set the user-defined mbedtls configuration file
