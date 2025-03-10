@@ -515,9 +515,7 @@ extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
 #define configNUMBER_OF_CORES                     1
 
 /* configTICK_CORE indicates which core should handle the SysTick interrupts */
-#if (configNUMBER_OF_CORES > 1)
-#define configTICK_CORE                         0
-#endif
+#define configTICK_CORE                           0
 
 /* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), set
  * configRUN_MULTIPLE_PRIORITIES to 0 to allow multiple tasks to run
