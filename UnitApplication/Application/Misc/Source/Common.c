@@ -68,7 +68,7 @@ void vAssertCalled( const char *pcFile, uint32_t ulLine )
     number in the source file. The pcFile and ulLine values can be printed
     out, or otherwise recorded, before the following infinite loop is
     entered. (TODO, for now just printing but consider other ways of sending/storing this error info) */
-    printf("Assertion failed in file: %s at line: %u\n", pcFile, ulLine);
+    printf("Assertion failed in file: %s at line: %u\n", pcFile, (unsigned int)ulLine);
 
     /* Disable interrupts so the tick interrupt stops executing, then sit in a
     loop so execution does not move past the line that failed the assertion. */
