@@ -43,8 +43,8 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
     flash_range_erase(flash_offset, size_in_bytes);
     
     /*******************  Program metadata sector *****************/
-    /* Calculate aligned size for programming */
-    uint32_t aligned_size = ((sizeof(boot_metadata_t) + 255) & ~255);  // Round up to next 256-byte boundary
+    /* Calculate aligned size for programming - due to flash_range_program() requirement it must be a multiple of 256 bytes (one page) */
+    uint32_t aligned_size = ((sizeof(boot_metadata_t) + 255u) / 256u) * 256u; // Per C11 §6.3.1.4p1: floating-to-integer conversion truncates toward zero
 
     /* Prepare aligned buffer */
     uint8_t aligned_buffer[aligned_size];
@@ -63,7 +63,7 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
        size_in_bytes - Must be a multiple of 256 bytes (one page) */
     flash_range_program(BOOT_CONFIG_START - FLASH_BASE, 
                        (const uint8_t*)aligned_buffer,
-                       sizeof(boot_metadata_t)); 
+                       aligned_size); 
 
     /* Re-enable interrupts */
     restore_interrupts(ints);
