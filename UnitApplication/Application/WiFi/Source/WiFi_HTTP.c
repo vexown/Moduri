@@ -24,7 +24,9 @@
 /*******************************************************************************/
 /*                               STATIC VARIABLES                              */
 /*******************************************************************************/
+#if (HTTP_ENABLED == ON)
 static char response[2048]; // 2kB response buffer for HTTP GET requests. This will be stored in RAM in the .bss section.
+#endif
 
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
