@@ -233,6 +233,10 @@ bool udp_client_send(const char* message)
  */
 static void udp_receive_callback(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port) 
 {
+    /* Unused parameters, but required for the callback signature */
+    (void)arg;
+    (void)pcb;
+
     if (p != NULL) 
     {
         // Wait for the mutex before accessing the buffer
@@ -294,7 +298,15 @@ static bool udp_send_message(const char *message, const ip_addr_t *dest_addr)
         return false;
     }
     
-    size_t message_len = strlen(message);
+    size_t requested_message_len = strlen(message);
+    
+    // Validate message length fits in uint16_t
+    if (requested_message_len > UINT16_MAX) {
+        LOG("UDP message too long (%zu bytes, maximum is %u)\n", requested_message_len, UINT16_MAX);
+        return false;
+    }
+    
+    uint16_t message_len = (uint16_t)requested_message_len;
     struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT, message_len, PBUF_RAM);
     
     if (!p) {
