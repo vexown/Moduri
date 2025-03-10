@@ -130,7 +130,9 @@ static void monitorTask(__unused void *taskParams);
 /*******************************************************************************/
 /* .uninitialized_data section is placed in RAM and is not initialized on startup (so-called no-init RAM)
  * Its content persists over SOFT resets, but not over HARD resets (power cycle) */
+#if (WATCHDOG_ENABLED == ON)
 static uint8_t watchdogResetCount __attribute__((section(".uninitialized_data")));
+#endif
 
 /*******************************************************************************/
 /*                             GLOBAL VARIABLES                                */
