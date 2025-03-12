@@ -10,6 +10,7 @@
 /* Standard includes. */
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 /* Kernel includes */
 #include "FreeRTOS.h"
@@ -76,7 +77,6 @@ static absolute_time_t stats_start_time;
 void Monitor_MainFunction(void)
 {
     static SystemStats_t stats;
-    static uint32_t prevTotalRunTime;
     static configRUN_TIME_COUNTER_TYPE totalRunTime;
     static UBaseType_t arraySize, populatedArraySize;
     
@@ -88,7 +88,6 @@ void Monitor_MainFunction(void)
     stats.currentNumOfTasks = arraySize;
     totalRunTime = 0;
     populatedArraySize = uxTaskGetSystemState(taskStatusArray, MAX_NUM_OF_TASKS, &totalRunTime); // returns 0 if if the MAX_NUM_OF_TASKS is too small 
-    prevTotalRunTime = totalRunTime;
     
     /* If WiFi State Machine is in Monitoring mode send stats via TCP, otherwise simply LOG them */
     if(ulTaskNotifyTake(pdTRUE, NO_TIMEOUT) == pdFALSE) //clear Notification on read, move on immediately if there is no Notifications  
@@ -103,7 +102,7 @@ void Monitor_MainFunction(void)
         LOG("Number of successfull vPortFree calls %u \n",                stats.heap_stats.xNumberOfSuccessfulFrees);
 
         LOG("\n=== Task Statistics ===\n");
-        LOG("Number of Tasks: %u\n", stats.currentNumOfTasks);
+        LOG("Number of Tasks: %lu\n", stats.currentNumOfTasks);
         LOG("Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
 
         for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
@@ -117,10 +116,11 @@ void Monitor_MainFunction(void)
                 case eBlocked:   taskState = 'B'; break;
                 case eSuspended: taskState = 'S'; break;
                 case eDeleted:   taskState = 'D'; break;
+                case eInvalid:   taskState = 'I'; break;
             }
             
             /* Print all the relevant stats for the given Task */
-            LOG("%-16s%c\t%u\t%u\t\t%u\n",
+            LOG("%-16s%c\t%lu\t%lu\t\t%lu\n",
                     taskStatusArray[task_num].pcTaskName,
                     taskState,
                     taskStatusArray[task_num].uxCurrentPriority,
@@ -136,37 +136,37 @@ void Monitor_MainFunction(void)
         char buffer[256];
 
         snprintf(buffer, sizeof(buffer), "\n=== System Statistics ===\n");
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Available Heap Space (sum of free blocks): %u bytes\n", stats.heap_stats.xAvailableHeapSpaceInBytes);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Largest Free Block: %u bytes\n", stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Smallest Free Block: %u bytes\n", stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of Free Blocks: %u\n", stats.heap_stats.xNumberOfFreeBlocks);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful pvPortMalloc calls: %u\n", stats.heap_stats.xNumberOfSuccessfulAllocations);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful vPortFree calls: %u\n", stats.heap_stats.xNumberOfSuccessfulFrees);
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "\n=== Task Statistics ===\n");
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
-        snprintf(buffer, sizeof(buffer), "Number of Tasks: %u\n", stats.currentNumOfTasks);
-        tcp_server_send(buffer, strlen(buffer));
+        snprintf(buffer, sizeof(buffer), "Number of Tasks: %lu\n", stats.currentNumOfTasks);
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 
         for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
         {
@@ -179,55 +179,56 @@ void Monitor_MainFunction(void)
                 case eBlocked:   taskState = 'B'; break;
                 case eSuspended: taskState = 'S'; break;
                 case eDeleted:   taskState = 'D'; break;
+                case eInvalid:   taskState = 'I'; break;
             }
             
             /* Format and send task statistics */
-            snprintf(buffer, sizeof(buffer), "%-16s%c\t%u\t%u\t\t%u\n",
+            snprintf(buffer, sizeof(buffer), "%-16s%c\t%lu\t%lu\t\t%lu\n",
                     taskStatusArray[task_num].pcTaskName,
                     taskState,
                     taskStatusArray[task_num].uxCurrentPriority,
                     taskStatusArray[task_num].usStackHighWaterMark,
                     taskStatusArray[task_num].xTaskNumber);
-            tcp_server_send(buffer, strlen(buffer));
+            tcp_server_send(buffer, (uint16_t)strlen(buffer));
         }
 
         snprintf(buffer, sizeof(buffer), "\n");
-        tcp_server_send(buffer, strlen(buffer));
+        tcp_server_send(buffer, (uint16_t)strlen(buffer));
 #else
         char buffer[256];
 
         snprintf(buffer, sizeof(buffer), "\n=== System Statistics ===\n");
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Available Heap Space (sum of free blocks): %u bytes\n", stats.heap_stats.xAvailableHeapSpaceInBytes);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Largest Free Block: %u bytes\n", stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Smallest Free Block: %u bytes\n", stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of Free Blocks: %u\n", stats.heap_stats.xNumberOfFreeBlocks);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful pvPortMalloc calls: %u\n", stats.heap_stats.xNumberOfSuccessfulAllocations);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful vPortFree calls: %u\n", stats.heap_stats.xNumberOfSuccessfulFrees);
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "\n=== Task Statistics ===\n");
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
-        snprintf(buffer, sizeof(buffer), "Number of Tasks: %u\n", stats.currentNumOfTasks);
-        tcp_client_send(buffer, strlen(buffer));
+        snprintf(buffer, sizeof(buffer), "Number of Tasks: %lu\n", stats.currentNumOfTasks);
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 
         for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
         {
@@ -240,20 +241,21 @@ void Monitor_MainFunction(void)
                 case eBlocked:   taskState = 'B'; break;
                 case eSuspended: taskState = 'S'; break;
                 case eDeleted:   taskState = 'D'; break;
+                case eInvalid:   taskState = 'I'; break;
             }
             
             /* Format and send task statistics */
-            snprintf(buffer, sizeof(buffer), "%-16s%c\t%u\t%u\t\t%u\n",
+            snprintf(buffer, sizeof(buffer), "%-16s%c\t%lu\t%lu\t\t%lu\n",
                     taskStatusArray[task_num].pcTaskName,
                     taskState,
                     taskStatusArray[task_num].uxCurrentPriority,
                     taskStatusArray[task_num].usStackHighWaterMark,
                     taskStatusArray[task_num].xTaskNumber);
-            tcp_client_send(buffer, strlen(buffer));
+            tcp_client_send(buffer, (uint16_t)strlen(buffer));
         }
 
         snprintf(buffer, sizeof(buffer), "\n");
-        tcp_client_send(buffer, strlen(buffer));
+        tcp_client_send(buffer, (uint16_t)strlen(buffer));
 #endif
     }
 }
@@ -290,7 +292,19 @@ void Monitor_initRuntimeCounter(void)
 unsigned long Monitor_getRuntimeCounter(void) 
 {
     absolute_time_t current_time = get_absolute_time(); //returns the absolute time (now) of Pico's System Timer (hardware timer)
-    return absolute_time_diff_us(stats_start_time, current_time);
+    int64_t time_diff_us = absolute_time_diff_us(stats_start_time, current_time);
+
+    if (time_diff_us < 0) 
+    {
+        time_diff_us = 0; //if the time difference is negative, return 0 (should never happen but just in case)
+    }
+
+    if (time_diff_us > ULONG_MAX)
+    {
+        time_diff_us = ULONG_MAX; //if the time difference is too large, return the maximum value of an unsigned long
+    }
+    
+    return (unsigned long)time_diff_us;
 }
 
 /*******************************************************************************/
