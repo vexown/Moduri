@@ -73,7 +73,7 @@ void MMC56x3::setContinuousMode(bool mode)
     } 
     else 
     {
-        _ctrl2_cache &= ~MMC56X3_CTRL2_CMM_EN;
+        _ctrl2_cache &= static_cast<uint8_t>(~MMC56X3_CTRL2_CMM_EN);
     }
 
     writeRegister(MMC56X3_REG_CTRL2, _ctrl2_cache);
@@ -94,7 +94,7 @@ void MMC56x3::setDataRate(uint16_t rate)
     } 
     else 
     {
-        _ctrl2_cache &= ~MMC56X3_CTRL2_HPOWER; // Normal power mode
+        _ctrl2_cache &= static_cast<uint8_t>(~MMC56X3_CTRL2_HPOWER); // Normal power mode
     }
     
     writeRegister(MMC56X3_REG_ODR, (uint8_t)rate);
@@ -213,9 +213,9 @@ bool MMC56x3::readData(MagData& data)
 
     /* Safety check for unreasonable values */
     const float MAX_REASONABLE_FIELD = 3277.0f;  // ±3277 µT is the actual sensor range
-    if (fabs(data.x) > MAX_REASONABLE_FIELD) data.x = 0.0f;
-    if (fabs(data.y) > MAX_REASONABLE_FIELD) data.y = 0.0f;
-    if (fabs(data.z) > MAX_REASONABLE_FIELD) data.z = 0.0f;
+    if (fabsf(data.x) > MAX_REASONABLE_FIELD) data.x = 0.0f;
+    if (fabsf(data.y) > MAX_REASONABLE_FIELD) data.y = 0.0f;
+    if (fabsf(data.z) > MAX_REASONABLE_FIELD) data.z = 0.0f;
     
     /* Read temperature too */
     data.temperature = readTemperature();
@@ -245,5 +245,5 @@ bool MMC56x3::readRegisters(uint8_t reg, uint8_t* data, size_t length)
     
     result = i2c_read_blocking(_i2c, _addr, data, length, false);
     
-    return result == length;
+    return result == static_cast<int>(length);
 }
