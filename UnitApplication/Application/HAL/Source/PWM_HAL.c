@@ -64,8 +64,8 @@ PWM_Status PWM_Init(const PWM_Config* config)
     uint channel = pwm_gpio_to_channel(config->pin);
 
     uint32_t system_clock = clock_get_hz(clk_sys);
-    float divider = system_clock / (config->frequency * 65535.0f);
-    uint16_t wrap = system_clock / (config->frequency * divider) - 1;
+    float divider = (float)system_clock / ((float)config->frequency * 65535.0f);
+    uint16_t wrap = (uint16_t)((float)system_clock / ((float)config->frequency * divider) - 1.0f);
 
     pwm_config pwm_cfg = pwm_get_default_config();
     pwm_config_set_clkdiv(&pwm_cfg, divider);
@@ -130,8 +130,8 @@ PWM_Status PWM_SetFrequency(uint8_t pin, uint32_t frequency)
 
     uint slice_num = pwm_gpio_to_slice_num(pin);
     uint32_t system_clock = clock_get_hz(clk_sys);
-    float divider = system_clock / (frequency * 65535.0f);
-    uint16_t wrap = system_clock / (frequency * divider) - 1;
+    float divider = (float)system_clock / ((float)frequency * 65535.0f);
+    uint16_t wrap = (uint16_t)((float)system_clock / ((float)frequency * divider) - 1.0f);
 
     pwm_config pwm_cfg = pwm_get_default_config();
     pwm_config_set_clkdiv(&pwm_cfg, divider);
