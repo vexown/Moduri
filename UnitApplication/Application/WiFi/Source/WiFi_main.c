@@ -239,9 +239,9 @@ static void WiFi_ActiveState(void)
          /************** TX **************/
         /* Send a message (for now just a test message) */
 #if (PICO_W_AS_TCP_SERVER == ON)
-        tcp_server_send(message, strlen(message));
+        tcp_server_send(message, (uint16_t)strlen(message));
 #else
-        tcp_client_send(message, strlen(message));
+        tcp_client_send(message, (uint16_t)strlen(message));
 #endif
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -345,6 +345,7 @@ static void WiFi_InitCommunication(void)
 
 static void WiFi_UpdateState(void)
 {
+#if (OTA_ENABLED == ON)
     LOG("Initiating firmware download...\n");
     int download_result = download_firmware();
     
@@ -401,6 +402,10 @@ static void WiFi_UpdateState(void)
         LOG("Failed to download firmware: error %d\n", download_result); //TODO - add retry mechanism
         WiFiState = LISTENING;
     }
+#else
+    LOG("OTA is not enabled in the configuration\n");
+    WiFiState = LISTENING;
+#endif
 }
 
 
