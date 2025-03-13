@@ -166,6 +166,8 @@ int main(void)
 #define DMA_RING_MIN_BITS 1    /* Minimum ring size (2 bytes) */
 #define DMA_RING_MAX_BITS 15   /* Maximum ring size (32768 bytes) */
 
+#define DMA_ERROR_RETURN 0xFF   /* Error return value */
+
 /**
  * @brief Reduced version of dreq_num_t enum from pico-sdk
  */

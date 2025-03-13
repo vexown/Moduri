@@ -36,13 +36,13 @@ static int dma_irq0_channel = -1; // static variable to store the channel number
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
-static int8_t claim_dma_channel(void);
+static uint claim_dma_channel(void);
 static void configure_channel_properties(dma_channel_config *channel_config, const DMA_Config_t *config);
 static void dma_irq0_handler(void);
 static void dma_timing_gpio_init(void);
 static bool calculate_timer_fraction(uint32_t desired_rate, uint16_t *denominator);
 static bool setup_dma_timer(const DMA_Config_t *config);
-static void setup_dma_interrupts(uint8_t channel);
+static void setup_dma_interrupts(uint channel);
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                          */
@@ -52,16 +52,16 @@ static void setup_dma_interrupts(uint8_t channel);
  * @brief Claim an unused DMA channel
  * @return Channel number if successful, -1 if error
  */
-static int8_t claim_dma_channel(void) 
+static uint claim_dma_channel(void) 
 {
     /* Attempt to claim an unused DMA channel, return -1 if none available */
     int channel = dma_claim_unused_channel(false);
-    if (channel < 0) return -1;
+    if (channel < 0) return DMA_ERROR_RETURN;
 
     /* Mark channel as used */
     dma_channels_used[channel] = true;
 
-    return channel;
+    return (uint)channel; // channel number is always positive, otherwise it would have returned DMA_ERROR_RETURN
 }
 
 /**
@@ -191,9 +191,9 @@ static bool setup_dma_timer(const DMA_Config_t *config)
  * @brief Setup the DMA interrupts for the given channel
  * @param channel DMA channel number
  */
-static void setup_dma_interrupts(uint8_t channel) 
+static void setup_dma_interrupts(uint channel) 
 {
-    dma_irq0_channel = channel; // store the channel number for the IRQ0 handler
+    dma_irq0_channel = (int)channel; // store the channel number for the IRQ0 handler
     dma_timing_gpio_init();
 
     /* Enable DMA interrupts on the given channel using DMA_IRQ_0 line (on RP2350 there is 4 lines dedicated to DMA: DMA_IRQ_0-3) */
@@ -237,7 +237,7 @@ int8_t DMA_Init(DMA_Config_t *config)
 {
     if (config == NULL) return -1;
 
-    int channel = claim_dma_channel();
+    uint channel = claim_dma_channel();
 
     /* Get the default channel configuration for a given channel */
     dma_channel_config channel_config = dma_channel_get_default_config(channel);
@@ -272,7 +272,7 @@ int8_t DMA_Init(DMA_Config_t *config)
     }
 
     /* Return the channel number - it is our handle for DMA operations */
-    return channel;
+    return (int8_t)channel; // casting is safe because channel range is 0-11 so it fits in int8_t
 }
 
 /**
