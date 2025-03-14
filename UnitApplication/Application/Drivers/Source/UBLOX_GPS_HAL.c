@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #define UART_ID uart1
 #define BAUD_RATE 9600
@@ -31,14 +32,16 @@ static void parse_gsa(char* sentence, GPS_Data* data) {
     while (fields[i] && i < 17) fields[++i] = strtok(NULL, ",");
     
     if (i >= 17) {
-        data->fix_quality = atoi(fields[2]);
+        int fix_quality = atoi(fields[2]);
+        data->fix_quality = (fix_quality > UINT8_MAX) ? UINT8_MAX : (uint8_t)fix_quality;
         data->valid = (data->fix_quality > 1);
         data->position_valid = data->valid;
         int sat_count = 0;
         for (int j = 3; j < 15; j++) {
             if (fields[j] && strlen(fields[j]) > 0) sat_count++;
         }
-        data->satellites_used += sat_count; // Accumulate
+        int new_sat_count = data->satellites_used + sat_count;
+        data->satellites_used = (new_sat_count > UINT8_MAX) ? UINT8_MAX : (uint8_t)new_sat_count;
     }
 }
 
@@ -52,11 +55,13 @@ static void parse_gga(char* sentence, GPS_Data* data) {
         if (strlen(fields[1]) >= 6) sscanf(fields[1], "%2hhu%2hhu%2hhu", &data->hours, &data->minutes, &data->seconds);
         if (strlen(fields[2]) > 0) data->latitude = nmea_to_decimal_degrees(fields[2], fields[3][0]);
         if (strlen(fields[4]) > 0) data->longitude = nmea_to_decimal_degrees(fields[4], fields[5][0]);
-        data->fix_quality = atoi(fields[6]);
+        int fix_quality = atoi(fields[6]);
+        data->fix_quality = (fix_quality > UINT8_MAX) ? UINT8_MAX : (uint8_t)fix_quality;
         data->valid = (data->fix_quality > 0);
         data->position_valid = data->valid;
-        data->satellites_used = atoi(fields[7]);
-        if (strlen(fields[9]) > 0) data->altitude = atof(fields[9]);
+        int satellites = atoi(fields[7]);
+        data->satellites_used = (satellites > UINT8_MAX) ? UINT8_MAX : (uint8_t)satellites;
+        if (strlen(fields[9]) > 0) data->altitude = (float)atof(fields[9]);
     }
 }
 
@@ -89,7 +94,7 @@ static void parse_rmc(char* sentence, GPS_Data* data) {
         if (data->valid) {
             if (strlen(fields[3]) > 0) data->latitude = nmea_to_decimal_degrees(fields[3], fields[4][0]);
             if (strlen(fields[5]) > 0) data->longitude = nmea_to_decimal_degrees(fields[5], fields[6][0]);
-            data->speed_knots = atof(fields[7]);
+            data->speed_knots = (float)atof(fields[7]);
             
             // Updated: Check if field 8 is a valid course (degrees) or date
             // If it contains periods it's likely a course, otherwise a date
@@ -122,7 +127,8 @@ static void parse_gsv(char* sentence, GPS_Data* data) {
         
         // Only update if this is the first GSV message (msgNum == 1)
         if (fields[2] && atoi(fields[2]) == 1) {
-            data->satellites_used = satellites_in_view;
+            data->satellites_used = (satellites_in_view > UINT8_MAX) ? 
+                UINT8_MAX : (uint8_t)satellites_in_view;
         }
     }
 }
