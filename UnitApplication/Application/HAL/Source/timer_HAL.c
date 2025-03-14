@@ -97,7 +97,7 @@ static void update_sw_timers(void)
             /* Calculate how many complete periods have elapsed
                Example: if period is 1000µs and elapsed is 2500µs,
                then 2 complete periods have passed */
-            uint32_t periods = elapsed / sw_timers[i]->config.period_us;
+            uint64_t periods = elapsed / sw_timers[i]->config.period_us;
             
             /* If at least one period has elapsed, we need to trigger callbacks */
             if (periods > 0) 
@@ -139,6 +139,8 @@ static void update_sw_timers(void)
  */
 static bool sw_timer_check_callback(repeating_timer_t *rt) 
 {
+    (void)rt;  // Unused parameter
+
     /* This callback is called every SW_TIMER_CHECK_PERIOD_US (100µs) to check software timers
        Update software timers currently managed by the system */
     update_sw_timers();
@@ -278,7 +280,9 @@ timer_status_t timer_get_remaining(timer_handle_t* handle, uint32_t* remaining_u
         } 
         else 
         {
-            *remaining_us = handle->config.period_us - elapsed;
+            uint64_t remaining_u64 = handle->config.period_us - elapsed;
+            /* Ensure we don't overflow uint32_t */
+            *remaining_us = (remaining_u64 > UINT32_MAX) ? UINT32_MAX : (uint32_t)remaining_u64;
         }
     }
     
