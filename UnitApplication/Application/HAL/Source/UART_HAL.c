@@ -153,8 +153,11 @@ static UART_Status_t verify_baudrate(uint32_t requested, uint32_t actual)
     /* Avoid division by zero */
     if (requested == 0) return UART_ERROR_INVALID_PARAMS;
     
-    /* Calculate error percentage (use float for precision) */
-    float error_percent = ((float)abs((int)actual - (int)requested) / requested) * 100.0f;
+    /* Calculate absolute difference without converting to signed int with abs() */
+    uint32_t diff = (actual > requested) ? (actual - requested) : (requested - actual);
+    
+    /* Calculate error percentage with explicit casts */
+    float error_percent = ((float)diff / (float)requested) * 100.0f;
     
     /* Industry standard typically accepts up to 3% error */
     const float MAX_BAUDRATE_ERROR = 3.0f;
