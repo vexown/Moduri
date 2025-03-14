@@ -297,13 +297,13 @@ void ssd1306_draw_pixel(SSD1306_t* display, uint8_t x, uint8_t y, bool on)
 {
     if (x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT) return;  // Ensure coordinates are within bounds
 
-    uint16_t byte_idx = x + (y / 8) * SSD1306_WIDTH;  // Calculate buffer index for (x, y)
+    uint16_t byte_idx = (uint16_t)(x + (y / 8) * SSD1306_WIDTH);  // Calculate buffer index for (x, y)
     uint8_t bit_mask = 1 << (y % 8);  // Create a bitmask for the pixel's position within the byte
 
     if (on) {
         display->buffer[byte_idx] |= bit_mask;  // Set the bit to turn the pixel on
     } else {
-        display->buffer[byte_idx] &= ~bit_mask;  // Clear the bit to turn the pixel off
+        display->buffer[byte_idx] &= (uint8_t)(~bit_mask);  // Clear the bit to turn the pixel off
     }
 }
 
