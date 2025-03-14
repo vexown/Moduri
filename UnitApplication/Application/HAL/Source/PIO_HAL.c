@@ -92,7 +92,13 @@ PIO_HAL_Status_t PIO_Init(PIO_HAL_Config_t *PIO_config)
     /* Attempt to load the program into the PIO instance */
     if(pio_can_add_program(PIO_config->pio_instance, PIO_config->program))
     {
-        PIO_config->program_offset = pio_add_program(PIO_config->pio_instance, PIO_config->program);
+        int offset_or_error = pio_add_program(PIO_config->pio_instance, PIO_config->program);
+        if (offset_or_error < 0) // if value is negative, it is an error
+        {
+            return PIO_HAL_ERROR_ADD_PROGRAM_FAILED;
+        }
+
+        PIO_config->program_offset = (uint)offset_or_error; // if value is positive, it is the offset where the program was loaded
     }
     else
     {
