@@ -39,10 +39,15 @@
 /*******************************************************************************/
 /*                               STATIC VARIABLES                              */
 /*******************************************************************************/
+#if (PICO_W_AS_TCP_SERVER == ON)
 static tcpServerType *tcpServerGlobal;
+#else
 TCP_Client_t *clientGlobal;
-static SemaphoreHandle_t bufferMutex;
 static SemaphoreHandle_t tcp_data_available_semaphore = NULL;
+#endif
+
+/* Common mutex for accessing the TCP receive buffer */
+static SemaphoreHandle_t bufferMutex;
 
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
@@ -57,6 +62,7 @@ static void tcp_server_err_callback(void *arg, err_t err);
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 TCP_Client_t* tcp_client_init(void);
+//TODO - add tcp_client_err_callback
 #endif
 
 /*******************************************************************************/
