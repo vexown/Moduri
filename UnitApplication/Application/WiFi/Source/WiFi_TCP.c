@@ -254,6 +254,22 @@ err_t tcp_server_send(const char *data, uint16_t length)
 
 #else // PICO_W_AS_TCP_SERVER == OFF
 
+
+static void tcp_client_err_callback(void *arg, err_t err) 
+{
+    (void)arg; // Unused parameter
+
+    if (err != ERR_ABRT) // See list of possible error codes in lwip/err.h in pico-sdk
+    {
+        LOG("TCP Client Error Callback. Error value: %d\n", err);
+        tcp_client_disconnect();
+    }
+    else
+    {
+        LOG("ERR_ABRT \n");
+    }
+}
+
 /* 
  * Function: tcp_client_init
  * 
@@ -305,6 +321,9 @@ TCP_Client_t* tcp_client_init(void) {
 
     // Set client structure as argument for callbacks
     tcp_arg(client->pcb, client);
+
+    // Set up error callback
+    tcp_err(client->pcb, tcp_client_err_callback);
 
 #if (OTA_ENABLED == ON)
     // Set up the TCP client to connect to the external server
