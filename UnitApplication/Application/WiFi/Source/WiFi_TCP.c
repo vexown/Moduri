@@ -556,7 +556,7 @@ void tcp_client_disconnect(void)
         {
             /* So let's wait for the connection to close if needed - but not forever */
             TickType_t xStartTime = xTaskGetTickCount();
-            TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
+            TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // 2s
 
             while (clientGlobal->is_closing) 
             {
@@ -568,7 +568,7 @@ void tcp_client_disconnect(void)
                 }
                 else if(tcp_close(clientGlobal->pcb) == ERR_OK) /* Try again to close the connection */
                 {
-
+                    LOG("Connection closed\n");
                     clientGlobal->is_closing = false;
                     clientGlobal->is_connected = false;
                     clientGlobal->pcb = NULL;
