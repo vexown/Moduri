@@ -524,7 +524,7 @@ void tcp_client_disconnect(void)
             TickType_t xStartTime = xTaskGetTickCount();
             TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
 
-            while (!clientGlobal->is_closing) 
+            while (clientGlobal->is_closing) 
             {
                 /* Check if timeout has occurred */
                 if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
