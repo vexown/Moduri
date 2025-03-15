@@ -473,6 +473,21 @@ bool tcp_client_connect(const char *host, uint16_t port)
         LOG("Already connected to requested host\n");
         return true;
     }
+    else
+    {
+        /* The lwIP TCP PCB has a few states. So even if we are not connected, we also need to make sure we are specifically
+           in the tcp CLOSED state. It is the only state from which we can attempt to tcp_connect */
+        if(clientGlobal->pcb->state == CLOSED)
+        {
+            LOG("TCP state is CLOSED. Attempting to connect... \n");
+        }
+        else
+        {
+            LOG("TCP state is not CLOSED. Current state: %d \n", clientGlobal->pcb->state); // find enum tcp_state in pico-sdk for info about the states
+            tcp_client_disconnect();
+            return false;
+        }
+    }
     
     if (ipaddr_aton(host, &server_ip) == 0) // Convert IP address string (of the host) to numeric value
     {
