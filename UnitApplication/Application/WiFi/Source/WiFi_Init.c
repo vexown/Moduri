@@ -71,11 +71,10 @@ bool connectToWifi(void)
     {
         LOG("connected sucessfully\n");
         status = true;
-    }
-
 #if (USE_STATIC_IP == ON)
-    configStaticIP();
+        configStaticIP();
 #endif
+    }
 
     return status;
 }
