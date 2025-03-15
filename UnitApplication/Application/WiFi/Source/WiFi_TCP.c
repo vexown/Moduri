@@ -422,6 +422,38 @@ int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
 bool tcp_client_connect(const char *host, uint16_t port) 
 {
     ip_addr_t server_ip;
+
+    if(clientGlobal == NULL || clientGlobal->pcb == NULL)
+    {
+        LOG("TCP client not initialized or PCB is NULL\n");
+        return false;
+    }
+    
+    /* Check if we are already connected to a host */
+    if(clientGlobal->is_connected)
+    {
+        /* Check if trying to connect to a different host/port while already connected */
+        ip_addr_t requested_ip;
+        if (ipaddr_aton(host, &requested_ip) == 0)
+        {
+            LOG("Invalid IP address: %s\n", host);
+            return false;
+        }
+        
+        /* Compare with current connection */
+        ip_addr_t *current_ip = &clientGlobal->pcb->remote_ip;
+        u16_t current_port = clientGlobal->pcb->remote_port;
+        
+        if (!ip_addr_cmp(&requested_ip, current_ip) || port != current_port)
+        {
+            LOG("Already connected to a different host (%s:%d). Disconnect first before connecting to %s:%d\n",
+                ipaddr_ntoa(current_ip), current_port, host, port);
+            return false;
+        }
+        
+        LOG("Already connected to requested host\n");
+        return true;
+    }
     
     if (ipaddr_aton(host, &server_ip) == 0) // Convert IP address string (of the host) to numeric value
     {
