@@ -50,8 +50,8 @@ void tcp_close_client_connection(struct tcp_pcb *client_pcb);
 #else
 extern TCP_Client_t *clientGlobal;
 bool start_TCP_client(void);
-bool tcp_client_connect(void *client, const char *host, uint16_t port);
-void tcp_client_disconnect(void *client);
+bool tcp_client_connect(const char *host, uint16_t port);
+void tcp_client_disconnect(void);
 err_t tcp_client_send(const char *data, uint16_t length);
 void tcp_client_process_recv_message(uint8_t *received_command);
 int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len);

@@ -251,60 +251,123 @@ err_t tcp_server_send(const char *data, uint16_t length)
     return err;
 }
 
-#else
 
-// Function to connect TCP client
-bool tcp_client_connect(void *client, const char *host, uint16_t port) {
-    TCP_Client_t *tcpClient = (TCP_Client_t *)client;
+#else // PICO_W_AS_TCP_SERVER == OFF
+
+/**
+ * Function: tcp_client_connect
+ * 
+ * Description: Connects the TCP client (Pico) to the specified IP address (host) and port of some TCP server.
+ * 
+ * Parameters:
+ * - const char *host: IP address of the server to connect to. Example: "192.168.1.194"
+ * - uint16_t port: Port number of the server to connect to. Example: 443 (HTTPS)
+ * 
+ * Returns: bool indicating the success (true) or failure (false) of the connection.
+ */
+bool tcp_client_connect(const char *host, uint16_t port) 
+{
     ip_addr_t server_ip;
     
-    if (ipaddr_aton(host, &server_ip) == 0) {
+    if (ipaddr_aton(host, &server_ip) == 0) // Convert IP address string (of the host) to numeric value
+    {
         LOG("Invalid IP address: %s\n", host);
         return false;
     }
     
-    err_t err = tcp_connect(tcpClient->pcb, &server_ip, port, tcp_client_connected_callback);
-    if (err != ERR_OK) {
-        LOG("Failed to connect to server: %d\n", err);
+    /* Connects the client to the server. Connected callback will be called when the connection is established. */
+    /* If connection wasn't properly established, the generic "err" callback will be called (it can be set via tcp_err() function) */
+    err_t err = tcp_connect(clientGlobal->pcb, &server_ip, port, tcp_client_connected_callback); // async call, returns immediately
+    if (err != ERR_OK) // This DOES NOT check if connection was successful, only if connection request was sent successfully
+    {
+        LOG("Failed to send connection request: %d\n", err);
         return false;
     }
 
-    // Wait for connection to establish
-    uint32_t timeout = 10000; // 10 seconds timeout
-    uint32_t start = to_ms_since_boot(get_absolute_time());
-    while (!tcpClient->is_connected && !tcpClient->is_closing) {
-        if (to_ms_since_boot(get_absolute_time()) - start > timeout) {
+    /* Wait for connection to establish */
+    TickType_t xStartTime = xTaskGetTickCount();
+    TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
+
+    while (!clientGlobal->is_connected && !clientGlobal->is_closing) 
+    {
+        /* Check if timeout has occurred */
+        if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
+        {
             LOG("Connection timeout\n");
             return false;
         }
-        // Give LWIP time to process
-        cyw43_arch_poll();
-        sleep_ms(10);
+        
+        /* Block this task for 10ms allowing other tasks to run */
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
     
-    return tcpClient->is_connected;
+    /* Client successfully connected (otherwise the while loop would have returned after timeout) */
+    return clientGlobal->is_connected;
 }
 
-// Function to disconnect TCP client
-void tcp_client_disconnect(void *client) {
-    TCP_Client_t *tcpClient = (TCP_Client_t *)client;
-    
-    if (tcpClient && tcpClient->pcb) {
-        tcp_arg(tcpClient->pcb, NULL);
-        tcp_recv(tcpClient->pcb, NULL);
-        tcp_err(tcpClient->pcb, NULL);
-        tcp_sent(tcpClient->pcb, NULL);
-        
-        err_t err = tcp_close(tcpClient->pcb);
-        if (err != ERR_OK) {
-            LOG("Error closing TCP connection: %d\n", err);
-            // Force abort if close failed
-            tcp_abort(tcpClient->pcb);
+/**
+ * Function: tcp_client_disconnect
+ * 
+ * Description: Disconnects the TCP client from the server and cleans up resources.
+ * 
+ * Parameters:
+ * - void *client: Pointer to the TCP client structure.
+ * 
+ * Returns: void
+ */
+void tcp_client_disconnect(void) 
+{
+    if (clientGlobal && clientGlobal->pcb) // double-check if client and its pcb are not NULL
+    {
+        clientGlobal->is_closing = true; // indicate that the client is closing the connection
+
+        /* Clear the callbacks for the client PCB to release the associated resources */
+        tcp_arg(clientGlobal->pcb, NULL);
+        tcp_recv(clientGlobal->pcb, NULL);
+        tcp_err(clientGlobal->pcb, NULL);
+        tcp_sent(clientGlobal->pcb, NULL);
+
+        /* Close the connection held by the client PCB and free the resources */
+        err_t err = tcp_close(clientGlobal->pcb);
+
+        /* According to lwIP documentation in pico-sdk, if tcp_close() returns ERR_OK, the connection was closed successfully
+           and if it returns ERR_MEM, the connection was not closed and the application should wait and try again */
+        if(err != ERR_OK)
+        {
+            /* So let's wait for the connection to close if needed - but not forever */
+            TickType_t xStartTime = xTaskGetTickCount();
+            TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
+
+            while (!clientGlobal->is_closing) 
+            {
+                /* Check if timeout has occurred */
+                if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
+                {
+                    LOG("Connection close timeout\n");
+                    break;
+                }
+                else if(tcp_close(clientGlobal->pcb) == ERR_OK) /* Try again to close the connection */
+                {
+
+                    clientGlobal->is_closing = false;
+                    clientGlobal->is_connected = false;
+                    clientGlobal->pcb = NULL;
+                    break;
+                }
+                else /* Block this task for 10ms allowing other tasks to run and try again after */
+                {
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+            }
         }
-        
-        tcpClient->pcb = NULL;
-        tcpClient->is_connected = false;
-        tcpClient->is_closing = false;
+
+        /* As a last resort, if after the timeout the connection is still open, 
+           force the abort which sends a RST segment to remote host. Ugly but never fails */
+        if (clientGlobal->is_connected == true)
+        {
+            LOG("Error closing TCP connection - forcing abort... \n");
+            tcp_abort(clientGlobal->pcb);
+        }
     }
 }
 
@@ -873,16 +936,20 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
  *  - err_t: An error code indicating the success (ERR_OK) or failure 
  *            (e.g., other error codes if the connection attempt failed).
  */
-static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) {
+static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) 
+{
     TCP_Client_t *client = (TCP_Client_t*)arg;
     
-    if (err != ERR_OK) {
+    if (err != ERR_OK) // Connection failed (Host unreachable, Connection refused, etc.)
+    {
+        LOG("TCP client connection failed: %d\n", err);
         return err;
     }
 
+    /* Set the client status to connected */
     client->is_connected = true;
     
-    // Set up receive callback
+    /* Set up receive callback */
     tcp_recv(tpcb, tcp_client_recv_callback);
     
     LOG("TCP client connected to server\n");
