@@ -254,6 +254,160 @@ err_t tcp_server_send(const char *data, uint16_t length)
 
 #else // PICO_W_AS_TCP_SERVER == OFF
 
+/* 
+ * Function: tcp_client_init
+ * 
+ * Description: 
+ *      Allocates and initializes the TCP client structure, creates a new 
+ *      TCP protocol control block (PCB), and initiates a connection to the 
+ *      specified server. This function prepares the client for communication 
+ *      by setting up necessary callbacks and connecting to the server.
+ * 
+ * Parameters:
+ *  - None
+ * 
+ * Returns: 
+ *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
+ *                   successful; NULL if initialization or connection 
+ *                   fails.
+ */
+TCP_Client_t* tcp_client_init(void) {
+    ip_addr_t server_ip;
+    
+    // Allocate client structure
+    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
+    if (client == NULL) {
+        LOG("Failed to allocate client structure\n");
+        return NULL;
+    }
+
+    tcp_data_available_semaphore = xSemaphoreCreateBinary();
+    if (tcp_data_available_semaphore == NULL) 
+    {
+        LOG("Failed to create semaphore\n");
+        vPortFree(client);
+        return NULL;
+    }
+
+    // Initialize client structure
+    client->pcb = NULL;
+    client->receive_length = 0;
+    client->is_connected = false;
+    client->is_closing = false;
+
+    // Create new TCP PCB
+    client->pcb = tcp_new();
+    if (client->pcb == NULL) {
+        LOG("Failed to create TCP PCB\n");
+        vPortFree(client);
+        return NULL;
+    }
+
+    // Set client structure as argument for callbacks
+    tcp_arg(client->pcb, client);
+
+#if (OTA_ENABLED == ON)
+    // Set up the TCP client to connect to the external server
+    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
+#else
+    // Convert server IP string to IP address structure
+    ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &server_ip);
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
+#endif
+
+
+    if (err != ERR_OK) {
+        LOG("TCP connect failed: %d\n", err);
+        tcp_close(client->pcb);
+        vPortFree(client);
+        return NULL;
+    }
+
+    return client;
+}
+
+// Custom send function for Mbed TLS
+int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len) 
+{
+    TCP_Client_t *client = (TCP_Client_t *)ctx;
+
+    // Check if the client is valid and connected
+    if (client == NULL || !client->is_connected || client->pcb == NULL) {
+        LOG("Cannot send - client not connected\n");
+        return MBEDTLS_ERR_NET_SEND_FAILED;
+    }
+
+    // Use your existing tcp_client_send function
+    err_t err = tcp_client_send((const char *)buf, len);
+    if (err != ERR_OK) {
+        LOG("tcp_client_send failed: %d\n", err);
+        return MBEDTLS_ERR_NET_SEND_FAILED;
+    }
+
+    // Since tcp_client_send doesn't return bytes sent, assume full send on success
+    // Note: lwIP's tcp_write is non-blocking, but tcp_output flushes, so this is usually safe
+    LOG("Sent %u bytes\n", len); 
+    return (int)len;
+}
+
+// Custom receive function for Mbed TLS
+int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
+    TCP_Client_t *client = (TCP_Client_t*)ctx;
+    size_t bytes_to_read = 0;
+    TickType_t start_time = xTaskGetTickCount();
+    
+    // Wait for data with timeout (5 seconds)
+    while (bytes_to_read == 0) {
+        // Check for timeout
+        if ((xTaskGetTickCount() - start_time) > pdMS_TO_TICKS(5000)) {
+            return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_TIMEOUT;
+        }
+        
+        // Check if connection closed
+        if (!client->is_connected || client->is_closing) {
+            return MBEDTLS_ERR_NET_CONN_RESET;
+        }
+        
+        // Check if we already have data in the buffer
+        if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
+            if (client->receive_length > 0) {
+                // Copy data to caller's buffer
+                bytes_to_read = client->receive_length > len ? len : client->receive_length;
+                memcpy(buf, client->receive_buffer, bytes_to_read);
+                
+                // If there's more data left, move it to the beginning of the buffer
+                if (bytes_to_read < client->receive_length) {
+                    memmove(client->receive_buffer, 
+                            client->receive_buffer + bytes_to_read, 
+                            client->receive_length - bytes_to_read);
+                    client->receive_length -= bytes_to_read;
+                    
+                    // Signal that there's still data available
+                    xSemaphoreGive(tcp_data_available_semaphore);
+                } else {
+                    // All data consumed - reset buffer
+                    client->receive_length = 0;
+                }
+            }
+            xSemaphoreGive(bufferMutex);
+        }
+        
+        // If no data was read and we need to wait
+        if (bytes_to_read == 0) {
+            // Wait for data notification
+            if (xSemaphoreTake(tcp_data_available_semaphore, pdMS_TO_TICKS(100)) != pdTRUE) {
+                // No data yet, continue waiting loop
+            }
+        }
+    }
+    
+    return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_WANT_READ;
+}
+
+
 /**
  * Function: tcp_client_connect
  * 
@@ -954,159 +1108,6 @@ static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_
     
     LOG("TCP client connected to server\n");
     return ERR_OK;
-}
-
-/* 
- * Function: tcp_client_init
- * 
- * Description: 
- *      Allocates and initializes the TCP client structure, creates a new 
- *      TCP protocol control block (PCB), and initiates a connection to the 
- *      specified server. This function prepares the client for communication 
- *      by setting up necessary callbacks and connecting to the server.
- * 
- * Parameters:
- *  - None
- * 
- * Returns: 
- *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
- *                   successful; NULL if initialization or connection 
- *                   fails.
- */
-TCP_Client_t* tcp_client_init(void) {
-    ip_addr_t server_ip;
-    
-    // Allocate client structure
-    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
-    if (client == NULL) {
-        LOG("Failed to allocate client structure\n");
-        return NULL;
-    }
-
-    tcp_data_available_semaphore = xSemaphoreCreateBinary();
-    if (tcp_data_available_semaphore == NULL) 
-    {
-        LOG("Failed to create semaphore\n");
-        vPortFree(client);
-        return NULL;
-    }
-
-    // Initialize client structure
-    client->pcb = NULL;
-    client->receive_length = 0;
-    client->is_connected = false;
-    client->is_closing = false;
-
-    // Create new TCP PCB
-    client->pcb = tcp_new();
-    if (client->pcb == NULL) {
-        LOG("Failed to create TCP PCB\n");
-        vPortFree(client);
-        return NULL;
-    }
-
-    // Set client structure as argument for callbacks
-    tcp_arg(client->pcb, client);
-
-#if (OTA_ENABLED == ON)
-    // Set up the TCP client to connect to the external server
-    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
-#else
-    // Convert server IP string to IP address structure
-    ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
-#endif
-
-
-    if (err != ERR_OK) {
-        LOG("TCP connect failed: %d\n", err);
-        tcp_close(client->pcb);
-        vPortFree(client);
-        return NULL;
-    }
-
-    return client;
-}
-
-// Custom send function for Mbed TLS
-int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len) 
-{
-    TCP_Client_t *client = (TCP_Client_t *)ctx;
-
-    // Check if the client is valid and connected
-    if (client == NULL || !client->is_connected || client->pcb == NULL) {
-        LOG("Cannot send - client not connected\n");
-        return MBEDTLS_ERR_NET_SEND_FAILED;
-    }
-
-    // Use your existing tcp_client_send function
-    err_t err = tcp_client_send((const char *)buf, len);
-    if (err != ERR_OK) {
-        LOG("tcp_client_send failed: %d\n", err);
-        return MBEDTLS_ERR_NET_SEND_FAILED;
-    }
-
-    // Since tcp_client_send doesn't return bytes sent, assume full send on success
-    // Note: lwIP's tcp_write is non-blocking, but tcp_output flushes, so this is usually safe
-    LOG("Sent %u bytes\n", len); 
-    return (int)len;
-}
-
-// Custom receive function for Mbed TLS
-int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
-    TCP_Client_t *client = (TCP_Client_t*)ctx;
-    size_t bytes_to_read = 0;
-    TickType_t start_time = xTaskGetTickCount();
-    
-    // Wait for data with timeout (5 seconds)
-    while (bytes_to_read == 0) {
-        // Check for timeout
-        if ((xTaskGetTickCount() - start_time) > pdMS_TO_TICKS(5000)) {
-            return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_TIMEOUT;
-        }
-        
-        // Check if connection closed
-        if (!client->is_connected || client->is_closing) {
-            return MBEDTLS_ERR_NET_CONN_RESET;
-        }
-        
-        // Check if we already have data in the buffer
-        if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-            if (client->receive_length > 0) {
-                // Copy data to caller's buffer
-                bytes_to_read = client->receive_length > len ? len : client->receive_length;
-                memcpy(buf, client->receive_buffer, bytes_to_read);
-                
-                // If there's more data left, move it to the beginning of the buffer
-                if (bytes_to_read < client->receive_length) {
-                    memmove(client->receive_buffer, 
-                            client->receive_buffer + bytes_to_read, 
-                            client->receive_length - bytes_to_read);
-                    client->receive_length -= bytes_to_read;
-                    
-                    // Signal that there's still data available
-                    xSemaphoreGive(tcp_data_available_semaphore);
-                } else {
-                    // All data consumed - reset buffer
-                    client->receive_length = 0;
-                }
-            }
-            xSemaphoreGive(bufferMutex);
-        }
-        
-        // If no data was read and we need to wait
-        if (bytes_to_read == 0) {
-            // Wait for data notification
-            if (xSemaphoreTake(tcp_data_available_semaphore, pdMS_TO_TICKS(100)) != pdTRUE) {
-                // No data yet, continue waiting loop
-            }
-        }
-    }
-    
-    return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_WANT_READ;
 }
 
 #endif
