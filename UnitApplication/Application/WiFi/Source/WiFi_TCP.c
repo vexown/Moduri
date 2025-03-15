@@ -600,34 +600,67 @@ void tcp_client_disconnect(void)
  */
 bool start_TCP_client(void) 
 {
-    clientGlobal = tcp_client_init();
     bool status = false;
 
-    if (clientGlobal != NULL) {
-        LOG("TCP client initialized successfully\n");
-        status = true;
-    } else {
-        LOG("TCP client initialization failed\n");
-    }
-
-    bufferMutex = xSemaphoreCreateMutex();
-    if (bufferMutex == NULL) 
+    if(clientGlobal != NULL && clientGlobal->is_connected)
     {
-        LOG("Failed to create mutex\n");
-        status = false;
+        LOG("TCP client already started and connected \n");
+        status = true;
+    }
+    else if (clientGlobal != NULL && !clientGlobal->is_connected)
+    {
+        LOG("TCP client already started but failed to connect. Freeing the client so it can be reinitialized... \n");
+        tcp_client_disconnect();
+        vPortFree(clientGlobal);
+    }
+    else
+    {
+        LOG("Initializing the TCP client... \n");
+        clientGlobal = tcp_client_init();
+
+        if (clientGlobal != NULL) 
+        {
+            LOG("TCP client initialized successfully\n");
+            status = true;
+        } 
+        else 
+        {
+            LOG("TCP client initialization failed\n");
+        }
     }
 
-    // Wait for connection to establish
-    int timeout = 100;  // 10 seconds (100 * 100ms)
-    while (!clientGlobal->is_connected && timeout > 0) {
-        vTaskDelay(pdMS_TO_TICKS(100));
-        timeout--;
+    /* If the client was successfully initialized, create a mutex for the buffer */
+    if(status == true)
+    {
+        bufferMutex = xSemaphoreCreateMutex();
+        if (bufferMutex == NULL) 
+        {
+            LOG("Failed to create mutex\n");
+            status = false;
+        }
     }
-    if (!clientGlobal->is_connected) {
-        LOG("TCP connection timed out\n");
-        status = false;
-    } else {
-        LOG("TCP connection established\n");
+
+    if((status == true) && (!clientGlobal->is_connected))
+    {
+        LOG("Giving the network a few seconds to establish a connection... \n");
+
+        /* Wait for connection to establish */
+        TickType_t xStartTime = xTaskGetTickCount();
+        TickType_t xTimeoutTicks = pdMS_TO_TICKS(30000); // 30s
+
+        while (!clientGlobal->is_connected) 
+        {
+            /* Check if timeout has occurred */
+            if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
+            {
+                LOG("Connection timeout\n");
+                status = false;
+                break;
+            }
+            
+            /* Block this task for 10ms allowing other tasks to run */
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
     }
         
     return status;
