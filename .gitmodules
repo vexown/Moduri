@@ -4,3 +4,6 @@
 [submodule "UnitApplication/Dependencies/pico-sdk"]
 	path = UnitApplication/Dependencies/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk.git
+[submodule "UnitApplication/Dependencies/picotool"]
+	path = UnitApplication/Dependencies/picotool
+	url = https://github.com/raspberrypi/picotool.git
