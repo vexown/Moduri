@@ -654,7 +654,7 @@ bool start_TCP_client(void)
 
         /* Wait for connection to establish */
         TickType_t xStartTime = xTaskGetTickCount();
-        TickType_t xTimeoutTicks = pdMS_TO_TICKS(30000); // 30s
+        TickType_t xTimeoutTicks = pdMS_TO_TICKS(2500); // 2.5s
 
         while (!clientGlobal->is_connected) 
         {
