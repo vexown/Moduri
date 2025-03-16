@@ -780,6 +780,8 @@ void tcp_client_process_recv_message(uint8_t *received_command)
 
         // Clear the buffer after processing
         memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
+        // Set the receive length to 0
+        clientGlobal->receive_length = 0;
 
         // Release the mutex after access
         xSemaphoreGive(bufferMutex); 
