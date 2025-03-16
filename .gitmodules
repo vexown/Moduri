@@ -7,3 +7,10 @@
 [submodule "UnitApplication/Dependencies/picotool"]
 	path = UnitApplication/Dependencies/picotool
 	url = https://github.com/raspberrypi/picotool.git
+[submodule "UnitApplication/Dependencies/openocd"]
+	path = UnitApplication/Dependencies/openocd
+	url = https://github.com/raspberrypi/openocd.git
+	branch = sdk-2.0.0
+[submodule "UnitApplication/Dependencies/debugprobe"]
+	path = UnitApplication/Dependencies/debugprobe
+	url = https://github.com/raspberrypi/debugprobe.git
