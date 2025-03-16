@@ -14,18 +14,80 @@ add_subdirectory(HAL)
 add_subdirectory(Drivers)
 add_subdirectory(PIO)
 
+# Aggregate all application source files into a single list
+set(APP_SOURCES
+    ${MAIN_SOURCE} 
+    ${OS_SOURCE_FILES}
+    ${MISC_SOURCE_FILES}
+    ${WIFI_SOURCE_FILES}
+    ${MONITOR_SOURCE_FILES}
+    ${HAL_SOURCE_FILES}
+    ${DRIVERS_SOURCE_FILES}
+)
+
 # Helper function to create a moduri target for a given bank
 function(create_moduri_target target_name linker_script)
+
     add_executable(${target_name}
-        ${MAIN_SOURCE} 
-        ${OS_SOURCE_FILES}
-        ${MISC_SOURCE_FILES}
-        ${WIFI_SOURCE_FILES}
-        ${MONITOR_SOURCE_FILES}
-        ${HAL_SOURCE_FILES}
-        ${DRIVERS_SOURCE_FILES}
+        ${APP_SOURCES} 
     )
 
+    # Set the compiler flags
+    # These compiler flags are for the GNU compiler collection (GCC):
+    # https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html (general options but also ARM-specific ones)
+    set(COMMON_WARNING_FLAGS
+    -Wall                # Enable all standard warnings
+    -Wextra              # Enable extra warnings
+    -Wpedantic           # Warn about non-standard C/C++
+    -Wshadow             # Warn when a variable shadows another
+    -Wdouble-promotion   # Implicit float to double promotions
+    -Wformat=2           # Stricter format checking
+    -Wundef              # Undefined macro evaluates to 0
+    -Wconversion         # Implicit type conversions
+    -Wunused             # Unused entities
+    -Wno-unused-function # Don't warn about unused static functions in headers
+    -fstack-usage        # Generate stack usage information
+    #-Werror              # Treat warnings as errors - TODO: Uncomment this line when all warnings are fixed
+    )
+
+    # C-specific warning flags
+    set(C_WARNING_FLAGS
+        -Wstrict-prototypes  # Function declared without parameter types
+        -Wbad-function-cast  # Suspicious cast of function return value
+    )
+
+    # Specify optimization flags
+    if(DEBUG_BUILD)
+        add_compile_options(-Og) # -Og: Reasonable level of optimization while maintaining fast compilation and a good debugging experience
+    else()
+        add_compile_options(-O2) # -O2: GCC performs nearly all supported optimizations that do not involve a space-speed tradeoff
+    endif()
+
+    # Combine the Common and C-specific warning flags
+    list(APPEND APP_COMPILE_OPTIONS ${COMMON_WARNING_FLAGS})
+    list(APPEND APP_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:C>:${C_WARNING_FLAGS}>")
+
+    # Remove ThirdParty source files from the list of files to check for warnings
+    # Double check if the file paths are correct, otherwise the files will not be removed (see in build output)
+    list(APPEND APP_SOURCES_FILTERED ${APP_SOURCES})
+    list(REMOVE_ITEM APP_SOURCES_FILTERED ${CMAKE_CURRENT_SOURCE_DIR}/WiFi/Source/WiFi_DHCP_server.c)
+    list(REMOVE_ITEM APP_SOURCES_FILTERED ${CMAKE_CURRENT_SOURCE_DIR}/WiFi/Source/WiFi_DNS_server.c)
+
+    # Add the warnings to the Application source files
+    set_source_files_properties(${APP_SOURCES_FILTERED}
+                                PROPERTIES COMPILE_OPTIONS 
+                                "${APP_COMPILE_OPTIONS}"
+                                )
+
+    # Set linker warning flags (GNU ld - https://sourceware.org/binutils/docs/ld/Options.html)
+    # Used flags:
+    #       -Wl,--warn-common: Warn about any common symbols that are defined in multiple object files
+    #       -Wl,--warn-section-align: Warn if there are any sections that are not properly aligned
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+    -Wl,--warn-common \
+    -Wl,--warn-section-align \
+    ")
+                                  
     # Link the flash utils library to the target
     target_link_libraries(${target_name} PRIVATE flash_utils)
 
