@@ -100,6 +100,7 @@ bool start_TCP_server(void)
         {
             LOG("Failed to allocate memory for DHCP server.\n");
             vPortFree(tcpServerGlobal);
+            tcpServerGlobal = NULL;
         }
         /* Start the dhcp server */
         dhcp_server_init(dhcp_server, &tcpServerGlobal->gateway, &mask);
@@ -111,6 +112,8 @@ bool start_TCP_server(void)
             LOG("Failed to allocate memory for DNS server.\n");
             vPortFree(tcpServerGlobal);
             vPortFree(dhcp_server);
+            tcpServerGlobal = NULL;
+            dhcp_server = NULL;
         }
         /* Start the dns server */
         dns_server_init(dns_server, &tcpServerGlobal->gateway);
@@ -123,6 +126,9 @@ bool start_TCP_server(void)
 			vPortFree(tcpServerGlobal);
             vPortFree(dhcp_server);
             vPortFree(dns_server);
+            tcpServerGlobal = NULL;
+            dhcp_server = NULL;
+            dns_server = NULL;
 		}
 		else
 		{
@@ -302,6 +308,7 @@ TCP_Client_t* tcp_client_init(void) {
     {
         LOG("Failed to create semaphore\n");
         vPortFree(client);
+        client = NULL;
         return NULL;
     }
 
@@ -612,6 +619,7 @@ bool start_TCP_client(void)
         LOG("TCP client already started but failed to connect. Freeing the client so it can be reinitialized... \n");
         tcp_client_disconnect();
         vPortFree(clientGlobal);
+        clientGlobal = NULL;
     }
     else
     {
