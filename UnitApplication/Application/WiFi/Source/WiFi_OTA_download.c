@@ -25,6 +25,8 @@
 #include "WiFi_Common.h"
 #include "Common.h"
 
+#if (OTA_ENABLED == ON)
+
 /**********************************************************************/
 /*                          DEFINES                                   */
 /**********************************************************************/
@@ -350,13 +352,13 @@ int download_firmware(void) {
             
             // Attempt to reconnect TCP client
             if (clientGlobal->is_connected) {
-                tcp_client_disconnect(clientGlobal);
+                tcp_client_disconnect();
             }
             
             // Wait before reconnecting
             vTaskDelay(pdMS_TO_TICKS(1000));
             
-            if (!tcp_client_connect(clientGlobal, OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT)) {
+            if (!tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT)) {
                 LOG("Failed to reconnect TCP client\n");
                 break;
             }
@@ -455,3 +457,5 @@ cleanup:
     LOG("=== Firmware download complete ===\n");
     return result;
 }
+
+#endif // OTA_ENABLED
