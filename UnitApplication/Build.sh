@@ -89,7 +89,7 @@ if [ ! -d "$DEPS_DIR" ]; then
 fi
 
 # Initialize all git submodules if not already done
-if [ ! -d "$DEPS_DIR/FreeRTOS-Kernel/.git" ] || [ ! -d "$DEPS_DIR/pico-sdk/.git" ] || [ ! -d "$DEPS_DIR/picotool/.git" ]; then
+if [ ! -d "$DEPS_DIR/FreeRTOS-Kernel/.git" ] || [ ! -d "$DEPS_DIR/pico-sdk/.git" ] || [ ! -d "$DEPS_DIR/picotool/.git" ] || [ ! -d "$DEPS_DIR/openocd/.git" ] || [ ! -d "$DEPS_DIR/debugprobe/.git" ]; then
     echo "Initializing git submodules..."
     git submodule update --init --recursive
 fi
@@ -121,6 +121,24 @@ if [ "$ACTUAL_TAG" != "$PICOTOOL_TAG" ]; then
     (cd "$PICOTOOL_DIR" && git fetch && git checkout "$PICOTOOL_TAG")
 fi
 
+# Verify OpenOCD is at the correct commit
+OPENOCD_DIR="$DEPS_DIR/openocd"
+OPENOCD_COMMIT="cf9c0b41cd5c45b2faf01b4fd1186f160342b7b7"
+ACTUAL_COMMIT=$(cd "$OPENOCD_DIR" && git rev-parse HEAD)
+if [ "$ACTUAL_COMMIT" != "$OPENOCD_COMMIT" ]; then
+    echo "OpenOCD is not at the expected commit. Updating..."
+    (cd "$OPENOCD_DIR" && git fetch && git checkout "$OPENOCD_COMMIT")
+fi
+
+# Verify debugprobe is at the correct version
+DEBUGPROBE_DIR="$DEPS_DIR/debugprobe"
+DEBUGPROBE_TAG="debugprobe-v2.2.2"
+ACTUAL_TAG=$(cd "$DEBUGPROBE_DIR" && git describe --tags --exact-match 2>/dev/null || echo "unknown")
+if [ "$ACTUAL_TAG" != "$DEBUGPROBE_TAG" ]; then
+    echo "debugprobe is not at the expected version. Updating..."
+    (cd "$DEBUGPROBE_DIR" && git fetch && git checkout "$DEBUGPROBE_TAG")
+fi
+
 # Build and install picotool
 # Check if picotool needs to be built/installed (always if not found in /usr/local/bin)
 if [ ! -f "/usr/local/bin/picotool" ]; then
@@ -144,14 +162,66 @@ if [ ! -f "/usr/local/bin/picotool" ]; then
     echo "picotool built and installed successfully"
 fi
 
+# Build and install OpenOCD if not already installed
+if [ ! -f "$OPENOCD_DIR/src/openocd" ]; then
+    echo "Building and installing OpenOCD..."
+    
+    cd "$OPENOCD_DIR"
+    
+    # Install additional dependencies for OpenOCD
+    if command -v apt-get &> /dev/null; then
+        sudo apt-get install -y autoconf automake libtool libusb-1.0-0-dev texinfo libhidapi-dev
+    fi
+    
+    # Configure and build
+    ./bootstrap
+    ./configure --disable-werror
+    make -j4
+    sudo make install
+    
+    # Return to the original directory
+    cd "$OLDPWD"
+    
+    echo "OpenOCD built and installed successfully"
+fi
+
+# Build and install debugprobe if not already installed
+if [ ! -f "$DEBUGPROBE_DIR/build/debugprobe_on_pico.elf" ]; then
+    echo "Building and installing debugprobe..."
+
+    # Initialize submodules
+    git submodule update --init
+    
+    # Create build directory if it doesn't exist
+    if [ ! -d "$DEBUGPROBE_DIR/build" ]; then
+        mkdir -p "$DEBUGPROBE_DIR/build"
+    fi
+    
+    # Configure, build and install debugprobe
+    cd "$DEBUGPROBE_DIR/build"
+    export PICO_SDK_PATH="$PICO_SDK_DIR"
+    # Use PICO_BOARD=pico for Pico 1st gen and PICO_BOARD=pico2 for Pico 2nd gen 
+    cmake cmake -DDEBUG_ON_PICO=ON -DPICO_BOARD=pico .. #build for 1st gen Pico
+    make -j4
+    
+    # Return to the original directory
+    cd "$OLDPWD"
+    
+    echo "debugprobe built and installed successfully"
+fi
+
 # Export environment variables for CMake
 export FREERTOS_KERNEL_PATH="$FREERTOS_DIR"
 export PICO_SDK_PATH="$PICO_SDK_DIR"
 export PICOTOOL_FETCH_FROM_GIT_PATH="$PICOTOOL_DIR"
+export OPENOCD_DIR="$OPENOCD_DIR"
+export DEBUGPROBE_DIR="$DEBUGPROBE_DIR"
 
 echo "Using FreeRTOS-Kernel at: $FREERTOS_KERNEL_PATH"
 echo "Using pico-sdk at: $PICO_SDK_PATH"
 echo "Using picotool at: $PICOTOOL_DIR"
+echo "Using OpenOCD at: $OPENOCD_DIR"
+echo "Using debugprobe at: $DEBUGPROBE_DIR"
 
 # Parse command line arguments
 CLEAN_BUILD=0
