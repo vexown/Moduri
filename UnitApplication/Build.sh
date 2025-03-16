@@ -185,31 +185,6 @@ if [ ! -f "$OPENOCD_DIR/src/openocd" ]; then
     echo "OpenOCD built and installed successfully"
 fi
 
-# Build and install debugprobe if not already installed
-if [ ! -f "$DEBUGPROBE_DIR/build/debugprobe_on_pico.elf" ]; then
-    echo "Building and installing debugprobe..."
-
-    # Initialize submodules
-    git submodule update --init
-    
-    # Create build directory if it doesn't exist
-    if [ ! -d "$DEBUGPROBE_DIR/build" ]; then
-        mkdir -p "$DEBUGPROBE_DIR/build"
-    fi
-    
-    # Configure, build and install debugprobe
-    cd "$DEBUGPROBE_DIR/build"
-    export PICO_SDK_PATH="$PICO_SDK_DIR"
-    # Use PICO_BOARD=pico for Pico 1st gen and PICO_BOARD=pico2 for Pico 2nd gen 
-    cmake cmake -DDEBUG_ON_PICO=ON -DPICO_BOARD=pico .. #build for 1st gen Pico
-    make -j4
-    
-    # Return to the original directory
-    cd "$OLDPWD"
-    
-    echo "debugprobe built and installed successfully"
-fi
-
 # Export environment variables for CMake
 export FREERTOS_KERNEL_PATH="$FREERTOS_DIR"
 export PICO_SDK_PATH="$PICO_SDK_DIR"
