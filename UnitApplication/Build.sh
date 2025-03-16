@@ -6,11 +6,13 @@
 # Description:
 # This script automates the process of building a project using CMake.
 # It performs the following steps:
-# 1. Checks if the 'build' directory exists and creates it if not.
-# 2. Configures the build directory by running CMake.
-# 3. Builds the project using CMake.
-# 4. Copies output files to the output directory.
-# 5. Prompts the user to press any key to exit the script.
+# 1. Checks for and installs required system packages if missing
+# 2. Ensures project dependencies (FreeRTOS, pico-sdk, picotool) are initialized as git submodules
+# 3. Checks if the 'build' directory exists and creates it if not.
+# 4. Configures the build directory by running CMake.
+# 5. Builds the project using CMake.
+# 6. Copies output files to the output directory.
+# 7. Prompts the user to press any key to exit the script.
 #
 # Usage:
 # Run this script from the root directory of the project:
@@ -19,8 +21,6 @@
 #   ./Build.sh --example=list           # List available examples
 #   ./Build.sh --example=ExampleName    # Build a specific example
 #   ./Build.sh --clean --example=ExampleName  # Clean and build an example
-#
-# The script assumes that CMake is installed and available in the system PATH.
 #
 # ****************************************************************************
 
@@ -31,7 +31,127 @@ set -e
 set -o pipefail
 
 echo "########## Build.sh - start ##########"
-echo "Building all components with CMake"
+
+# Check for required system packages
+echo "Checking for required system packages..."
+
+# Check if we're on a system with apt
+if command -v apt-get &> /dev/null; then
+    MISSING_PACKAGES=""
+    
+    # List of required packages
+    REQUIRED_PACKAGES=(
+        "cmake"
+        "gcc-arm-none-eabi"
+        "libnewlib-arm-none-eabi" 
+        "build-essential" 
+        "g++" 
+        "libstdc++-arm-none-eabi-newlib"
+        "libusb-1.0-0-dev"
+    )
+    
+    # Check each required package
+    for pkg in "${REQUIRED_PACKAGES[@]}"; do
+        if ! dpkg-query -W -f='${Status}' $pkg 2>/dev/null | grep -q "ok installed"; then
+            echo "Package $pkg is not installed."
+            MISSING_PACKAGES="$MISSING_PACKAGES $pkg"
+        fi
+    done
+    
+    # Install missing packages if any
+    if [ ! -z "$MISSING_PACKAGES" ]; then
+        echo "Installing missing packages:$MISSING_PACKAGES"
+        sudo apt-get update
+        sudo apt-get install -y $MISSING_PACKAGES
+        echo "Required packages installed."
+    else
+        echo "All required packages are already installed."
+    fi
+else
+    echo "Warning: This script cannot check for packages on non-Debian based systems."
+    echo "Please ensure you have these packages installed:"
+    echo "- cmake"
+    echo "- gcc-arm-none-eabi"
+    echo "- libnewlib-arm-none-eabi"
+    echo "- build-essential"
+    echo "- g++"
+    echo "- libstdc++-arm-none-eabi-newlib"
+    echo "- libusb-1.0-0-dev"
+fi
+
+# Check if git submodules are initialized
+echo "Checking git submodules..."
+# Create Dependencies directory if it doesn't exist
+DEPS_DIR="$(pwd)/Dependencies"
+if [ ! -d "$DEPS_DIR" ]; then
+    mkdir -p "$DEPS_DIR"
+    echo "Created Dependencies directory"
+fi
+
+# Initialize all git submodules if not already done
+if [ ! -d "$DEPS_DIR/FreeRTOS-Kernel/.git" ] || [ ! -d "$DEPS_DIR/pico-sdk/.git" ] || [ ! -d "$DEPS_DIR/picotool/.git" ]; then
+    echo "Initializing git submodules..."
+    git submodule update --init --recursive
+fi
+
+# Verify FreeRTOS-Kernel is at the correct commit
+FREERTOS_DIR="$DEPS_DIR/FreeRTOS-Kernel"
+FREERTOS_COMMIT="4f7299d6ea746b27a9dd19e87af568e34bd65b15"
+ACTUAL_COMMIT=$(cd "$FREERTOS_DIR" && git rev-parse HEAD)
+if [ "$ACTUAL_COMMIT" != "$FREERTOS_COMMIT" ]; then
+    echo "FreeRTOS-Kernel is not at the expected commit. Updating..."
+    (cd "$FREERTOS_DIR" && git fetch && git checkout "$FREERTOS_COMMIT")
+fi
+
+# Verify pico-sdk is at the correct version
+PICO_SDK_DIR="$DEPS_DIR/pico-sdk"
+PICO_SDK_TAG="2.1.1"
+ACTUAL_TAG=$(cd "$PICO_SDK_DIR" && git describe --tags --exact-match 2>/dev/null || echo "unknown")
+if [ "$ACTUAL_TAG" != "$PICO_SDK_TAG" ]; then
+    echo "pico-sdk is not at the expected version. Updating..."
+    (cd "$PICO_SDK_DIR" && git fetch && git checkout "$PICO_SDK_TAG" && git submodule update --init)
+fi
+
+# Verify picotool is at the correct version
+PICOTOOL_DIR="$DEPS_DIR/picotool"
+PICOTOOL_TAG="2.1.1"
+ACTUAL_TAG=$(cd "$PICOTOOL_DIR" && git describe --tags --exact-match 2>/dev/null || echo "unknown")
+if [ "$ACTUAL_TAG" != "$PICOTOOL_TAG" ]; then
+    echo "picotool is not at the expected version. Updating..."
+    (cd "$PICOTOOL_DIR" && git fetch && git checkout "$PICOTOOL_TAG")
+fi
+
+# Build and install picotool
+# Check if picotool needs to be built/installed (always if not found in /usr/local/bin)
+if [ ! -f "/usr/local/bin/picotool" ]; then
+    echo "Building and installing picotool..."
+    
+    # Create build directory if it doesn't exist
+    if [ ! -d "$PICOTOOL_DIR/build" ]; then
+        mkdir -p "$PICOTOOL_DIR/build"
+    fi
+    
+    # Configure, build and install picotool
+    cd "$PICOTOOL_DIR/build"
+    export PICO_SDK_PATH="$PICO_SDK_DIR"
+    cmake ..
+    make
+    sudo make install
+    
+    # Return to the original directory
+    cd "$OLDPWD"
+    
+    echo "picotool built and installed successfully"
+fi
+
+# Export environment variables for CMake
+export FREERTOS_KERNEL_PATH="$FREERTOS_DIR"
+export PICO_SDK_PATH="$PICO_SDK_DIR"
+export PICOTOOL_FETCH_FROM_GIT_PATH="$PICOTOOL_DIR"
+
+echo "Using FreeRTOS-Kernel at: $FREERTOS_KERNEL_PATH"
+echo "Using pico-sdk at: $PICO_SDK_PATH"
+echo "Using picotool at: $PICOTOOL_DIR"
 
 # Parse command line arguments
 CLEAN_BUILD=0

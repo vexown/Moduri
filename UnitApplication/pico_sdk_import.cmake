@@ -1,25 +1,19 @@
 # ------------------------------------------------------------------------------
-# This CMake script helps locate and include the Raspberry Pi Pico SDK for use 
-# in an external project. It checks if the PICO_SDK_PATH environment variable 
-# is set or provided as a CMake argument, verifies the SDK's existence, and 
-# then includes the necessary SDK initialization file. 
+# This CMake script enforces the use of the Pico SDK from the project's
+# submodule at a specific version. This ensures consistent builds regardless of
+# environment settings.
 #
-# Original source: <PICO_SDK_PATH>/external/pico_sdk_import.cmake
 # Git repository: https://github.com/raspberrypi/pico-sdk
+# Specific tag: 2.1.1
 # ------------------------------------------------------------------------------
 
-if (NOT DEFINED ENV{PICO_SDK_PATH})
-    message(FATAL_ERROR "Environmental variable PICO_SDK_PATH is not defined - please define it with a path to the pico-sdk directory")
-endif ()
- 
-# Set the PICO_SDK_PATH variable if it's not already set, using the environment variable if available
-if (NOT DEFINED PICO_SDK_PATH)
-    set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
-    message("Using PICO_SDK_PATH from environment ('${PICO_SDK_PATH}')")
-endif ()
+# Get the absolute path to the current file
+get_filename_component(CURRENT_DIR "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE)
 
-# Cache the PICO_SDK_PATH variable to allow reuse between CMake runs
-set(PICO_SDK_PATH "${PICO_SDK_PATH}" CACHE PATH "Path to the Raspberry Pi Pico SDK" FORCE)
+# Force using the submodule path
+set(PICO_SDK_PATH "${CURRENT_DIR}/Dependencies/pico-sdk" CACHE PATH "Path to the Pico SDK" FORCE)
+
+message(STATUS "Using Pico SDK from submodule ('${PICO_SDK_PATH}')")
 
 # Convert PICO_SDK_PATH to an absolute path
 get_filename_component(PICO_SDK_PATH "${PICO_SDK_PATH}" REALPATH)

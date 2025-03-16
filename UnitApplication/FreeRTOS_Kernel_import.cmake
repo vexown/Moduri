@@ -1,25 +1,19 @@
 # ------------------------------------------------------------------------------
-# This CMake script helps locate and include the FreeRTOS kernel for the RP2350 
-# in an external project. It checks if the FREERTOS_KERNEL_PATH environment variable 
-# is set or provided as a CMake argument, verifies the kernel's existence, and 
-# then includes the necessary FreeRTOS port directory.
+# This CMake script enforces the use of the FreeRTOS Kernel from the project's
+# submodule at a specific version. This ensures consistent builds regardless of
+# environment settings.
 #
-# Original source: <FREERTOS_KERNEL_PATH>/portable/ThirdParty/GCC/RP2350_ARM_NTZ/FREERTOS_KERNEL_import.cmake
-# Git repository: <https://github.com/raspberrypi/FreeRTOS-Kernel>
+# Git repository: https://github.com/raspberrypi/FreeRTOS-Kernel
+# Specific commit: 4f7299d6ea746b27a9dd19e87af568e34bd65b15
 # ------------------------------------------------------------------------------
 
-if (NOT DEFINED ENV{FREERTOS_KERNEL_PATH})
-    message(FATAL_ERROR "Environment variable FREERTOS_KERNEL_PATH is not defined - please define it with a path to the FreeRTOS kernel directory")
-endif ()
+# Get the absolute path to the current file
+get_filename_component(CURRENT_DIR "${CMAKE_CURRENT_LIST_DIR}" ABSOLUTE)
 
-# Set the FREERTOS_KERNEL_PATH variable if it's not already set, using the environment variable if available
-if (NOT DEFINED FREERTOS_KERNEL_PATH)
-    set(FREERTOS_KERNEL_PATH $ENV{FREERTOS_KERNEL_PATH})
-    message(STATUS "Using FREERTOS_KERNEL_PATH from environment ('${FREERTOS_KERNEL_PATH}')")
-endif ()
+# Force using the submodule path
+set(FREERTOS_KERNEL_PATH "${CURRENT_DIR}/Dependencies/FreeRTOS-Kernel" CACHE PATH "Path to the FreeRTOS Kernel" FORCE)
 
-# Cache the FREERTOS_KERNEL_PATH variable to allow reuse between CMake runs
-set(FREERTOS_KERNEL_PATH "${FREERTOS_KERNEL_PATH}" CACHE PATH "Path to the FreeRTOS Kernel" FORCE)
+message(STATUS "Using FreeRTOS Kernel from submodule ('${FREERTOS_KERNEL_PATH}')")
 
 # Convert FREERTOS_KERNEL_PATH to an absolute path
 get_filename_component(FREERTOS_KERNEL_PATH "${FREERTOS_KERNEL_PATH}" REALPATH)
