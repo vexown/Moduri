@@ -339,7 +339,7 @@ TCP_Client_t* tcp_client_init(void) {
     err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
 #else
     // Convert server IP string to IP address structure
-    ipaddr_aton(EXTERNAL_SERVER_IP_ADDRESS, &server_ip);
+    ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
     // Connect to server
     err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
 #endif
@@ -616,10 +616,21 @@ bool start_TCP_client(void)
     }
     else if (clientGlobal != NULL && !clientGlobal->is_connected)
     {
-        LOG("TCP client already started but failed to connect. Freeing the client so it can be reinitialized... \n");
-        tcp_client_disconnect();
-        vPortFree(clientGlobal);
-        clientGlobal = NULL;
+        LOG("TCP client already started but has not connected yet. Waiting... \n");
+        
+        static int wait_cycle_count = 0; // 1 cycle = NETWORK_TASK_PERIOD_TICKS
+        if(wait_cycle_count >= 5)
+        {
+            LOG("Been waiting too long. Freeing the client so it can be reinitialized again... \n");
+            wait_cycle_count = 0;
+            tcp_client_disconnect();
+            vPortFree(clientGlobal);
+            clientGlobal = NULL;
+        }
+        else
+        {
+            wait_cycle_count++;
+        }
     }
     else
     {
