@@ -46,6 +46,14 @@
 #define WATCHDOG_ENABLED        OFF //TODO - reenable this once you figure out how to pet it during TLS operations during OTA
 
 /* Enables the OTA (Over-The-Air) firmware update feature. A TCP client will connect to specified server and download updated firmware if available */
-#define OTA_ENABLED             ON
+#define OTA_ENABLED             OFF
+#if (OTA_ENABLED == ON)
+    #if (PICO_W_AS_TCP_SERVER == ON) 
+    #error "OTA_ENABLED requires the Pico to be set up as a TCP client"
+    #endif
+    #if (USE_STATIC_IP == OFF)
+    #error "OTA_ENABLED requires USE_STATIC_IP to be ON"
+    #endif
+#endif
 
 #endif // MODURICONFIG_H
