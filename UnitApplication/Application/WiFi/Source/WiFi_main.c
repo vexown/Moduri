@@ -155,8 +155,12 @@ static void WiFi_ProcessCommand(uint8_t command)
             WiFiState = LISTENING;
             break;
         case PICO_TRANSITION_TO_MONITOR_MODE:
+#if (MONITORING_ENABLED == ON)
             LOG("Transitioning to Monitor Mode...\n");
             WiFiState = MONITOR;
+#else
+            LOG("Monitoring not enabled - turn it on in ModuriConfig.h\n");
+#endif
             break;
         case PICO_TRANSITION_TO_UPDATE_MODE:
             LOG("Transitioning to Update Mode...\n");
