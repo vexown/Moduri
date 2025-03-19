@@ -61,8 +61,8 @@ static void tcp_server_err_callback(void *arg, err_t err);
 #else
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
-TCP_Client_t* tcp_client_init(void);
-//TODO - add tcp_client_err_callback
+static void tcp_client_err_callback(void *arg, err_t err);
+static TCP_Client_t* tcp_client_init(void);
 #endif
 
 /*******************************************************************************/
@@ -259,101 +259,6 @@ err_t tcp_server_send(const char *data, uint16_t length)
 
 
 #else // PICO_W_AS_TCP_SERVER == OFF
-
-
-static void tcp_client_err_callback(void *arg, err_t err) 
-{
-    (void)arg; // Unused parameter
-
-    if (err != ERR_ABRT) // See list of possible error codes in lwip/err.h in pico-sdk
-    {
-        LOG("TCP Client Error Callback. Error value: %d\n", err);
-        tcp_client_disconnect();
-    }
-    else
-    {
-        LOG("ERR_ABRT \n");
-    }
-}
-
-/* 
- * Function: tcp_client_init
- * 
- * Description: 
- *      Allocates and initializes the TCP client structure, creates a new 
- *      TCP protocol control block (PCB), and initiates a connection to the 
- *      specified server. This function prepares the client for communication 
- *      by setting up necessary callbacks and connecting to the server.
- * 
- * Parameters:
- *  - None
- * 
- * Returns: 
- *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
- *                   successful; NULL if initialization or connection 
- *                   fails.
- */
-TCP_Client_t* tcp_client_init(void) {
-    ip_addr_t server_ip;
-    
-    // Allocate client structure
-    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
-    if (client == NULL) {
-        LOG("Failed to allocate client structure\n");
-        return NULL;
-    }
-
-    tcp_data_available_semaphore = xSemaphoreCreateBinary();
-    if (tcp_data_available_semaphore == NULL) 
-    {
-        LOG("Failed to create semaphore\n");
-        vPortFree(client);
-        client = NULL;
-        return NULL;
-    }
-
-    // Initialize client structure
-    client->pcb = NULL;
-    client->receive_length = 0;
-    client->is_connected = false;
-    client->is_closing = false;
-
-    // Create new TCP PCB
-    client->pcb = tcp_new();
-    if (client->pcb == NULL) {
-        LOG("Failed to create TCP PCB\n");
-        vPortFree(client);
-        return NULL;
-    }
-
-    // Set client structure as argument for callbacks
-    tcp_arg(client->pcb, client);
-
-    // Set up error callback
-    tcp_err(client->pcb, tcp_client_err_callback);
-
-#if (OTA_ENABLED == ON)
-    // Set up the TCP client to connect to the external server
-    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
-#else
-    // Convert server IP string to IP address structure
-    ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
-#endif
-
-
-    if (err != ERR_OK) {
-        LOG("TCP connect failed: %d\n", err);
-        tcp_close(client->pcb);
-        vPortFree(client);
-        return NULL;
-    }
-
-    return client;
-}
 
 // Custom send function for Mbed TLS
 int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len) 
@@ -609,6 +514,7 @@ bool start_TCP_client(void)
 {
     bool status = false;
 
+    /* Check the initialization and connection status of the TCP client */
     if(clientGlobal != NULL && clientGlobal->is_connected)
     {
         LOG("TCP client already started and connected \n");
@@ -621,9 +527,11 @@ bool start_TCP_client(void)
         static int wait_cycle_count = 0; // 1 cycle = NETWORK_TASK_PERIOD_TICKS
         if(wait_cycle_count >= 5)
         {
-            LOG("Been waiting too long. Freeing the client so it can be reinitialized again... \n");
+            LOG("Been waiting too long. Freeing the client so it can be initialized again... \n");
             wait_cycle_count = 0;
+            
             tcp_client_disconnect();
+            
             vPortFree(clientGlobal);
             clientGlobal = NULL;
         }
@@ -659,6 +567,7 @@ bool start_TCP_client(void)
         }
     }
 
+    /* If the client was successfully initialized, but not connected yet, wait for the connection to establish */
     if((status == true) && (!clientGlobal->is_connected))
     {
         LOG("Giving the network a few seconds to establish a connection... \n");
@@ -1126,6 +1035,86 @@ static bool tcp_server_open(void)
 #else
 
 /* 
+ * Function: tcp_client_init
+ * 
+ * Description: 
+ *      Allocates and initializes the TCP client structure, creates a new 
+ *      TCP protocol control block (PCB), and initiates a connection to the 
+ *      specified server. This function prepares the client for communication 
+ *      by setting up necessary callbacks and connecting to the server.
+ * 
+ * Parameters:
+ *  - None
+ * 
+ * Returns: 
+ *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
+ *                   successful; NULL if initialization or connection 
+ *                   fails.
+ */
+static TCP_Client_t* tcp_client_init(void) 
+{
+    ip_addr_t server_ip;
+    
+    // Allocate client structure
+    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
+    if (client == NULL) {
+        LOG("Failed to allocate client structure\n");
+        return NULL;
+    }
+
+    tcp_data_available_semaphore = xSemaphoreCreateBinary();
+    if (tcp_data_available_semaphore == NULL) 
+    {
+        LOG("Failed to create semaphore\n");
+        vPortFree(client);
+        client = NULL;
+        return NULL;
+    }
+
+    // Initialize client structure
+    client->pcb = NULL;
+    client->receive_length = 0;
+    client->is_connected = false;
+    client->is_closing = false;
+
+    // Create new TCP PCB
+    client->pcb = tcp_new();
+    if (client->pcb == NULL) {
+        LOG("Failed to create TCP PCB\n");
+        vPortFree(client);
+        return NULL;
+    }
+
+    // Set client structure as argument for callbacks
+    tcp_arg(client->pcb, client);
+
+    // Set up error callback
+    tcp_err(client->pcb, tcp_client_err_callback);
+
+#if (OTA_ENABLED == ON)
+    // Set up the TCP client to connect to the external server
+    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
+#else
+    // Convert server IP string to IP address structure
+    ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
+    // Connect to server
+    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
+#endif
+
+
+    if (err != ERR_OK) {
+        LOG("TCP connect failed: %d\n", err);
+        tcp_close(client->pcb);
+        vPortFree(client);
+        return NULL;
+    }
+
+    return client;
+}
+
+/* 
  * Function: tcp_client_recv_callback
  * 
  * Description: 
@@ -1228,6 +1217,52 @@ static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_
     
     LOG("TCP client connected to server\n");
     return ERR_OK;
+}
+
+/**
+ * Function: tcp_client_err_callback
+ * 
+ * Description: Callback function that is called when when a fatal error
+ *              has occurred on the connection.
+ * 
+ * Parameters:
+ *  - void *arg: A pointer to the TCP client structure (TCP_Client_t) that
+ *               is passed when the callback is registered.
+ *  - err_t err: Error status indicating the type of error that occurred.
+ * 
+ * Returns: void
+ * 
+ * Note: The corresponding pcb is already freed when this callback is called!
+ */
+static void tcp_client_err_callback(void *arg, err_t err) 
+{
+    (void)arg; // Unused parameter, we know the client is global
+
+    if(clientGlobal != NULL)
+    {
+        clientGlobal->is_connected = false;
+        clientGlobal->is_closing = false;
+        clientGlobal->pcb = NULL;
+    }
+
+    switch (err) 
+    {
+        case ERR_ABRT:
+            LOG("Connection aborted locally\n");
+            break;
+        case ERR_RST:
+            LOG("Connection reset by remote host\n");
+            break;
+        case ERR_CLSD:
+            LOG("Connection closed by remote host\n");
+            break;
+        case ERR_TIMEOUT:
+            LOG("Connection timed out\n");
+            break;
+        default:
+            LOG("TCP Client Error: %d\n", err);
+            break;
+    }
 }
 
 #endif
