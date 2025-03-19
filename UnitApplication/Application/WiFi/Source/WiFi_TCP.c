@@ -266,7 +266,7 @@ int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len
     TCP_Client_t *client = (TCP_Client_t *)ctx;
 
     // Check if the client is valid and connected
-    if (client == NULL || !client->is_connected || client->pcb == NULL) {
+    if (client == NULL || !tcp_client_is_connected || client->pcb == NULL) {
         LOG("Cannot send - client not connected\n");
         return MBEDTLS_ERR_NET_SEND_FAILED;
     }
@@ -298,7 +298,7 @@ int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
         }
         
         // Check if connection closed
-        if (!client->is_connected || client->is_closing) {
+        if (!tcp_client_is_connected || client->is_closing) {
             return MBEDTLS_ERR_NET_CONN_RESET;
         }
         
@@ -361,7 +361,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
     }
     
     /* Check if we are already connected to a host */
-    if(clientGlobal->is_connected)
+    if(tcp_client_is_connected())
     {
         /* Check if trying to connect to a different host/port while already connected */
         ip_addr_t requested_ip;
@@ -420,7 +420,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
     TickType_t xStartTime = xTaskGetTickCount();
     TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
 
-    while (!clientGlobal->is_connected && !clientGlobal->is_closing) 
+    while (!tcp_client_is_connected() && !clientGlobal->is_closing) 
     {
         /* Check if timeout has occurred */
         if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
@@ -434,7 +434,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
     }
     
     /* Client successfully connected (otherwise the while loop would have returned after timeout) */
-    return clientGlobal->is_connected;
+    return tcp_client_is_connected();
 }
 
 /**
@@ -482,7 +482,6 @@ void tcp_client_disconnect(void)
                 {
                     LOG("Connection closed\n");
                     clientGlobal->is_closing = false;
-                    clientGlobal->is_connected = false;
                     clientGlobal->pcb = NULL;
                     break;
                 }
@@ -495,7 +494,7 @@ void tcp_client_disconnect(void)
 
         /* As a last resort, if after the timeout the connection is still open, 
            force the abort which sends a RST segment to remote host. Ugly but never fails */
-        if (clientGlobal->is_connected == true)
+        if (tcp_client_is_connected() == true)
         {
             LOG("Error closing TCP connection - forcing abort... \n");
             tcp_abort(clientGlobal->pcb);
@@ -515,15 +514,15 @@ bool start_TCP_client(void)
     bool status = false;
 
     /* Check the initialization and connection status of the TCP client */
-    if(clientGlobal != NULL && clientGlobal->is_connected)
+    if(clientGlobal != NULL && tcp_client_is_connected())
     {
         LOG("TCP client already started and connected \n");
         status = true;
     }
-    else if (clientGlobal != NULL && !clientGlobal->is_connected)
+    else if (clientGlobal != NULL && !tcp_client_is_connected())
     {
-        LOG("TCP client already started but has not connected yet. Waiting... \n");
-        
+        LOG("TCP client already started but the host did not respond to the connection request yet. Waiting... \n");
+
         static int wait_cycle_count = 0; // 1 cycle = NETWORK_TASK_PERIOD_TICKS
         if(wait_cycle_count >= 5)
         {
@@ -568,7 +567,7 @@ bool start_TCP_client(void)
     }
 
     /* If the client was successfully initialized, but not connected yet, wait for the connection to establish */
-    if((status == true) && (!clientGlobal->is_connected))
+    if((status == true) && (!tcp_client_is_connected()))
     {
         LOG("Giving the network a few seconds to establish a connection... \n");
 
@@ -576,7 +575,7 @@ bool start_TCP_client(void)
         TickType_t xStartTime = xTaskGetTickCount();
         TickType_t xTimeoutTicks = pdMS_TO_TICKS(2500); // 2.5s
 
-        while (!clientGlobal->is_connected) 
+        while (!tcp_client_is_connected()) 
         {
             /* Check if timeout has occurred */
             if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
@@ -615,7 +614,7 @@ err_t tcp_client_send(const char *data, uint16_t length) {
     err_t err = ERR_OK;
     
     // Check if clientGlobal exists and is connected
-    if (clientGlobal == NULL || !clientGlobal->is_connected || clientGlobal->pcb == NULL) {
+    if (clientGlobal == NULL || !tcp_client_is_connected() || clientGlobal->pcb == NULL) {
         LOG("Cannot send - client not connected\n");
         return ERR_CONN;
     }
@@ -699,6 +698,23 @@ void tcp_client_process_recv_message(uint8_t *received_command)
     {
         LOG("Failed to acquire the pointer to receive buffer.\n");
     }
+}
+
+/**
+ * Function: tcp_client_is_connected
+ * 
+ * Description: Safely checks if TCP client is connected
+ * 
+ * Returns: bool indicating connection state
+ */
+bool tcp_client_is_connected(void) 
+{
+    if (clientGlobal == NULL || clientGlobal->pcb == NULL) 
+    {
+        return false;
+    }
+    
+    return (clientGlobal->pcb->state == ESTABLISHED);
 }
 
 #endif
@@ -1074,7 +1090,6 @@ static TCP_Client_t* tcp_client_init(void)
     // Initialize client structure
     client->pcb = NULL;
     client->receive_length = 0;
-    client->is_connected = false;
     client->is_closing = false;
 
     // Create new TCP PCB
@@ -1141,7 +1156,6 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
     
     if (p == NULL) {
         // Connection closed by remote host
-        client->is_connected = false;
         return ERR_OK;
     }
 
@@ -1208,9 +1222,6 @@ static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_
         LOG("TCP client connection failed: %d\n", err);
         return err;
     }
-
-    /* Set the client status to connected */
-    client->is_connected = true;
     
     /* Set up receive callback */
     tcp_recv(tpcb, tcp_client_recv_callback);
@@ -1240,7 +1251,6 @@ static void tcp_client_err_callback(void *arg, err_t err)
 
     if(clientGlobal != NULL)
     {
-        clientGlobal->is_connected = false;
         clientGlobal->is_closing = false;
         clientGlobal->pcb = NULL;
     }

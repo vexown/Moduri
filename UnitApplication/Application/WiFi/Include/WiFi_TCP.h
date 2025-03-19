@@ -34,7 +34,6 @@ typedef struct {
     struct tcp_pcb *pcb;                      // The TCP protocol control block - lwIP's main structure for a TCP connection
     uint8_t receive_buffer[TCP_RECV_BUFFER_SIZE]; // Buffer for incoming data
     uint16_t receive_length;                  // Length of received data
-    bool is_connected;                        // Connection status
     bool is_closing;                         // Connection closing status
 } TCP_Client_t;
 
@@ -54,6 +53,7 @@ bool tcp_client_connect(const char *host, uint16_t port);
 void tcp_client_disconnect(void);
 err_t tcp_client_send(const char *data, uint16_t length);
 void tcp_client_process_recv_message(uint8_t *received_command);
+bool tcp_client_is_connected(void);
 int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len);
 int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len);
 #endif /* PICO_W_AS_TCP_SERVER */

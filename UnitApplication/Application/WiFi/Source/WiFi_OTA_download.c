@@ -351,7 +351,7 @@ int download_firmware(void) {
             mbedtls_ssl_session_reset(&ssl);
             
             // Attempt to reconnect TCP client
-            if (clientGlobal->is_connected) {
+            if (tcp_client_is_connected()) {
                 tcp_client_disconnect();
             }
             
@@ -442,7 +442,7 @@ int download_firmware(void) {
     
 cleanup:
     // Try to close the SSL connection gracefully
-    if (clientGlobal && clientGlobal->is_connected) {
+    if (clientGlobal && tcp_client_is_connected()) {
         LOG("Closing TLS connection...\n");
         mbedtls_ssl_close_notify(&ssl);
     }
