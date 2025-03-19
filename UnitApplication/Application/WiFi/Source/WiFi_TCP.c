@@ -395,8 +395,9 @@ bool tcp_client_connect(const char *host, uint16_t port)
         }
         else
         {
-            LOG("TCP state is not CLOSED. Current state: %d \n", clientGlobal->pcb->state); // find enum tcp_state in pico-sdk for info about the states
+            LOG("TCP state is not CLOSED. Current state: %d - Attempting to reinitialize the TCP client... \n", clientGlobal->pcb->state); // find enum tcp_state in pico-sdk for info about the states
             tcp_client_disconnect();
+            WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
             return false;
         }
     }
@@ -413,6 +414,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
     if (err != ERR_OK) // This DOES NOT check if connection was successful, only if connection request was sent successfully
     {
         LOG("Failed to send connection request: %d\n", err);
+        WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
         return false;
     }
 
@@ -426,6 +428,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
         if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
         {
             LOG("Connection timeout\n");
+            WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
             return false;
         }
         
@@ -521,23 +524,12 @@ bool start_TCP_client(void)
     }
     else if (clientGlobal != NULL && !tcp_client_is_connected())
     {
-        LOG("TCP client already started but the host did not respond to the connection request yet. Waiting... \n");
-
-        static int wait_cycle_count = 0; // 1 cycle = NETWORK_TASK_PERIOD_TICKS
-        if(wait_cycle_count >= 5)
-        {
-            LOG("Been waiting too long. Freeing the client so it can be initialized again... \n");
-            wait_cycle_count = 0;
-            
-            tcp_client_disconnect();
-            
-            vPortFree(clientGlobal);
-            clientGlobal = NULL;
-        }
-        else
-        {
-            wait_cycle_count++;
-        }
+        LOG("TCP client is initialized but the connection is not established. Freeing resources and reinitializing... \n");
+        
+        tcp_client_disconnect();
+        
+        vPortFree(clientGlobal);
+        clientGlobal = NULL;
     }
     else
     {
@@ -651,6 +643,25 @@ err_t tcp_client_send(const char *data, uint16_t length) {
  */
 void tcp_client_process_recv_message(uint8_t *received_command) 
 {
+    // Make sure we have a valid client and receive buffer
+    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL) 
+    {
+        LOG("Invalid client or receive buffer\n");
+        return;
+    }
+
+    // Make sure client is connected so we can tell the difference between no connection and no data
+    if (!tcp_client_is_connected()) 
+    {
+        LOG("Attempted to receive data while not connected. Trying to reconnect...\n");
+#if (OTA_ENABLED == ON)
+        tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
+#else
+        tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
+#endif
+        return;
+    }
+
     // Wait for the mutex before accessing the buffer
     if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
     {
@@ -1273,6 +1284,9 @@ static void tcp_client_err_callback(void *arg, err_t err)
             LOG("TCP Client Error: %d\n", err);
             break;
     }
+
+    /* Attempt to recover connection by reinitializing the client */
+    WiFiState = INIT;
 }
 
 #endif

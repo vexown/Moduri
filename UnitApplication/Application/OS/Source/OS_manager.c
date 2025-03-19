@@ -88,7 +88,7 @@
 */
 /* Task periods */
 #define ALIVE_TASK_PERIOD_TICKS			    pdMS_TO_TICKS(500)  //500ms
-#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(5000)  //5s
+#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(1000)  //1s
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
@@ -348,8 +348,6 @@ static void networkTask(__unused void *taskParams)
 	/*******************************************************************************/
 	/*                          Task Initialization Code                           */
 	/*******************************************************************************/
-	TickType_t xLastWakeTime;
-
 #if (PICO_AS_ACCESS_POINT == ON)
 	if(setupWifiAccessPoint() == false)
 #else
@@ -359,15 +357,12 @@ static void networkTask(__unused void *taskParams)
 		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WIFI_DID_NOT_CONNECT);
 	}
 
-	/* Initialize xLastWakeTime - this only needs to be done once. */
-	xLastWakeTime = xTaskGetTickCount();
-
 	/*******************************************************************************/
 	/*                               Task Loop Code                                */
 	/*******************************************************************************/
     for( ;; )
 	{
-        vTaskDelayUntil(&xLastWakeTime, NETWORK_TASK_PERIOD_TICKS); /* Execute periodically at consistent intervals based on a reference time */
+        vTaskDelay(NETWORK_TASK_PERIOD_TICKS); 
 
 		WiFi_MainFunction();
 	}

@@ -42,21 +42,6 @@
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
 
-/* Wifi Communication Types */
-typedef enum {
-    UDP_COMMUNICATION = 0xAA,
-    TCP_COMMUNICATION = 0xAB
-} TransportLayerType;
-
-/* Communication State */
-typedef enum {
-    INIT = 0,
-    LISTENING = 1,
-    ACTIVE_SEND_AND_RECEIVE = 2,
-    MONITOR = 3,
-    UPDATE = 4
-} WiFiStateType;
-
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
 /*******************************************************************************/
@@ -69,7 +54,7 @@ static TransportLayerType TransportLayer = TCP_COMMUNICATION; /* select either T
 #endif
 
 /* Current Communication State */
-static WiFiStateType WiFiState = INIT; 
+WiFiStateType WiFiState = INIT; 
 
 /*******************************************************************************/
 /*                          STATIC FUNCTION DECLARATIONS                       */
