@@ -14,3 +14,6 @@
 [submodule "UnitApplication/Dependencies/debugprobe"]
 	path = UnitApplication/Dependencies/debugprobe
 	url = https://github.com/raspberrypi/debugprobe.git
+[submodule "UnitApplication/Dependencies/esp-idf"]
+	path = UnitApplication/Dependencies/esp-idf
+	url = https://github.com/espressif/esp-idf
