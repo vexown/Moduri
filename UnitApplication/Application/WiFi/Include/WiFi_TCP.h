@@ -38,24 +38,42 @@ typedef struct {
 } TCP_Client_t;
 
 /*******************************************************************************/
+/*                               GLOBAL VARIABLES                              */
+/*******************************************************************************/
+#if (PICO_W_AS_TCP_SERVER == ON)
+/* Global server instance */
+extern tcpServerType *tcpServerGlobal;
+#else
+/* Global client instance */
+extern TCP_Client_t *clientGlobal;
+#endif
+
+/*******************************************************************************/
 /*                        GLOBAL FUNCTION DELCARATION                          */
 /*******************************************************************************/
+err_t tcp_send(const char *data, uint16_t length);
+void tcp_receive(uint8_t *received_command);
 
 #if (PICO_W_AS_TCP_SERVER == ON)
+/* Global server instance */
+extern tcpServerType *tcpServerGlobal;
+
+/* Server initialization */
 bool start_TCP_server(void);
-err_t tcp_server_send(const char *data, uint16_t length);
-void tcp_server_process_recv_message(uint8_t *received_command);
+/* Connection management */
 void tcp_close_client_connection(struct tcp_pcb *client_pcb);
 #else
+/* Global client instance */
 extern TCP_Client_t *clientGlobal;
+/* Client initialization */
 bool start_TCP_client(void);
+/* Connection management */
 bool tcp_client_connect(const char *host, uint16_t port);
 void tcp_client_disconnect(void);
-err_t tcp_client_send(const char *data, uint16_t length);
-void tcp_client_process_recv_message(uint8_t *received_command);
 bool tcp_client_is_connected(void);
+/* OTA specific functions */
 int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len);
 int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len);
-#endif /* PICO_W_AS_TCP_SERVER */
+#endif
 
 #endif /* WIFI_TCP_H */

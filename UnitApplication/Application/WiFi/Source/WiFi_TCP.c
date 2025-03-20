@@ -37,14 +37,20 @@
 #include "Common.h"
 
 /*******************************************************************************/
-/*                               STATIC VARIABLES                              */
+/*                               GLOBAL VARIABLES                              */
 /*******************************************************************************/
 #if (PICO_W_AS_TCP_SERVER == ON)
-static tcpServerType *tcpServerGlobal;
+tcpServerType *tcpServerGlobal;
 #else
 TCP_Client_t *clientGlobal;
-static SemaphoreHandle_t tcp_data_available_semaphore = NULL;
 #endif
+
+/*******************************************************************************/
+/*                               STATIC VARIABLES                              */
+/*******************************************************************************/
+
+/* Semaphore for notifying the TCP server that data is available */
+static SemaphoreHandle_t tcp_data_available_semaphore = NULL;
 
 /* Common mutex for accessing the TCP receive buffer */
 static SemaphoreHandle_t bufferMutex;
@@ -53,21 +59,77 @@ static SemaphoreHandle_t bufferMutex;
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
 #if (PICO_W_AS_TCP_SERVER == ON)
+/* Open/close server */
 static bool tcp_server_open();
+static void tcp_server_close(tcpServerType *tcpServer);
+/* Callback functions */
 static err_t tcp_server_accept_callback(void *arg, struct tcp_pcb *client_pcb, err_t err);
 static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *buffer, err_t err);
-static void tcp_server_close(tcpServerType *tcpServer);
 static void tcp_server_err_callback(void *arg, err_t err);
+/* Send/receive functions */
+static void tcp_server_process_recv_message(uint8_t *received_command);
+static void tcp_server_send(const char *data, uint16_t length);
 #else
+/* Initialization functions */
+static TCP_Client_t* tcp_client_init(void);
+/* Callback functions */
 static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 static void tcp_client_err_callback(void *arg, err_t err);
-static TCP_Client_t* tcp_client_init(void);
+/* Send/receive functions */
+static void tcp_client_process_recv_message(uint8_t *received_command);
+static err_t tcp_client_send(const char *data, uint16_t length);
 #endif
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
+
+/* 
+ * Function: tcp_send
+ * 
+ * Description: Unified function for sending data over TCP. It calls the appropriate
+ *              send function based on the configuration of the Pico as a TCP server
+ *              or client.
+ * 
+ * Parameters:
+ *  - const char *data: Pointer to the data to be sent.
+ *  - uint16_t length: Length of the data to be sent.
+ * 
+ * Returns: err_t indicating the result of the send operation.
+ */
+err_t tcp_send(const char *data, uint16_t length)
+{
+#if (PICO_W_AS_TCP_SERVER == ON)
+    return tcp_server_send(data, length);
+#else
+    return tcp_client_send(data, length);
+#endif
+}
+
+/* 
+ * Function: tcp_receive
+ * 
+ * Description: Unified function for receiving data over TCP. It calls the appropriate
+ *              receive function based on the configuration of the Pico as a TCP server
+ *              or client.
+ * 
+ * Parameters:
+ *  - uint8_t *data: Pointer to the received data.
+ * 
+ * Returns: void
+ * 
+ * Note: This function doesn't actually receive data, it just fetches the data from the buffer. 
+ *       The actual data reception is done asynchronously by the lwIP stack and the receive callbacks.
+ */
+void tcp_receive(uint8_t *data)
+{
+#if (PICO_W_AS_TCP_SERVER == ON)
+    tcp_server_process_recv_message(data); // Fetch data received in tcp_server_recv_callback
+#else
+    tcp_client_process_recv_message(data); // Fetch data received in tcp_client_recv_callback
+#endif
+}
 
 #if (PICO_W_AS_TCP_SERVER == ON)
 /* 
@@ -146,118 +208,6 @@ bool start_TCP_server(void)
     return status;
 }
 
-/* 
- * Function: tcp_server_process_recv_message
- * 
- * Description: 
- *      Prints the received buffer and analyzes its content.
- *      Checks if the buffer starts with "cmd:".
- *      If it does, it extracts the numeric value following "cmd:"
- *      and stores it as the received command.
- * 
- * Parameters:
- *  - received_command: Pointer to store the extracted command value
- * 
- * Returns: 
- *  - void
- */
-void tcp_server_process_recv_message(uint8_t *received_command) 
-{
-    // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
-    {
-        // Access the receive buffer
-        uint8_t *buffer = tcpServerGlobal->receive_buffer;
-
-        // Print the entire received buffer
-        LOG("Received message: %s\n", buffer);
-
-        // Check if the buffer starts with "cmd:"
-        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
-        {
-            // Extract the number after "cmd:"
-            // Explanation of atoi return value:
-            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
-            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
-            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
-            int command_value = atoi((const char *)&buffer[4]);
-
-            // Ensure the command value is within 0-255 range
-            if (command_value >= 0 && command_value <= 255) 
-            {
-                *received_command = (uint8_t)command_value;
-                LOG("Received command: %u\n", *received_command);
-            } 
-            else 
-            {
-                LOG("Command value out of range (0-255).\n");
-            }
-        } 
-        else 
-        {
-            LOG("No command found in received message.\n");
-        }
-
-        // Clear the buffer after processing
-        memset(tcpServerGlobal->receive_buffer, 0, sizeof(tcpServerGlobal->receive_buffer));
-
-        // Release the mutex after access
-        xSemaphoreGive(bufferMutex); 
-    } 
-    else 
-    {
-        LOG("Failed to acquire the pointer to receive buffer.\n");
-    }
-}
-
-/* 
- * Function: tcp_server_send
- * 
- * Description: 
- *      Checks if the TCP server has an active client connection. If connected, 
- *      it uses tcp_write() to queue the data for sending and then uses 
- *      tcp_output() to actually send the queued data over the network.
- * 
- * Parameters:
- *  - const char *data: Pointer to the data buffer to be sent.
- *  - uint16_t length: Length of the data to be sent.
- * 
- * Returns: 
- *  - err_t: An error code indicating the success (ERR_OK) or failure 
- *            (e.g., ERR_CONN if no client is connected or other 
- *            error codes from tcp_write() or tcp_output()) of the send operation.
- */
-err_t tcp_server_send(const char *data, uint16_t length) 
-{
-    err_t err = ERR_OK;
-    
-    /* Check if tcpServerGlobal exists and has an active client connection */
-    if (tcpServerGlobal == NULL || tcpServerGlobal->client_pcb == NULL) 
-    {
-        LOG("Cannot send - no client connected\n");
-        return ERR_CONN;
-    }
-    
-    /* Send data */
-    err = tcp_write(tcpServerGlobal->client_pcb, data, length, TCP_WRITE_FLAG_COPY);
-    if (err == ERR_OK) 
-    {
-        /* Actually send the data */
-        err = tcp_output(tcpServerGlobal->client_pcb);
-        if (err != ERR_OK) 
-        {
-            LOG("tcp_output failed: %d\n", err);
-        }
-    } 
-    else 
-    {
-        LOG("tcp_write failed: %d\n", err);
-    }
-    
-    return err;
-}
-
-
 #else // PICO_W_AS_TCP_SERVER == OFF
 
 // Custom send function for Mbed TLS
@@ -271,14 +221,14 @@ int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len
         return MBEDTLS_ERR_NET_SEND_FAILED;
     }
 
-    // Use your existing tcp_client_send function
-    err_t err = tcp_client_send((const char *)buf, len);
+    // Use your existing tcp_send function
+    err_t err = tcp_send((const char *)buf, len);
     if (err != ERR_OK) {
-        LOG("tcp_client_send failed: %d\n", err);
+        LOG("tcp_send failed: %d\n", err);
         return MBEDTLS_ERR_NET_SEND_FAILED;
     }
 
-    // Since tcp_client_send doesn't return bytes sent, assume full send on success
+    // Since tcp_send doesn't return bytes sent, assume full send on success
     // Note: lwIP's tcp_write is non-blocking, but tcp_output flushes, so this is usually safe
     LOG("Sent %u bytes\n", len); 
     return (int)len;
@@ -583,132 +533,6 @@ bool start_TCP_client(void)
     }
         
     return status;
-}
-
-/* 
- * Function: tcp_client_send
- * 
- * Description: 
- *      Checks if the TCP client is connected. If connected, it uses tcp_write() 
- *      to queue the data for sending and then uses tcp_output() to actually send 
- *      the queued data over the network.
- * 
- * Parameters:
- *  - const char *data: Pointer to the data buffer to be sent.
- *  - uint16_t length: Length of the data to be sent.
- * 
- * Returns: 
- *  - err_t: An error code indicating the success (ERR_OK) or failure 
- *            (e.g., ERR_CONN if the client is not connected or other 
- *            error codes from tcp_write() or tcp_output()) of the send operation.
- */
-err_t tcp_client_send(const char *data, uint16_t length) {
-    err_t err = ERR_OK;
-    
-    // Check if clientGlobal exists and is connected
-    if (clientGlobal == NULL || !tcp_client_is_connected() || clientGlobal->pcb == NULL) {
-        LOG("Cannot send - client not connected\n");
-        return ERR_CONN;
-    }
-    
-    // Send data
-    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
-    if (err == ERR_OK) {
-        // Actually send the data
-        err = tcp_output(clientGlobal->pcb);
-        if (err != ERR_OK) {
-            LOG("tcp_output failed: %d\n", err);
-        }
-    } else {
-        LOG("tcp_write failed: %d\n", err);
-    }
-    
-    return err;
-}
-
-/* 
- * Function: tcp_client_process_recv_message
- * 
- * Description: 
- *      Prints the received buffer and analyzes its content.
- *      Checks if the buffer starts with "cmd:".
- *      If it does, it extracts the numeric value following "cmd:"
- *      and stores it as the received command.
- * 
- * Parameters:
- *  - received_command: Pointer to store the extracted command value
- * 
- * Returns: 
- *  - void
- */
-void tcp_client_process_recv_message(uint8_t *received_command) 
-{
-    // Make sure we have a valid client and receive buffer
-    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL) 
-    {
-        LOG("Invalid client or receive buffer\n");
-        return;
-    }
-
-    // Make sure client is connected so we can tell the difference between no connection and no data
-    if (!tcp_client_is_connected()) 
-    {
-        LOG("Attempted to receive data while not connected. Trying to reconnect...\n");
-#if (OTA_ENABLED == ON)
-        tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
-#else
-        tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
-#endif
-        return;
-    }
-
-    // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
-    {
-        // Access the receive buffer
-        uint8_t *buffer = clientGlobal->receive_buffer;
-
-        // Print the entire received buffer
-        LOG("Received message: %s\n", buffer);
-
-        // Check if the buffer starts with "cmd:"
-        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
-        {
-            // Extract the number after "cmd:"
-            // Explanation of atoi return value:
-            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
-            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
-            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
-            int command_value = atoi((const char *)&buffer[4]);
-
-            // Ensure the command value is within 0-255 range
-            if (command_value >= 0 && command_value <= 255) 
-            {
-                *received_command = (uint8_t)command_value;
-                LOG("Received command: %u\n", *received_command);
-            } 
-            else 
-            {
-                LOG("Command value out of range (0-255).\n");
-            }
-        } 
-        else 
-        {
-            LOG("No command found in received message.\n");
-        }
-
-        // Clear the buffer after processing
-        memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
-        // Set the receive length to 0
-        clientGlobal->receive_length = 0;
-
-        // Release the mutex after access
-        xSemaphoreGive(bufferMutex); 
-    } 
-    else 
-    {
-        LOG("Failed to acquire the pointer to receive buffer.\n");
-    }
 }
 
 /**
@@ -1059,6 +883,117 @@ static bool tcp_server_open(void)
     return true;
 }
 
+/* 
+ * Function: tcp_server_process_recv_message
+ * 
+ * Description: 
+ *      Prints the received buffer and analyzes its content.
+ *      Checks if the buffer starts with "cmd:".
+ *      If it does, it extracts the numeric value following "cmd:"
+ *      and stores it as the received command.
+ * 
+ * Parameters:
+ *  - received_command: Pointer to store the extracted command value
+ * 
+ * Returns: 
+ *  - void
+ */
+static void tcp_server_process_recv_message(uint8_t *received_command) 
+{
+    // Wait for the mutex before accessing the buffer
+    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    {
+        // Access the receive buffer
+        uint8_t *buffer = tcpServerGlobal->receive_buffer;
+
+        // Print the entire received buffer
+        LOG("Received message: %s\n", buffer);
+
+        // Check if the buffer starts with "cmd:"
+        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
+        {
+            // Extract the number after "cmd:"
+            // Explanation of atoi return value:
+            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
+            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
+            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
+            int command_value = atoi((const char *)&buffer[4]);
+
+            // Ensure the command value is within 0-255 range
+            if (command_value >= 0 && command_value <= 255) 
+            {
+                *received_command = (uint8_t)command_value;
+                LOG("Received command: %u\n", *received_command);
+            } 
+            else 
+            {
+                LOG("Command value out of range (0-255).\n");
+            }
+        } 
+        else 
+        {
+            LOG("No command found in received message.\n");
+        }
+
+        // Clear the buffer after processing
+        memset(tcpServerGlobal->receive_buffer, 0, sizeof(tcpServerGlobal->receive_buffer));
+
+        // Release the mutex after access
+        xSemaphoreGive(bufferMutex); 
+    } 
+    else 
+    {
+        LOG("Failed to acquire the pointer to receive buffer.\n");
+    }
+}
+
+/* 
+ * Function: tcp_server_send
+ * 
+ * Description: 
+ *      Checks if the TCP server has an active client connection. If connected, 
+ *      it uses tcp_write() to queue the data for sending and then uses 
+ *      tcp_output() to actually send the queued data over the network.
+ * 
+ * Parameters:
+ *  - const char *data: Pointer to the data buffer to be sent.
+ *  - uint16_t length: Length of the data to be sent.
+ * 
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_CONN if no client is connected or other 
+ *            error codes from tcp_write() or tcp_output()) of the send operation.
+ */
+static err_t tcp_server_send(const char *data, uint16_t length) 
+{
+    err_t err = ERR_OK;
+    
+    /* Check if tcpServerGlobal exists and has an active client connection */
+    if (tcpServerGlobal == NULL || tcpServerGlobal->client_pcb == NULL) 
+    {
+        LOG("Cannot send - no client connected\n");
+        return ERR_CONN;
+    }
+    
+    /* Send data */
+    err = tcp_write(tcpServerGlobal->client_pcb, data, length, TCP_WRITE_FLAG_COPY);
+    if (err == ERR_OK) 
+    {
+        /* Actually send the data */
+        err = tcp_output(tcpServerGlobal->client_pcb);
+        if (err != ERR_OK) 
+        {
+            LOG("tcp_output failed: %d\n", err);
+        }
+    } 
+    else 
+    {
+        LOG("tcp_write failed: %d\n", err);
+    }
+    
+    return err;
+}
+
 #else
 
 /* 
@@ -1138,6 +1073,132 @@ static TCP_Client_t* tcp_client_init(void)
     }
 
     return client;
+}
+
+/* 
+ * Function: tcp_client_send
+ * 
+ * Description: 
+ *      Checks if the TCP client is connected. If connected, it uses tcp_write() 
+ *      to queue the data for sending and then uses tcp_output() to actually send 
+ *      the queued data over the network.
+ * 
+ * Parameters:
+ *  - const char *data: Pointer to the data buffer to be sent.
+ *  - uint16_t length: Length of the data to be sent.
+ * 
+ * Returns: 
+ *  - err_t: An error code indicating the success (ERR_OK) or failure 
+ *            (e.g., ERR_CONN if the client is not connected or other 
+ *            error codes from tcp_write() or tcp_output()) of the send operation.
+ */
+static err_t tcp_client_send(const char *data, uint16_t length) {
+    err_t err = ERR_OK;
+    
+    // Check if clientGlobal exists and is connected
+    if (clientGlobal == NULL || !tcp_client_is_connected() || clientGlobal->pcb == NULL) {
+        LOG("Cannot send - client not connected\n");
+        return ERR_CONN;
+    }
+    
+    // Send data
+    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
+    if (err == ERR_OK) {
+        // Actually send the data
+        err = tcp_output(clientGlobal->pcb);
+        if (err != ERR_OK) {
+            LOG("tcp_output failed: %d\n", err);
+        }
+    } else {
+        LOG("tcp_write failed: %d\n", err);
+    }
+    
+    return err;
+}
+
+/* 
+ * Function: tcp_client_process_recv_message
+ * 
+ * Description: 
+ *      Prints the received buffer and analyzes its content.
+ *      Checks if the buffer starts with "cmd:".
+ *      If it does, it extracts the numeric value following "cmd:"
+ *      and stores it as the received command.
+ * 
+ * Parameters:
+ *  - received_command: Pointer to store the extracted command value
+ * 
+ * Returns: 
+ *  - void
+ */
+static void tcp_client_process_recv_message(uint8_t *received_command) 
+{
+    // Make sure we have a valid client and receive buffer
+    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL) 
+    {
+        LOG("Invalid client or receive buffer\n");
+        return;
+    }
+
+    // Make sure client is connected so we can tell the difference between no connection and no data
+    if (!tcp_client_is_connected()) 
+    {
+        LOG("Attempted to receive data while not connected. Trying to reconnect...\n");
+#if (OTA_ENABLED == ON)
+        tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
+#else
+        tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
+#endif
+        return;
+    }
+
+    // Wait for the mutex before accessing the buffer
+    if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
+    {
+        // Access the receive buffer
+        uint8_t *buffer = clientGlobal->receive_buffer;
+
+        // Print the entire received buffer
+        LOG("Received message: %s\n", buffer);
+
+        // Check if the buffer starts with "cmd:"
+        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
+        {
+            // Extract the number after "cmd:"
+            // Explanation of atoi return value:
+            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
+            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
+            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
+            int command_value = atoi((const char *)&buffer[4]);
+
+            // Ensure the command value is within 0-255 range
+            if (command_value >= 0 && command_value <= 255) 
+            {
+                *received_command = (uint8_t)command_value;
+                LOG("Received command: %u\n", *received_command);
+            } 
+            else 
+            {
+                LOG("Command value out of range (0-255).\n");
+            }
+        } 
+        else 
+        {
+            LOG("No command found in received message.\n");
+        }
+
+        // Clear the buffer after processing
+        memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
+        // Set the receive length to 0
+        clientGlobal->receive_length = 0;
+
+        // Release the mutex after access
+        xSemaphoreGive(bufferMutex); 
+    } 
+    else 
+    {
+        LOG("Failed to acquire the pointer to receive buffer.\n");
+    }
 }
 
 /* 

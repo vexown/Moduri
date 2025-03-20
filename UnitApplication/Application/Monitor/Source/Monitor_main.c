@@ -132,41 +132,40 @@ void Monitor_MainFunction(void)
     }
     else /* Notification was received - send Monitor data over TCP */
     {
-#if (PICO_W_AS_TCP_SERVER == ON)
         char buffer[256];
 
         snprintf(buffer, sizeof(buffer), "\n=== System Statistics ===\n");
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Available Heap Space (sum of free blocks): %u bytes\n", stats.heap_stats.xAvailableHeapSpaceInBytes);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Largest Free Block: %u bytes\n", stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Size of Smallest Free Block: %u bytes\n", stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of Free Blocks: %u\n", stats.heap_stats.xNumberOfFreeBlocks);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful pvPortMalloc calls: %u\n", stats.heap_stats.xNumberOfSuccessfulAllocations);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of successful vPortFree calls: %u\n", stats.heap_stats.xNumberOfSuccessfulFrees);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "\n=== Task Statistics ===\n");
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Number of Tasks: %lu\n", stats.currentNumOfTasks);
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         snprintf(buffer, sizeof(buffer), "Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
+        tcp_send(buffer, (uint16_t)strlen(buffer));
 
         for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
         {
@@ -189,74 +188,11 @@ void Monitor_MainFunction(void)
                     taskStatusArray[task_num].uxCurrentPriority,
                     taskStatusArray[task_num].usStackHighWaterMark,
                     taskStatusArray[task_num].xTaskNumber);
-            tcp_server_send(buffer, (uint16_t)strlen(buffer));
+            tcp_send(buffer, (uint16_t)strlen(buffer));
         }
 
         snprintf(buffer, sizeof(buffer), "\n");
-        tcp_server_send(buffer, (uint16_t)strlen(buffer));
-#else
-        char buffer[256];
-
-        snprintf(buffer, sizeof(buffer), "\n=== System Statistics ===\n");
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Available Heap Space (sum of free blocks): %u bytes\n", stats.heap_stats.xAvailableHeapSpaceInBytes);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Size of Largest Free Block: %u bytes\n", stats.heap_stats.xSizeOfLargestFreeBlockInBytes);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Size of Smallest Free Block: %u bytes\n", stats.heap_stats.xSizeOfSmallestFreeBlockInBytes);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Number of Free Blocks: %u\n", stats.heap_stats.xNumberOfFreeBlocks);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Minimum amount of total free memory since boot: %u bytes\n", stats.heap_stats.xMinimumEverFreeBytesRemaining);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Number of successful pvPortMalloc calls: %u\n", stats.heap_stats.xNumberOfSuccessfulAllocations);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Number of successful vPortFree calls: %u\n", stats.heap_stats.xNumberOfSuccessfulFrees);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "\n=== Task Statistics ===\n");
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Number of Tasks: %lu\n", stats.currentNumOfTasks);
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        snprintf(buffer, sizeof(buffer), "Name\t\tState\tPrio\tRemainingStack\tTaskNum\n");
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-
-        for (UBaseType_t task_num = 0; task_num < populatedArraySize; task_num++) 
-        {
-            char taskState = 'X';
-            /* Cast the numeric taskState to a char representation */
-            switch (taskStatusArray[task_num].eCurrentState) 
-            {
-                case eRunning:   taskState = 'R'; break;
-                case eReady:     taskState = 'r'; break;
-                case eBlocked:   taskState = 'B'; break;
-                case eSuspended: taskState = 'S'; break;
-                case eDeleted:   taskState = 'D'; break;
-                case eInvalid:   taskState = 'I'; break;
-            }
-            
-            /* Format and send task statistics */
-            snprintf(buffer, sizeof(buffer), "%-16s%c\t%lu\t%lu\t\t%lu\n",
-                    taskStatusArray[task_num].pcTaskName,
-                    taskState,
-                    taskStatusArray[task_num].uxCurrentPriority,
-                    taskStatusArray[task_num].usStackHighWaterMark,
-                    taskStatusArray[task_num].xTaskNumber);
-            tcp_client_send(buffer, (uint16_t)strlen(buffer));
-        }
-
-        snprintf(buffer, sizeof(buffer), "\n");
-        tcp_client_send(buffer, (uint16_t)strlen(buffer));
-#endif
+        tcp_send(buffer, (uint16_t)strlen(buffer));
     }
 }
 

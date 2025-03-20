@@ -39,9 +39,6 @@ static int test_server_content(const char *request, const char *query, char *res
 /*******************************************************************************/
 
 #if (HTTP_ENABLED == ON)
-#if (PICO_W_AS_TCP_SERVER == ON)
-/* Not handled currently */
-#else
 /**
  * Function: send_http_get_request
  * 
@@ -77,7 +74,7 @@ bool send_http_get_request(const char *host, const char *path)
     }
 
     // Send the HTTP GET request
-    err_t result = tcp_client_send(http_request, len);
+    err_t result = tcp_send(http_request, len);
     if (result != ERR_OK) 
     {
         LOG("Failed to send HTTP request: %d\n", result);
@@ -88,7 +85,6 @@ bool send_http_get_request(const char *host, const char *path)
 
     return true;
 }
-#endif
 
 /**
  * Function: process_HTTP_response

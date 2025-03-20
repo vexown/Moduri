@@ -177,11 +177,7 @@ static void WiFi_ListenState(void)
 
     if(TransportLayer == TCP_COMMUNICATION)
     {
-#if (PICO_W_AS_TCP_SERVER == ON)
-        tcp_server_process_recv_message(&received_command);
-#else
-        tcp_client_process_recv_message(&received_command);
-#endif
+        tcp_receive(&received_command);
         if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -218,20 +214,13 @@ static void WiFi_ActiveState(void)
     {
         /************** RX **************/
         /* Handle any received messages */
-#if (PICO_W_AS_TCP_SERVER == ON)
-        tcp_server_process_recv_message(&received_command);
-#else
-        tcp_client_process_recv_message(&received_command);
-#endif
+        tcp_receive(&received_command);
+
         WiFi_ProcessCommand(received_command); 
 
          /************** TX **************/
         /* Send a message (for now just a test message) */
-#if (PICO_W_AS_TCP_SERVER == ON)
-        tcp_server_send(message, (uint16_t)strlen(message));
-#else
-        tcp_client_send(message, (uint16_t)strlen(message));
-#endif
+        tcp_send(message, (uint16_t)strlen(message));
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
@@ -270,11 +259,8 @@ static void WiFi_MonitorState(void)
     {
         /************** RX **************/
         /* Handle any received messages */
-#if (PICO_W_AS_TCP_SERVER == ON)
-        tcp_server_process_recv_message(&received_command);
-#else
-        tcp_client_process_recv_message(&received_command);
-#endif
+        tcp_receive(&received_command);
+
         WiFi_ProcessCommand(received_command); 
 
          /************** TX **************/
