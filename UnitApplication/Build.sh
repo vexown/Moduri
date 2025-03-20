@@ -118,9 +118,9 @@ echo "Installing ESP32 toolchain..."
 cd "$ESP_IDF_DIR"
 ./install.sh esp32
 . ./export.sh
-cd ../../esp32_blinky
+cd ../../Application
 idf.py set-target esp32
-idf.py menuconfig
+#TODO - find out if this is needed: idf.py menuconfig 
 idf.py build
 
 #TODO - move this to Flash.sh
