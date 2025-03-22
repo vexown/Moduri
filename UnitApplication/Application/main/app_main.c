@@ -6,20 +6,20 @@
 
 /**
  * ****************************************************************************
- * hello_world_main.c
+ * app_main.c
  *
  * Description:
- * This is the main application file for the ESP32 hello world example.
- * It demonstrates basic ESP32 functionality and displays detailed chip information.
+ * This is the main application file for the Moduri application.
+ * It serves as the entry point and handles system initialization.
  * 
  * The application performs the following tasks:
- * 1. Prints a hello world message
+ * 1. Prints a welcome message
  * 2. Displays detailed chip information (CPU cores, features, revision)
  * 3. Shows flash memory size and type
  * 4. Reports minimum free heap size
- * 5. Performs a countdown and restarts the ESP32
+ * 5. Initializes the SW components
  *
- * This serves as a basic template and testing application for new ESP32 projects.
+ * This file implements the main control flow for the Moduri application.
  * ****************************************************************************
  */
 
@@ -34,6 +34,7 @@
  #include "esp_chip_info.h"
  #include "esp_flash.h"
  #include "esp_system.h"
+ #include "CAN_HAL.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -72,7 +73,11 @@
  * Function: app_main
  * 
  * Description: Main application entry point. This function is called by the 
- *              ESP-IDF framework after initialization
+ *              ESP-IDF framework after initialization. It runs in the context
+ *              of a default high-priority FreeRTOS main task which is created 
+ *              by the ESP-IDF framework and runs your app_main() function.
+ *              app_main() can be used to start other FreeRTOS tasks that your
+ *              application requires.
  * 
  * Parameters:
  *   - none
@@ -82,8 +87,9 @@
  */
  void app_main(void)
  {
-    printf("Hello world!\n");
+    printf("Welcome to Moduri Application!\n");
 
+    /******************************* Platform Information *******************************/
     esp_chip_info_t chip_info;
     uint32_t flash_size;
 
@@ -115,15 +121,13 @@
         (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+    /***********************************************************************************/
 
-    for (int i = 10; i >= 0; i--) 
+    test_print(); // dummy test CAN_HAL
+
+    while(1) //
     {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay( pdMS_TO_TICKS(1000) ); 
     }
-
-    printf("Restarting now.\n");
-    fflush(stdout);
     
-    esp_restart();
  }

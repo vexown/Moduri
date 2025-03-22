@@ -24,4 +24,4 @@ cmake_minimum_required(VERSION 3.16)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 # Define the project name - affects output filenames and other identifiers
-project(hello_world)
+project(moduri)
