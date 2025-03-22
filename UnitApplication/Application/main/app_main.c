@@ -123,9 +123,18 @@
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     /***********************************************************************************/
 
-    test_print(); // dummy test CAN_HAL
+    init_twai();
 
-    while(1) //
+#if (USE_CAN_AS_TRANSMITTER == 1)
+    xTaskCreate(sender_task, "sender_task", 2048, NULL, 5, NULL);
+#endif
+
+#if (USE_CAN_AS_RECEIVER == 1)
+    xTaskCreate(receiver_task, "receiver_task", 2048, NULL, 5, NULL);
+#endif
+
+    /* Task loop */
+    while(1) 
     {
         vTaskDelay( pdMS_TO_TICKS(1000) ); 
     }

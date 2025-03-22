@@ -8,17 +8,20 @@
 /*******************************************************************************/
 /*                                INCLUDES                                     */
 /*******************************************************************************/
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "driver/twai.h"
 #include <stdio.h>
 #include <inttypes.h>
 #include "sdkconfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "CAN_HAL.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-
+#define CAN_TX_PIN GPIO_NUM_5
+#define CAN_RX_PIN GPIO_NUM_4
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -47,20 +50,59 @@
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
-/**
-* ****************************************************************************
-* Function: app_main
-* 
-* Description: Main application entry point. This function is called by the 
-*              ESP-IDF framework after initialization
-* 
-* Parameters:
-*   - none
-* 
-* Returns: void
-* ****************************************************************************
-*/
-void test_print(void)
+void init_twai(void) 
 {
-    printf("Hello World from CAN HAL!\n");
+    twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(CAN_TX_PIN, CAN_RX_PIN, TWAI_MODE_NORMAL);
+    twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
+    twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
+
+    // Install TWAI driver
+    if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
+        printf("TWAI driver installed\n");
+    } else {
+        printf("Failed to install TWAI driver\n");
+        return;
+    }
+
+    // Start TWAI driver
+    if (twai_start() == ESP_OK) {
+        printf("TWAI driver started\n");
+    } else {
+        printf("Failed to start TWAI driver\n");
+        return;
+    }
 }
+
+#if (USE_CAN_AS_TRANSMITTER == 1)
+void sender_task(void *pvParameters) {
+    uint8_t counter = 0;
+    while (1) {
+        twai_message_t message;
+        message.identifier = 0x123;  // CAN ID
+        message.data_length_code = 1;
+        message.data[0] = counter++;
+        if (twai_transmit(&message, pdMS_TO_TICKS(1000)) == ESP_OK) {
+            printf("Message sent\n");
+        } else {
+            printf("Failed to send message\n");
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));  // Wait 1 second
+    }
+}
+#endif
+
+#if (USE_CAN_AS_RECEIVER == 1)
+void receiver_task(void *pvParameters) {
+    while (1) {
+        twai_message_t message;
+        if (twai_receive(&message, pdMS_TO_TICKS(1500)) == ESP_OK) {
+            printf("Received message: ID=0x%lX, DLC=%d, Data=0x%X\n",
+                   (unsigned long)message.identifier, message.data_length_code, (unsigned int)message.data[0]);
+        } else {
+            printf("Failed to receive message\n");
+        }
+    }
+}
+#endif
+
+
