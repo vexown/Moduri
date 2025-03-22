@@ -41,13 +41,21 @@ if command -v apt-get &> /dev/null; then
     
     # List of required packages
     REQUIRED_PACKAGES=(
+        "git"
+        "wget"
+        "flex"
+        "bison"
+        "gperf"
+        "python3"
+        "python3-pip"
+        "python3-venv"
         "cmake"
-        "gcc-arm-none-eabi"
-        "libnewlib-arm-none-eabi" 
-        "build-essential" 
-        "g++" 
-        "libstdc++-arm-none-eabi-newlib"
-        "libusb-1.0-0-dev"
+        "ninja-build"
+        "ccache"
+        "libffi-dev"
+        "libssl-dev"
+        "dfu-util"
+        "libusb-1.0-0"
     )
     
     # Check each required package
@@ -70,13 +78,21 @@ if command -v apt-get &> /dev/null; then
 else
     echo "Warning: This script cannot check for packages on non-Debian based systems."
     echo "Please ensure you have these packages installed:"
+    echo "- git"
+    echo "- wget"
+    echo "- flex"
+    echo "- bison"
+    echo "- gperf"
+    echo "- python3"
+    echo "- python3-pip"
+    echo "- python3-venv"
     echo "- cmake"
-    echo "- gcc-arm-none-eabi"
-    echo "- libnewlib-arm-none-eabi"
-    echo "- build-essential"
-    echo "- g++"
-    echo "- libstdc++-arm-none-eabi-newlib"
-    echo "- libusb-1.0-0-dev"
+    echo "- ninja-build"
+    echo "- ccache"
+    echo "- libffi-dev"
+    echo "- libssl-dev"
+    echo "- dfu-util"
+    echo "- libusb-1.0-0"
 fi
 
 # Check if git submodules are initialized
@@ -89,24 +105,14 @@ if [ ! -d "$DEPS_DIR" ]; then
 fi
 
 # Initialize all git submodules if not already done
-if [ ! -d "$DEPS_DIR/FreeRTOS-Kernel/.git" ] || [ ! -d "$DEPS_DIR/esp-idf/.git" ]; then
+if [ ! -d "$DEPS_DIR/esp-idf/.git" ]; then
     echo "Initializing git submodules..."
-    git submodule update --init --recursive "$DEPS_DIR/FreeRTOS-Kernel"
     git submodule update --init --recursive "$DEPS_DIR/esp-idf"
-fi
-
-# Verify FreeRTOS-Kernel is at the correct commit
-FREERTOS_DIR="$DEPS_DIR/FreeRTOS-Kernel"
-FREERTOS_COMMIT="4f7299d6ea746b27a9dd19e87af568e34bd65b15"
-ACTUAL_COMMIT=$(cd "$FREERTOS_DIR" && git rev-parse HEAD)
-if [ "$ACTUAL_COMMIT" != "$FREERTOS_COMMIT" ]; then
-    echo "FreeRTOS-Kernel is not at the expected commit. Updating..."
-    (cd "$FREERTOS_DIR" && git fetch && git checkout "$FREERTOS_COMMIT")
 fi
 
 # Verify ESP-IDF is at the correct commit
 ESP_IDF_DIR="$DEPS_DIR/esp-idf"
-ESP_IDF_TAG="v5.2.5"
+ESP_IDF_TAG="v5.4"
 ACTUAL_TAG=$(cd "$ESP_IDF_DIR" && git describe --tags --exact-match 2>/dev/null || echo "unknown")
 if [ "$ACTUAL_TAG" != "$ESP_IDF_TAG" ]; then
     echo "ESP-IDF is not at the expected version. Updating..."
