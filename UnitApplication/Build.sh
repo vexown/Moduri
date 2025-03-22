@@ -4,23 +4,18 @@
 # Build.sh
 #
 # Description:
-# This script automates the process of building a project using CMake.
+# This script automates the process of building a project using ESP-IDF.
 # It performs the following steps:
 # 1. Checks for and installs required system packages if missing
-# 2. Ensures project dependencies (FreeRTOS, pico-sdk, picotool) are initialized as git submodules
-# 3. Checks if the 'build' directory exists and creates it if not.
-# 4. Configures the build directory by running CMake.
-# 5. Builds the project using CMake.
-# 6. Copies output files to the output directory.
-# 7. Prompts the user to press any key to exit the script.
+# 2. Ensures ESP-IDF dependency is initialized as a git submodule
+# 3. Verifies ESP-IDF is at the correct version
+# 4. Installs the ESP32 toolchain
+# 5. Sets the ESP32 as the target
+# 6. Builds the project using idf.py
+# 7. Copies output files to the output directory (TODO)
 #
 # Usage:
-# Run this script from the root directory of the project:
-#   ./Build.sh                          # Build the default application
-#   ./Build.sh --clean                  # Clean and rebuild
-#   ./Build.sh --example=list           # List available examples
-#   ./Build.sh --example=ExampleName    # Build a specific example
-#   ./Build.sh --clean --example=ExampleName  # Clean and build an example
+#   ./Build.sh
 #
 # ****************************************************************************
 
@@ -128,72 +123,6 @@ cd ../../Application
 idf.py set-target esp32
 #TODO - find out if this is needed: idf.py menuconfig 
 idf.py build
-
-#TODO - move this to Flash.sh
-idf.py -p /dev/ttyUSB0 flash
-idf.py -p /dev/ttyUSB0 monitor
-
-# Export environment variables for CMake
-export FREERTOS_KERNEL_PATH="$FREERTOS_DIR"
-export ESP_IDF_PATH="$ESP_IDF_DIR"
-
-echo "Using FreeRTOS-Kernel at: $FREERTOS_KERNEL_PATH"
-echo "Using ESP-IDF at: $ESP_IDF_PATH"
-
-# Parse command line arguments
-CLEAN_BUILD=0
-EXAMPLE_NAME=""
-
-for arg in "$@"
-do
-    # Check for --clean flag
-    if [[ "$arg" == "--clean" ]]; then
-        CLEAN_BUILD=1
-    fi
-    
-    # Check for --example flag with value
-    if [[ "$arg" == --example=* ]]; then
-        EXAMPLE_NAME="${arg#*=}"
-    fi
-done
-
-# Handle clean build if requested
-if [ $CLEAN_BUILD -eq 1 ]; then
-    echo "Performing clean build..."
-    if [ -d "build" ]; then
-        rm -rf build
-        echo "Removed existing build directory"
-    fi
-fi
-
-# Create build directory if it does not exist
-if [ ! -d "build" ]; then
-    mkdir build
-    echo "Created build directory"
-else
-    echo "Build directory already exists"
-fi
-
-# Configure the build directory
-echo "Configuring the build directory..."
-cd build
-
-# Set CMake arguments based on whether an example is selected
-#TODO: CMAKE_ARGS=".."
-
-# Run CMake to configure the build system
-# This command generates the necessary build files in the 'build' directory.
-# These files include:
-# - Makefiles or project files for the chosen build system (e.g., Make, Ninja, Visual Studio).
-# - Configuration files that define how the project should be built.
-# - Dependency files that track which files need to be recompiled when changes are made.
-#TODO: cmake $CMAKE_ARGS
-
-# Build the project using the generated build files
-# This command compiles the project based on the configuration done by the previous cmake command.
-# It uses the generated Makefiles or project files to compile the source code into executables or libraries.
-echo "Building..."
-#TODO: cmake --build .
 
 echo "Build complete."
 
