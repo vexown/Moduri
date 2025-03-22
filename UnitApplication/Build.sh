@@ -118,16 +118,22 @@ fi
 echo "Installing ESP32 toolchain..."
 cd "$ESP_IDF_DIR"
 ./install.sh esp32
+
+# Make the idf.py script available in the PATH
 . ./export.sh
+
+# Return to the Application directory
 cd ../../Application
+
+# Set the target to ESP32
 idf.py set-target esp32
-#TODO - find out if this is needed: idf.py menuconfig 
+
+# Build the project
 idf.py build
 
 echo "Build complete."
 
 echo "Copying output files..."
-
 #TODO - Copy output files to the output directory
 
 echo "Done"
