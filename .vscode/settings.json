@@ -29,5 +29,8 @@
         "dma_hal.h": "c",
         "random": "c",
         "ranges": "c"
-    }
+    },
+    "idf.pythonInstallPath": "/usr/bin/python3",
+    "idf.espIdfPath": "/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/esp-idf",
+    "idf.toolsPath": "/home/blankmcu/.espressif"
 }
