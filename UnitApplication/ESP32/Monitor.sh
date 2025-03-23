@@ -1,31 +1,30 @@
 #!/bin/bash
 
 # ****************************************************************************
-# Configure.sh
+# Monitor.sh
 #
 # Description:
-# This script automates the process of configuring an ESP32 project.
+# This script automates the process of monitoring serial output from an ESP32 device.
 # It performs the following steps:
 # 1. Sets up the ESP-IDF environment
-# 2. Launches the ESP-IDF configuration menu (menuconfig)
-# 3. Saves configuration changes to sdkconfig
+# 2. Connects to the ESP32 device on /dev/ttyUSB0
+# 3. Displays the serial output from the device
 # 4. Prompts the user to press any key to exit the script
 #
 # Usage:
-#   ./Configure.sh
+#   ./Monitor.sh
 #
 # ****************************************************************************
-DEPS_DIR="$(pwd)/Dependencies"
+DEPS_DIR="../Dependencies"
 ESP_IDF_DIR="$DEPS_DIR/esp-idf"
 
 cd "$ESP_IDF_DIR"
 . ./export.sh
-cd ../../Application
+cd ../../ESP32/Application
 
-echo "Launching ESP-IDF menuconfig..."
-idf.py menuconfig
+idf.py -p /dev/ttyUSB0 monitor
 
-echo "Configuration completed"
+echo "Done"
 
 # Prompt the user to press any key to exit
 echo "Press any key to exit the script."
@@ -33,3 +32,5 @@ echo "Press any key to exit the script."
 # Handle user input
 read -n 1 -s  # Read a single keypress silently
 echo "Exiting the script."
+
+

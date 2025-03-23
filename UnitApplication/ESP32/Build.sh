@@ -93,7 +93,7 @@ fi
 # Check if git submodules are initialized
 echo "Checking git submodules..."
 # Create Dependencies directory if it doesn't exist
-DEPS_DIR="$(pwd)/Dependencies"
+DEPS_DIR="../Dependencies"
 if [ ! -d "$DEPS_DIR" ]; then
     mkdir -p "$DEPS_DIR"
     echo "Created Dependencies directory"
@@ -123,7 +123,7 @@ cd "$ESP_IDF_DIR"
 . ./export.sh
 
 # Return to the Application directory
-cd ../../Application
+cd ../../ESP32/Application
 
 # Set the target to ESP32
 idf.py set-target esp32

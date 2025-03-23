@@ -16,13 +16,13 @@
 #   ./ESP-IDF_Terminal.sh
 #
 # ****************************************************************************
-DEPS_DIR="$(pwd)/Dependencies"
+DEPS_DIR="../Dependencies"
 ESP_IDF_DIR="$DEPS_DIR/esp-idf"
 
 # Source the ESP-IDF environment setup script
 cd "$ESP_IDF_DIR"
 . ./export.sh
-cd ../../Application
+cd ../../ESP32/Application
 
 echo "****************************************************************************"
 echo "                         ESP-IDF Terminal"
