@@ -3,7 +3,7 @@
 echo "Flashing both banks using Picoprobe and OpenOCD..."
 
 # Set the path to the OpenOCD installation directory
-OPENOCD_PATH="Dependencies/openocd"
+OPENOCD_PATH="../Dependencies/openocd"
 
 # Flash Bank A
 echo "Flashing Bank A..."

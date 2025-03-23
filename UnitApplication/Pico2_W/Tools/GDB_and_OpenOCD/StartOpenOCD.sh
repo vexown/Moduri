@@ -14,7 +14,7 @@
 # ****************************************************************************
 
 # Set the path to the OpenOCD installation directory - we are using the OpenOCD version from RPi repository https://github.com/raspberrypi/openocd
-OPENOCD_PATH="Dependencies/openocd"
+OPENOCD_PATH="../Dependencies/openocd"
 
 $OPENOCD_PATH/src/openocd \
     -s "/home/blankmcu/pico/openocd/tcl" \

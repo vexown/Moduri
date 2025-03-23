@@ -3,7 +3,7 @@
 echo "Flashing bootloader and metadata using Picoprobe and OpenOCD..."
 
 # Set the path to the OpenOCD installation directory
-OPENOCD_PATH="Dependencies/openocd"
+OPENOCD_PATH="../Dependencies/openocd"
 
 # Flash both components in a single OpenOCD session
 echo "Flashing bootloader and metadata..."
