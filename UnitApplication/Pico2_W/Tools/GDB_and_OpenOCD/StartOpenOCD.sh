@@ -17,7 +17,7 @@
 OPENOCD_PATH="../Dependencies/openocd"
 
 $OPENOCD_PATH/src/openocd \
-    -s "/home/blankmcu/pico/openocd/tcl" \
+    -s "$OPENOCD_PATH/tcl" \
     -f "$OPENOCD_PATH/tcl/interface/cmsis-dap.cfg" \
     -f "$OPENOCD_PATH/tcl/target/rp2350.cfg" \
     -c "adapter speed 5000"
