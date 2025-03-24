@@ -22,4 +22,5 @@ idf_component_register(SRCS "app_main.c"
                        REQUIRES CAN_HAL 
                                 spi_flash 
                                 esp_common
+                                Common
                       )

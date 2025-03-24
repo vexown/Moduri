@@ -16,6 +16,7 @@
 #include <inttypes.h>
 #include "sdkconfig.h"
 #include "CAN_HAL.h"
+#include "Common.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -76,11 +77,11 @@ esp_err_t init_twai(void)
     status = twai_driver_install(&general_config, &timing_config, &filter_config);
     if (status == ESP_OK) 
     {
-        printf("TWAI driver installed successfully\n");
+        LOG("TWAI driver installed successfully\n");
     } 
     else 
     {
-        printf("Failed to install TWAI driver. Error code: %d\n", status);
+        LOG("Failed to install TWAI driver. Error code: %d\n", status);
         return status;
     }
 
@@ -90,11 +91,11 @@ esp_err_t init_twai(void)
     status = twai_start();
     if (status == ESP_OK) 
     {
-        printf("TWAI driver started successfully\n");
+        LOG("TWAI driver started successfully\n");
     } 
     else 
     {
-        printf("Failed to start TWAI driver. Error code: %d\n", status);
+        LOG("Failed to start TWAI driver. Error code: %d\n", status);
         return status;
     }
 
@@ -110,7 +111,7 @@ void sender_task(void *pvParameters)
         message.data_length_code = 1;
         message.data[0] = counter++;
         if (twai_transmit(&message, pdMS_TO_TICKS(1000)) == ESP_OK) {
-            printf("Sent message with ID=0x%lX, Data=0x%X\n", (unsigned long)ESP32_1_CAN_ID, counter - 1);
+            LOG("Sent message with ID=0x%lX, Data=0x%X\n", (unsigned long)ESP32_1_CAN_ID, counter - 1);
         }
         vTaskDelay(pdMS_TO_TICKS(1000));  // Send every 1 second
     }
@@ -124,11 +125,11 @@ void receiver_task(void *pvParameters)
         if (twai_receive(&message, pdMS_TO_TICKS(1500)) == ESP_OK) {
             if (message.identifier == ESP32_2_CAN_ID) // receiving from ESP32_2
             {
-                printf("Received message from other ESP32: ID=0x%lX, Data=0x%X\n",
+                LOG("Received message from other ESP32: ID=0x%lX, Data=0x%X\n",
                        (unsigned long)message.identifier, message.data[0]);
             }
         } else {
-            printf("Failed to receive message\n");
+            LOG("Failed to receive message\n");
         }
     }
 }

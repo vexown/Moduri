@@ -26,15 +26,16 @@
 /*******************************************************************************/
 /*                                INCLUDES                                     */
 /*******************************************************************************/
- #include <stdio.h>
- #include <inttypes.h>
- #include "sdkconfig.h"
- #include "freertos/FreeRTOS.h"
- #include "freertos/task.h"
- #include "esp_chip_info.h"
- #include "esp_flash.h"
- #include "esp_system.h"
- #include "CAN_HAL.h"
+#include <stdio.h>
+#include <inttypes.h>
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_chip_info.h"
+#include "esp_flash.h"
+#include "esp_system.h"
+#include "CAN_HAL.h"
+#include "Common.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -85,9 +86,9 @@
  * Returns: void
  * ****************************************************************************
  */
- void app_main(void)
- {
-    printf("Welcome to Moduri Application!\n");
+void app_main(void)
+{
+    LOG("Welcome to Moduri Application!\n");
 
     /******************************* Platform Information *******************************/
     esp_chip_info_t chip_info;
@@ -97,7 +98,7 @@
     esp_chip_info(&chip_info);
 
     /* Print chip information */
-    printf("This is %s chip with %d CPU core(s), %s%s%s%s, ",
+    LOG("This is %s chip with %d CPU core(s), %s%s%s%s, ",
             CONFIG_IDF_TARGET,
             chip_info.cores,
             (chip_info.features & CHIP_FEATURE_WIFI_BGN) ? "WiFi/" : "",
@@ -107,20 +108,20 @@
 
     unsigned major_rev = chip_info.revision / 100;
     unsigned minor_rev = chip_info.revision % 100;
-    printf("silicon revision v%d.%d, ", major_rev, minor_rev);
+    LOG("silicon revision v%d.%d, ", major_rev, minor_rev);
 
     /* Get flash size */
     if(esp_flash_get_size(NULL, &flash_size) != ESP_OK) 
     {
-        printf("Get flash size failed");
+        LOG("Get flash size failed");
         return;
     }
 
     /* Print flash size */
-    printf("%" PRIu32 "MB %s flash\n", flash_size / (uint32_t)(1024 * 1024),
+    LOG("%" PRIu32 "MB %s flash\n", flash_size / (uint32_t)(1024 * 1024),
         (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+    LOG("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     /***********************************************************************************/
 
     (void)init_twai();
@@ -133,5 +134,4 @@
     {
         vTaskDelay( pdMS_TO_TICKS(1000) ); 
     }
-    
- }
+}
