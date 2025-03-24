@@ -123,7 +123,7 @@
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     /***********************************************************************************/
 
-    init_twai();
+    (void)init_twai();
 
     xTaskCreate(sender_task, "sender_task", 2048, NULL, 5, NULL);
     xTaskCreate(receiver_task, "receiver_task", 2048, NULL, 5, NULL);
