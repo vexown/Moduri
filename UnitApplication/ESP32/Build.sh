@@ -125,9 +125,6 @@ cd "$ESP_IDF_DIR"
 # Return to the Application directory
 cd ../../ESP32/Application
 
-# Set the target to ESP32
-idf.py set-target esp32
-
 # Build the project
 idf.py build
 
