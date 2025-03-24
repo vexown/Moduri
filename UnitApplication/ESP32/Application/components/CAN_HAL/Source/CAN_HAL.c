@@ -20,8 +20,10 @@
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-#define CAN_TX_PIN GPIO_NUM_5
-#define CAN_RX_PIN GPIO_NUM_4
+#define ESP32_1_CAN_ID 0xA1
+#define ESP32_2_CAN_ID 0xA2
+#define CAN_TX_PIN  GPIO_NUM_5
+#define CAN_RX_PIN  GPIO_NUM_4
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -73,36 +75,37 @@ void init_twai(void)
     }
 }
 
-#if (USE_CAN_AS_TRANSMITTER == 1)
-void sender_task(void *pvParameters) {
+void sender_task(void *pvParameters) 
+{
     uint8_t counter = 0;
     while (1) {
         twai_message_t message;
-        message.identifier = 0x123;  // CAN ID
+        message.identifier = ESP32_2_CAN_ID; // sending from ESP32_2
         message.data_length_code = 1;
         message.data[0] = counter++;
         if (twai_transmit(&message, pdMS_TO_TICKS(1000)) == ESP_OK) {
-            printf("Message sent\n");
-        } else {
-            printf("Failed to send message\n");
+            printf("Sent message with ID=0x%lX, Data=0x%X\n", (unsigned long)ESP32_2_CAN_ID, counter - 1);
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));  // Wait 1 second
+        vTaskDelay(pdMS_TO_TICKS(1000));  // Send every 1 second
     }
 }
-#endif
 
-#if (USE_CAN_AS_RECEIVER == 1)
-void receiver_task(void *pvParameters) {
+
+void receiver_task(void *pvParameters) 
+{
     while (1) {
         twai_message_t message;
         if (twai_receive(&message, pdMS_TO_TICKS(1500)) == ESP_OK) {
-            printf("Received message: ID=0x%lX, DLC=%d, Data=0x%X\n",
-                   (unsigned long)message.identifier, message.data_length_code, (unsigned int)message.data[0]);
+            if (message.identifier == ESP32_1_CAN_ID) // receiving from ESP32_1
+            {
+                printf("Received message from other ESP32: ID=0x%lX, Data=0x%X\n",
+                       (unsigned long)message.identifier, message.data[0]);
+            }
         } else {
             printf("Failed to receive message\n");
         }
     }
 }
-#endif
+
 
 
