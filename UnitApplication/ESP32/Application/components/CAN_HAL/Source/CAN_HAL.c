@@ -21,8 +21,6 @@
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-#define ESP32_1_CAN_ID 0xA1
-#define ESP32_2_CAN_ID 0xA2
 #define CAN_TX_PIN  GPIO_NUM_5
 #define CAN_RX_PIN  GPIO_NUM_4
 /*******************************************************************************/
@@ -102,28 +100,58 @@ esp_err_t init_twai(void)
     return status; // ESP_OK, otherwise it would have returned earlier with an error code
 }
 
-void sender_task(void *pvParameters) 
+esp_err_t send_CAN_message(uint32_t message_id, uint8_t *data, uint8_t data_length) 
 {
-    uint8_t counter = 0;
-    while (1) {
-        twai_message_t message;
-        message.identifier = ESP32_1_CAN_ID; // sending from ESP32_1
-        message.data_length_code = 1;
-        message.data[0] = counter++;
-        if (twai_transmit(&message, pdMS_TO_TICKS(1000)) == ESP_OK) {
-            LOG("Sent message with ID=0x%lX, Data=0x%X\n", (unsigned long)ESP32_1_CAN_ID, counter - 1);
-        }
-        vTaskDelay(pdMS_TO_TICKS(1000));  // Send every 1 second
+    esp_err_t status = ESP_OK;
+    twai_message_t message;
+
+    if(data_length > 8)
+    {
+        LOG("Data length is greater than 8 bytes\n"); // For now we only support the standard CAN frame with 8 bytes of data
+        return ESP_ERR_INVALID_SIZE;
     }
-}
+    else
+    {
+        /*  Formulate a TWAI message to transmit. The message contains the identifier, data length code, and data */
+        message.identifier = message_id;
+        message.data_length_code = data_length;
 
+        /*  Populate the message buffer with the data provided by the user */
+        for (uint8_t i = 0; i < data_length; i++)
+        {
+            message.data[i] = data[i];
+            LOG("Data[%d] = 0x%X\n", i, message.data[i]);
+        }
+    }
 
-void receiver_task(void *pvParameters) 
+    /* Specify the TWAI flags for the message. The flags are used to specify the message type, such as standard or extended frame, 
+       remote frame, single shot transmission, self reception request, and data length code non-compliant. */
+    message.extd = 0;         // 1 - Extended Frame Format (29bit ID) or 0 - Standard Frame Format (11bit ID)
+    message.rtr = 0;          // 1 - Message is a Remote Frame or 0 - Message is a Data Frame
+    message.ss = 0;           // 1 - Transmit as a Single Shot Transmission (the message will not be retransmitted upon error or arbitration loss)
+    message.self = 0;         // 1 - Transmit as a Self Reception Request (the msg will be received by the transmitting device) or 0 for normal transmission
+    message.dlc_non_comp = 0; // 1 - Message's Data length code is larger than 8 (this will break compliance with ISO 11898-1) or 0 the opposite
+
+    /*  Transmit a CAN message. The message is copied to the driver's internal buffer.
+        The driver will transmit the message as soon as the bus is available. */
+    status = twai_transmit(&message, pdMS_TO_TICKS(1000));
+    if (status == ESP_OK) 
+    {
+        LOG("Message with ID=0x%lX sent successfully\n", (unsigned long)message_id);
+    } 
+    else 
+    {
+        LOG("Failed to send message. Error code: %d\n", status);
+    }
+    return status;
+} 
+
+void receive_CAN_message(void *pvParameters) 
 {
     while (1) {
         twai_message_t message;
         if (twai_receive(&message, pdMS_TO_TICKS(1500)) == ESP_OK) {
-            if (message.identifier == ESP32_2_CAN_ID) // receiving from ESP32_2
+            if (message.identifier == ESP32_1_CAN_ID) // receiving from ESP32_1
             {
                 LOG("Received message from other ESP32: ID=0x%lX, Data=0x%X\n",
                        (unsigned long)message.identifier, message.data[0]);

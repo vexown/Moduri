@@ -125,10 +125,8 @@ void app_main(void)
     LOG("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
     /***********************************************************************************/
 
+    /* Initialize the TWAI peripheral for CAN communication */
     (void)init_twai();
-
-    xTaskCreate(sender_task, "sender_task", 2048, NULL, 5, NULL);
-    xTaskCreate(receiver_task, "receiver_task", 2048, NULL, 5, NULL);
 
     // Configure WiFi AP (disabled for now because brownout resets when powering from USB. It has to be powered from a battery/power supply)
     /*
@@ -149,9 +147,14 @@ void app_main(void)
     // Connect to "ESP32_AP" WiFi network and open http://192.168.4.1 in a browser
     */
 
+    uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+    uint8_t data_length = sizeof(data);
+
     /* Task loop */
     while(1) 
     {
+        // Send a CAN message
+        send_CAN_message(ESP32_2_CAN_ID, data, data_length);
         vTaskDelay( pdMS_TO_TICKS(1000) ); 
     }
 }
