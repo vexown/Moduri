@@ -130,7 +130,8 @@ void app_main(void)
     xTaskCreate(sender_task, "sender_task", 2048, NULL, 5, NULL);
     xTaskCreate(receiver_task, "receiver_task", 2048, NULL, 5, NULL);
 
-    // Configure WiFi AP
+    // Configure WiFi AP (disabled for now because brownout resets when powering from USB. It has to be powered from a battery/power supply)
+    /*
     wifi_ap_custom_config_t ap_config = {
         .ssid = "ESP32_AP",
         .password = "password123",  // NULL for open network
@@ -139,13 +140,14 @@ void app_main(void)
     };
     
     // Initialize WiFi AP
-    //ESP_ERROR_CHECK(wifi_ap_init(&ap_config));
+    ESP_ERROR_CHECK(wifi_ap_init(&ap_config));
     
     // Start HTTP server
-    //ESP_ERROR_CHECK(http_server_start());
-    
+    ESP_ERROR_CHECK(http_server_start());
+
     // Now your ESP32 is running as an access point with an HTTP server
     // Connect to "ESP32_AP" WiFi network and open http://192.168.4.1 in a browser
+    */
 
     /* Task loop */
     while(1) 
