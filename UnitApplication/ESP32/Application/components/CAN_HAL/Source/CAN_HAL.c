@@ -38,7 +38,12 @@
 /*******************************************************************************/
 /*                            STATIC VARIABLES                                 */
 /*******************************************************************************/
-
+static const uint8_t response_templates[3][STANDARD_CAN_MAX_DATA_LENGTH] = 
+{
+    {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+    {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xF0, 0xF7, 0xFF},
+    {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
+};
 /*******************************************************************************/
 /*                            GLOBAL VARIABLES                                 */
 /*******************************************************************************/
@@ -46,6 +51,31 @@
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
+
+static esp_err_t remote_frame_responder(twai_message_t *message)
+{
+    const uint8_t* response = NULL;
+
+    /* Analyze the received message and prepare a response (for now just respond based on the message ID) */
+    switch (message->identifier)
+    {
+        case ESP32_1_CAN_ID:
+            response = response_templates[ESP32_1_CAN_ID_RESPONSE_ID];
+            break;
+        case ESP32_2_CAN_ID:
+            response = response_templates[ESP32_2_CAN_ID_RESPONSE_ID];
+            break;
+        default: // Respond with all FFs for unsupported message IDs
+            response = response_templates[DEFAULT_RESPONSE_ID];
+            LOG("Unsupported message ID received\n");
+            break;
+    }
+
+    /* Send the response under the same message ID */
+    esp_err_t status = send_CAN_message(message->identifier, response, STANDARD_CAN_MAX_DATA_LENGTH);
+
+    return status;
+}
 
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
@@ -100,15 +130,15 @@ esp_err_t init_twai(void)
     return status; // ESP_OK, otherwise it would have returned earlier with an error code
 }
 
-esp_err_t send_CAN_message(uint32_t message_id, uint8_t *data, uint8_t data_length) 
+esp_err_t send_CAN_message(uint32_t message_id, const uint8_t *data, uint8_t data_length) 
 {
     esp_err_t status = ESP_OK;
     twai_message_t message;
 
-    if(data_length > 8)
+    if((data_length > 8) || (data == NULL))
     {
-        LOG("Data length is greater than 8 bytes\n"); // For now we only support the standard CAN frame with 8 bytes of data
-        return ESP_ERR_INVALID_SIZE;
+        LOG("Data length is greater than 8 bytes or data is NULL\n"); // For now we only support the standard CAN frame
+        status = ESP_ERR_INVALID_SIZE;
     }
     else
     {
@@ -117,49 +147,95 @@ esp_err_t send_CAN_message(uint32_t message_id, uint8_t *data, uint8_t data_leng
         message.data_length_code = data_length;
 
         /*  Populate the message buffer with the data provided by the user */
+        LOG("Sending data...\n");
         for (uint8_t i = 0; i < data_length; i++)
         {
             message.data[i] = data[i];
             LOG("Data[%d] = 0x%X\n", i, message.data[i]);
         }
+
+        /* Specify the TWAI flags for the message. The flags are used to specify the message type, such as standard or extended frame, 
+        remote frame, single shot transmission, self reception request, and data length code non-compliant. */
+        message.extd = 0;         // 1 - Extended Frame Format (29bit ID) or 0 - Standard Frame Format (11bit ID)
+        message.rtr = 0;          // 1 - Message is a Remote Frame or 0 - Message is a Data Frame
+        message.ss = 0;           // 1 - Transmit as a Single Shot Transmission (the message will not be retransmitted upon error or arbitration loss)
+        message.self = 0;         // 1 - Transmit as a Self Reception Request (the msg will be received by the transmitting device) or 0 for normal transmission
+        message.dlc_non_comp = 0; // 1 - Message's Data length code is larger than 8 (this will break compliance with ISO 11898-1) or 0 the opposite
+
+        /*  Transmit a CAN message. The message is copied to the driver's internal buffer.
+            The driver will transmit the message as soon as the bus is available. */
+        status = twai_transmit(&message, pdMS_TO_TICKS(1000));
+        if (status == ESP_OK) 
+        {
+            LOG("Message with ID=0x%lX sent successfully\n", (unsigned long)message_id);
+        } 
+        else 
+        {
+            LOG("Failed to send message. Error code: %d\n", status);
+        }
     }
 
-    /* Specify the TWAI flags for the message. The flags are used to specify the message type, such as standard or extended frame, 
-       remote frame, single shot transmission, self reception request, and data length code non-compliant. */
-    message.extd = 0;         // 1 - Extended Frame Format (29bit ID) or 0 - Standard Frame Format (11bit ID)
-    message.rtr = 0;          // 1 - Message is a Remote Frame or 0 - Message is a Data Frame
-    message.ss = 0;           // 1 - Transmit as a Single Shot Transmission (the message will not be retransmitted upon error or arbitration loss)
-    message.self = 0;         // 1 - Transmit as a Self Reception Request (the msg will be received by the transmitting device) or 0 for normal transmission
-    message.dlc_non_comp = 0; // 1 - Message's Data length code is larger than 8 (this will break compliance with ISO 11898-1) or 0 the opposite
-
-    /*  Transmit a CAN message. The message is copied to the driver's internal buffer.
-        The driver will transmit the message as soon as the bus is available. */
-    status = twai_transmit(&message, pdMS_TO_TICKS(1000));
-    if (status == ESP_OK) 
-    {
-        LOG("Message with ID=0x%lX sent successfully\n", (unsigned long)message_id);
-    } 
-    else 
-    {
-        LOG("Failed to send message. Error code: %d\n", status);
-    }
     return status;
 } 
 
-void receive_CAN_message(void *pvParameters) 
+esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length)
 {
-    while (1) {
-        twai_message_t message;
-        if (twai_receive(&message, pdMS_TO_TICKS(1500)) == ESP_OK) {
-            if (message.identifier == ESP32_1_CAN_ID) // receiving from ESP32_1
-            {
-                LOG("Received message from other ESP32: ID=0x%lX, Data=0x%X\n",
-                       (unsigned long)message.identifier, message.data[0]);
-            }
-        } else {
+    bool message_received = false;
+    esp_err_t status = ESP_OK;
+    twai_message_t message;
+
+    /* Check for NULL pointers */
+    if (buffer == NULL || buffer_length == NULL) 
+    {
+        LOG("Invalid parameters: buffer or buffer_length is NULL\n");
+        status = ESP_ERR_INVALID_ARG;
+    }
+    else
+    {
+        /* Attempt to receive a CAN message */
+        if (twai_receive(&message, pdMS_TO_TICKS(1000)) == ESP_OK) 
+        {
+            message_received = true;
+            LOG("Message received with ID=0x%lX (Extended=%d, RTR=%d, SS=%d, Self=%d, DLC Non-Comp=%d)\n", 
+                (unsigned long)message.identifier, message.extd, message.rtr, message.ss, message.self, message.dlc_non_comp);
+        } 
+        else 
+        {
             LOG("Failed to receive message\n");
+            status = ESP_FAIL;
+        }
+
+        /* Process the received message if one was received */
+        if(message_received)
+        {
+            /* Verify the length of the received data */
+            if((message.data_length_code > 8) || (*buffer_length < message.data_length_code))
+            {
+                LOG("Data length %d is greater than 8 bytes or too big for the buffer of size %d\n", message.data_length_code, *buffer_length);
+                status = ESP_ERR_INVALID_SIZE;
+            }
+            else
+            {
+                /*  Copy the received data to the buffer provided by the user */
+                LOG("Receiving data...\n");
+                for (uint8_t i = 0; i < message.data_length_code; i++)
+                {
+                    buffer[i] = message.data[i];
+                    LOG("Data[%d] = 0x%X\n", i, buffer[i]);
+                }
+                *buffer_length = message.data_length_code; // Store the actual length of the data received
+            }
+
+            /* Handle remote frames (frames that request data) */
+            if(message.rtr)
+            {
+                LOG("Received message is a Remote Frame. Responding with a Data Frame...\n");
+                status = remote_frame_responder(&message);
+            }
         }
     }
+    
+    return status;
 }
 
 

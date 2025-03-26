@@ -150,11 +150,18 @@ void app_main(void)
     uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
     uint8_t data_length = sizeof(data);
 
+    uint8_t buffer[STANDARD_CAN_MAX_DATA_LENGTH];
+    uint8_t buffer_length = sizeof(buffer);
+
     /* Task loop */
     while(1) 
     {
         // Send a CAN message
-        send_CAN_message(ESP32_2_CAN_ID, data, data_length);
+        send_CAN_message(ESP32_1_CAN_ID, data, data_length);
         vTaskDelay( pdMS_TO_TICKS(1000) ); 
+        
+        // Receive a CAN message
+        receive_CAN_message(buffer, &buffer_length);
+        vTaskDelay( pdMS_TO_TICKS(1000) );
     }
 }
