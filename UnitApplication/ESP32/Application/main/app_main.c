@@ -156,12 +156,20 @@ void app_main(void)
     /* Task loop */
     while(1) 
     {
-        // Send a CAN message
-        send_CAN_message(ESP32_1_CAN_ID, data, data_length);
-        vTaskDelay( pdMS_TO_TICKS(1000) ); 
+        /* Send a CAN message */
+        esp_err_t send_result = send_CAN_message(ESP32_1_CAN_ID, data, data_length);
+        if (send_result != ESP_OK) 
+        {
+            LOG("Error sending CAN message: %s", esp_err_to_name(send_result));
+        } 
+        vTaskDelay(pdMS_TO_TICKS(1000));
         
-        // Receive a CAN message
-        receive_CAN_message(buffer, &buffer_length);
-        vTaskDelay( pdMS_TO_TICKS(1000) );
+        /* Receive a CAN message */
+        esp_err_t recv_result = receive_CAN_message(buffer, &buffer_length);
+        if (recv_result != ESP_OK) 
+        {
+            LOG("Error receiving CAN message: %s", esp_err_to_name(recv_result));
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
