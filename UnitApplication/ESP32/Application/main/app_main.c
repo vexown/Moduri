@@ -171,5 +171,12 @@ void app_main(void)
             LOG("Error receiving CAN message: %s", esp_err_to_name(recv_result));
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
+
+        bool monitor_result = monitor_CAN_bus();
+        if (!monitor_result) 
+        {
+            LOG("Error monitoring CAN bus");
+        }
+
     }
 }

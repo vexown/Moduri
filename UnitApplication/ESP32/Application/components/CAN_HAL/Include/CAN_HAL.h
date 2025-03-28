@@ -71,5 +71,23 @@ esp_err_t send_CAN_message(uint32_t message_id, const uint8_t *data, uint8_t dat
  */
 esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length);
 
+/**
+ * @brief Monitors the CAN bus checking the alerts and the status of the driver
+ *
+ * Alters:
+ *      Critical TWAI alerts indicating significant communication issues include TWAI_ALERT_BUS_ERROR 
+ *      (indicating data corruption or protocol violations) and TWAI_ALERT_BUS_OFF (signaling a complete 
+ *      loss of communication capability). See full list of alerts in twai_alert_messages array.
+ * 
+ * Driver status:
+ *      Includes the number of transmitted and received messages, counts of various 
+ *      error types (transmission failures, receive misses, overruns, arbitration losses, and bus errors), 
+ *      and the current communication state. In essence, it provides a comprehensive overview of the TWAI 
+ *      driver's operational health and performance.
+ *
+ * @return bool Returns true if the monitoring was successful, false if there were issues
+ */
+bool monitor_CAN_bus(void);
+
 
 #endif /* CAN_HAL_H */

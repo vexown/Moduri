@@ -26,6 +26,14 @@
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
+/**
+ * @brief Struct to hold TWAI alert flag and corresponding message
+ */
+typedef struct 
+{
+    uint32_t flag;
+    const char *message;
+} twai_alert_message_t;
 
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DECLARATIONS                         */
@@ -38,12 +46,57 @@
 /*******************************************************************************/
 /*                            STATIC VARIABLES                                 */
 /*******************************************************************************/
+/**
+ * @brief Lookup table for CAN message responses
+ */
 static const uint8_t response_templates[3][STANDARD_CAN_MAX_DATA_LENGTH] = 
 {
     {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
     {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xF0, 0xF7, 0xFF},
     {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 };
+
+/**
+ * @brief Lookup table for TWAI alert messages
+ */
+static const twai_alert_message_t twai_alert_messages[] = 
+{
+    {TWAI_ALERT_TX_IDLE,              "No more messages to transmit"},
+    {TWAI_ALERT_TX_SUCCESS,           "Previous transmission was successful"},
+    {TWAI_ALERT_RX_DATA,              "Frame received and added to RX queue"},
+    {TWAI_ALERT_BELOW_ERR_WARN,       "Error counters dropped below error warning limit"},
+    {TWAI_ALERT_ERR_ACTIVE,           "TWAI controller has become error active"},
+    {TWAI_ALERT_RECOVERY_IN_PROGRESS, "TWAI controller is undergoing bus recovery"},
+    {TWAI_ALERT_BUS_RECOVERED,        "TWAI controller has completed bus recovery"},
+    {TWAI_ALERT_ARB_LOST,             "Previous transmission lost arbitration"},
+    {TWAI_ALERT_ABOVE_ERR_WARN,       "Error counter(s) exceeded warning limit"},
+    {TWAI_ALERT_BUS_ERROR,            "Bus error occurred (Bit, Stuff, CRC, Form, ACK)"},
+    {TWAI_ALERT_TX_FAILED,            "Previous transmission failed (for single shot)"},
+    {TWAI_ALERT_RX_QUEUE_FULL,        "RX queue full, causing frame loss"},
+    {TWAI_ALERT_ERR_PASS,             "TWAI controller has become error passive"},
+    {TWAI_ALERT_BUS_OFF,              "Bus-off condition, controller cannot influence bus"},
+    {TWAI_ALERT_RX_FIFO_OVERRUN,      "RX FIFO overrun occurred"},
+    {TWAI_ALERT_TX_RETRIED,           "Message transmission retried due to errata workaround"},
+    {TWAI_ALERT_PERIPH_RESET,         "TWAI controller was reset"}
+};
+
+/* Convert TWAI state enum to a descriptive string */
+static const char* twai_state_to_string(twai_state_t state)
+{
+    switch (state) 
+    {
+        case TWAI_STATE_STOPPED:
+            return "STOPPED - Controller not participating in bus activities";
+        case TWAI_STATE_RUNNING:
+            return "RUNNING - Controller can transmit and receive messages";
+        case TWAI_STATE_BUS_OFF:
+            return "BUS_OFF - Controller cannot participate in bus activities";
+        case TWAI_STATE_RECOVERING:
+            return "RECOVERING - Controller is undergoing bus recovery";
+        default:
+            return "UNKNOWN STATE";
+    }
+}
 /*******************************************************************************/
 /*                            GLOBAL VARIABLES                                 */
 /*******************************************************************************/
@@ -52,6 +105,13 @@ static const uint8_t response_templates[3][STANDARD_CAN_MAX_DATA_LENGTH] =
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
+/**
+ * @brief Handles analyzing and responding to a Remote Frame Request
+ * 
+ * @param message Pointer to the received TWAI message
+ * @return esp_err_t Returns ESP_OK if the response was successfully sent or the error code if it failed
+ * 
+ */
 static esp_err_t remote_frame_responder(twai_message_t *message)
 {
     const uint8_t* response = NULL;
@@ -77,6 +137,33 @@ static esp_err_t remote_frame_responder(twai_message_t *message)
     return status;
 }
 
+/**
+ * @brief Process and print active TWAI alerts
+ * 
+ * @param alerts Combined alerts value from twai_read_alerts
+ */
+static void process_twai_alerts(uint32_t alerts) 
+{
+    if (alerts == 0) 
+    {
+        LOG("No TWAI alerts active\n");
+    }
+    else
+    {
+        LOG("TWAI Alerts detected:\n");
+    
+        /* Iterate through all defined alerts and check if each is present */
+        uint32_t num_of_alerts_messages = sizeof(twai_alert_messages) / sizeof(twai_alert_messages[0]);
+        for (uint32_t i = 0; i < num_of_alerts_messages; i++)
+        {
+            /* Check if this specific flag is set in the combined alerts value */
+            if (alerts & twai_alert_messages[i].flag) 
+            {
+                LOG("  - %s\n", twai_alert_messages[i].message);
+            }
+        }
+    }
+}
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
@@ -237,6 +324,54 @@ esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length)
     
     return status;
 }
+
+bool monitor_CAN_bus(void)
+{
+    bool status = true;
+
+    /* Read the alerts raised by the TWAI driver */
+    uint32_t alerts = 0;
+    esp_err_t alerts_status = twai_read_alerts(&alerts, pdMS_TO_TICKS(100));
+    if (alerts_status == ESP_OK) 
+    {
+        /* Process and print all active alerts */
+        process_twai_alerts(alerts);
+    } 
+    else if (alerts_status == ESP_ERR_TIMEOUT) 
+    {
+        /* This is normal - it means no alerts were generated during the timeout period */
+        LOG("No TWAI alerts during monitoring period\n");
+    }
+    else 
+    {
+        LOG("Failed to read TWAI alerts. Error code: %d\n", alerts_status);
+        status = false;
+    }
+
+    /* Read the status information of the TWAI driver */
+    twai_status_info_t driver_status_info;
+    esp_err_t twai_status = twai_get_status_info(&driver_status_info);
+    if (twai_status == ESP_OK) 
+    {
+        LOG("TWAI Status Information:\n");
+        LOG("  - TX Messages: %lu\n", driver_status_info.msgs_to_tx);
+        LOG("  - RX Messages: %lu\n", driver_status_info.msgs_to_rx);
+        LOG("  - TX Failed Count: %lu\n", driver_status_info.tx_failed_count);
+        LOG("  - RX Missed Count: %lu\n", driver_status_info.rx_missed_count);
+        LOG("  - RX Overrun Count: %lu\n", driver_status_info.rx_overrun_count);
+        LOG("  - Arb Lost Count: %lu\n", driver_status_info.arb_lost_count);
+        LOG("  - Bus Error Count: %lu\n", driver_status_info.bus_error_count);
+        LOG("  - State: %s\n", twai_state_to_string(driver_status_info.state));
+    } 
+    else 
+    {
+        LOG("Failed to get TWAI status information. Error code: %d\n", twai_status);
+        status = false;
+    }
+    
+    return status;
+}
+    
 
 
 
