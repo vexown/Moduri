@@ -52,7 +52,7 @@ extern TCP_Client_t *clientGlobal;
 /*                        GLOBAL FUNCTION DELCARATION                          */
 /*******************************************************************************/
 err_t tcp_send(const char *data, uint16_t length);
-void tcp_receive(uint8_t *received_command);
+void tcp_receive_cmd(uint8_t *received_command);
 
 #if (PICO_W_AS_TCP_SERVER == ON)
 /* Global server instance */

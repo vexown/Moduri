@@ -124,8 +124,6 @@ void WiFi_MainFunction(void)
  */
 static void WiFi_ProcessCommand(uint8_t command)
 {
-    LOG("Processing command nr %u... \n", command);
-
     switch (command)
     {
         case PICO_DO_NOTHING:
@@ -160,10 +158,7 @@ static void WiFi_ProcessCommand(uint8_t command)
 /* 
  * Function: WiFi_ListenState
  * 
- * Description: State in which the Pico W is simply listening to the TCP/IP comms.
- * The only way to exit this passive state is to use PICO_TRANSITION_TO_ACTIVE_MODE
- * command which transitions the Pico to the active state where it can send messages
- * and process various commands.
+ * Description: State in which the Pico W is simply listening to the TCP/IP comms and waits for commands.
  * 
  * Parameters:
  *   - none
@@ -177,13 +172,19 @@ static void WiFi_ListenState(void)
 
     if(TransportLayer == TCP_COMMUNICATION)
     {
-        tcp_receive(&received_command);
-        if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
+        /************** RX **************/
+        /* Handle any received commands */
+        tcp_receive_cmd(&received_command);
+        
+        WiFi_ProcessCommand(received_command); 
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
+        /************** RX **************/
+        /* Handle any received commands */
         udp_client_process_recv_message(&received_command);
-        if(received_command == PICO_TRANSITION_TO_ACTIVE_MODE) WiFi_ProcessCommand(received_command); 
+
+        WiFi_ProcessCommand(received_command); 
     }
     else
     {
@@ -213,8 +214,8 @@ static void WiFi_ActiveState(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
         /************** RX **************/
-        /* Handle any received messages */
-        tcp_receive(&received_command);
+        /* Handle any received commands */
+        tcp_receive_cmd(&received_command);
 
         WiFi_ProcessCommand(received_command); 
 
@@ -225,7 +226,7 @@ static void WiFi_ActiveState(void)
     else if(TransportLayer == UDP_COMMUNICATION)
     {
         /************** RX **************/
-        /* Handle any received messages */
+        /* Handle any received commands */
         udp_client_process_recv_message(&received_command);
         WiFi_ProcessCommand(received_command); 
 
@@ -258,8 +259,8 @@ static void WiFi_MonitorState(void)
     if(TransportLayer == TCP_COMMUNICATION)
     {
         /************** RX **************/
-        /* Handle any received messages */
-        tcp_receive(&received_command);
+        /* Handle any received commands */
+        tcp_receive_cmd(&received_command);
 
         WiFi_ProcessCommand(received_command); 
 

@@ -77,7 +77,7 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 static void tcp_client_err_callback(void *arg, err_t err);
 /* Send/receive functions */
-static void tcp_client_process_recv_message(uint8_t *received_command);
+static void tcp_client_process_recv_message(char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command);
 static err_t tcp_client_send(const char *data, uint16_t length);
 #endif
 
@@ -98,7 +98,7 @@ static err_t tcp_client_send(const char *data, uint16_t length);
  * 
  * Returns: err_t indicating the result of the send operation.
  */
-err_t tcp_send(const char *data, uint16_t length)
+err_t tcp_send(const char* data, uint16_t length)
 {
 #if (PICO_W_AS_TCP_SERVER == ON)
     return tcp_server_send(data, length);
@@ -108,26 +108,55 @@ err_t tcp_send(const char *data, uint16_t length)
 }
 
 /* 
- * Function: tcp_receive
+ * Function: tcp_receive_cmd
  * 
- * Description: Unified function for receiving data over TCP. It calls the appropriate
+ * Description: Unified function for receiving commands over TCP. It calls the appropriate
  *              receive function based on the configuration of the Pico as a TCP server
  *              or client.
  * 
  * Parameters:
- *  - uint8_t *data: Pointer to the received data.
+ *  - uint8_t *cmd: Pointer to the buffer where the received command will be stored.
  * 
  * Returns: void
  * 
  * Note: This function doesn't actually receive data, it just fetches the data from the buffer. 
  *       The actual data reception is done asynchronously by the lwIP stack and the receive callbacks.
  */
-void tcp_receive(uint8_t *data)
+void tcp_receive_cmd(uint8_t* cmd)
 {
 #if (PICO_W_AS_TCP_SERVER == ON)
-    tcp_server_process_recv_message(data); // Fetch data received in tcp_server_recv_callback
+    tcp_server_process_recv_message(cmd); // Fetch data received in tcp_server_recv_callback
 #else
-    tcp_client_process_recv_message(data); // Fetch data received in tcp_client_recv_callback
+    char received_cmd[CMD_MAX_SIZE_BYTES] = {0};
+    uint16_t received_cmd_length = sizeof(received_cmd);
+
+    tcp_client_process_recv_message(received_cmd, &received_cmd_length, cmd); // Fetch data received in tcp_client_recv_callback
+#endif
+}
+
+/* 
+ * Function: tcp_receive_data
+ * 
+ * Description: Unified function for receiving data over TCP. It calls the appropriate
+ *              receive function based on the configuration of the Pico as a TCP server
+ *              or client.
+ * 
+ * Parameters:
+ *  - char* buffer: Pointer to the buffer where the received data will be stored.
+ *  - uint16_t* buffer_length: Pointer to the length of the received data.
+ * 
+ * Returns: void
+ */
+void tcp_receive_data(char* buffer, uint16_t* buffer_length)
+{
+#if (PICO_W_AS_TCP_SERVER == ON)
+    //tcp_server_process_recv_message(cmd); // Fetch data received in tcp_server_recv_callback - TODO, only receiving commands for now
+#else
+    uint8_t received_cmd; 
+
+    tcp_client_process_recv_message(buffer, buffer_length, &received_cmd); // Fetch data received in tcp_client_recv_callback
+
+    (void)received_cmd; //unused in the case of receiving data, there is a separate function for receving commands
 #endif
 }
 
@@ -1126,21 +1155,27 @@ static err_t tcp_client_send(const char *data, uint16_t length) {
  *      and stores it as the received command.
  * 
  * Parameters:
- *  - received_command: Pointer to store the extracted command value
+ *  - char* output_buffer: Pointer to the buffer where the received data will be stored.
+ *  - uint16_t* output_buffer_length: Pointer to the length of the received data.
+ *  - uint8_t* received_command: Pointer to store the extracted command value.
  * 
  * Returns: 
  *  - void
  */
-static void tcp_client_process_recv_message(uint8_t *received_command) 
+static void tcp_client_process_recv_message(char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command)
 {
-    // Make sure we have a valid client and receive buffer
-    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL) 
+    /* Initialize output parameters to default values */
+    *received_command = 0;
+    *output_buffer = '\0';
+
+    /* Make sure we have a valid client and receive buffer */
+    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL || output_buffer == NULL || output_buffer_length == NULL || received_command == NULL) 
     {
         LOG("Invalid client or receive buffer\n");
         return;
     }
 
-    // Make sure client is connected so we can tell the difference between no connection and no data
+    /* Make sure client is connected so we can tell the difference between no connection and no data */
     if (!tcp_client_is_connected()) 
     {
         LOG("Attempted to receive data while not connected. Trying to reconnect...\n");
@@ -1152,52 +1187,66 @@ static void tcp_client_process_recv_message(uint8_t *received_command)
         return;
     }
 
-    // Wait for the mutex before accessing the buffer
+    /* Wait for the mutex before accessing the buffer */
     if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
     {
-        // Access the receive buffer
-        uint8_t *buffer = clientGlobal->receive_buffer;
-
-        // Print the entire received buffer
-        LOG("Received message: %s\n", buffer);
-
-        // Check if the buffer starts with "cmd:"
-        if (strncmp((const char *)buffer, "cmd:", 4) == 0) 
+        /* Check if the output buffer is large enough to store the received data */
+        if(clientGlobal->receive_length > *output_buffer_length)
         {
-            // Extract the number after "cmd:"
-            // Explanation of atoi return value:
-            // - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
-            // - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
-            // - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
-            int command_value = atoi((const char *)&buffer[4]);
+            LOG("Output buffer is too small to store the received data. Data will be truncated.\n");
+        }
+        else
+        {
+            *output_buffer_length = clientGlobal->receive_length; // Update the output buffer length with the actual received data length
+        }
 
-            // Ensure the command value is within 0-255 range
-            if (command_value >= 0 && command_value <= 255) 
+        /* Copy the received data from the TCP receive_buffer to the output buffer */
+        memcpy(output_buffer, clientGlobal->receive_buffer, *output_buffer_length);
+
+        /* Check if the message starts with "cmd:" and if it's even long enough to contain a command */
+        if (*output_buffer_length >= CMD_MIN_SIZE_BYTES && strncmp((const char *)output_buffer, "cmd:", 4) == 0) 
+        {
+            /* Extract the number after "cmd:"
+             * Explanation of atoi return value:
+             * - If the string after "cmd:" is non-numeric (e.g., "cmd:abc"), atoi will return 0.
+             * - If there is nothing after "cmd:" (e.g., "cmd:"), atoi will return 0.
+             * - If the string after "cmd:" is explicitly "0", atoi will return 0 as a valid value.
+             */
+            int command_value = atoi((const char *)&output_buffer[4]);
+
+            /* Ensure the command value is within 1-255 range */
+            if (command_value > 0 && command_value <= 255) 
             {
                 *received_command = (uint8_t)command_value;
                 LOG("Received command: %u\n", *received_command);
             } 
             else 
             {
-                LOG("Command value out of range (0-255).\n");
+                received_command = 0;
+                LOG("Command value out of range (1-255).\n");
             }
-        } 
-        else 
+        }
+        else /* Received message is not a command */
         {
-            LOG("No command found in received message.\n");
+            /* Print the entire received buffer (if not empty) */
+            if(strlen((const char *)output_buffer) > 0)
+            {
+                LOG("Received message: %s\n", output_buffer);
+                LOG("Data has been stored in the output buffer\n");
+            }
         }
 
-        // Clear the buffer after processing
+        /* Clear the buffer after processing */
         memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
-        // Set the receive length to 0
+        /* Set the receive length to 0 */
         clientGlobal->receive_length = 0;
 
-        // Release the mutex after access
+        /* Release the mutex after access */
         xSemaphoreGive(bufferMutex); 
     } 
     else 
     {
-        LOG("Failed to acquire the pointer to receive buffer.\n");
+        LOG("Failed to acquire the mutex for the receive buffer.\n");
     }
 }
 
