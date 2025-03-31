@@ -27,6 +27,10 @@ set -o pipefail
 
 echo "########## Build.sh - start ##########"
 
+# Store the script's directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="$SCRIPT_DIR/build.log"
+
 # Check for required system packages
 echo "Checking for required system packages..."
 
@@ -125,21 +129,18 @@ cd "$ESP_IDF_DIR"
 # Return to the Application directory
 cd ../../ESP32/Application
 
-# Build the project
-idf.py build
+# Build the project and save output to build.log with full path
+echo "Building project... This may take a while, be patient."
+echo "Starting build at $(date)" > "$LOG_FILE"
+idf.py build >> "$LOG_FILE" 2>&1
+BUILD_RESULT=$?
+echo "Build finished at $(date), exit code: $BUILD_RESULT" >> "$LOG_FILE"
 
-echo "Build complete."
-
-echo "Copying output files..."
-#TODO - Copy output files to the output directory
-
-echo "Done"
-
-# Prompt the user to press any key to exit
-echo "Press any key to exit the script."
-
-# Handle user input
-read -n 1 -s  # Read a single keypress silently
-echo "Exiting the script."
-
+if [ $BUILD_RESULT -eq 0 ]; then
+    echo "Build succeeded. Log saved to $LOG_FILE"
+else
+    echo "Build failed with exit code $BUILD_RESULT. See $LOG_FILE for details."
+    # Uncomment next line if you want script to exit on build failure
+    # exit $BUILD_RESULT
+fi
 
