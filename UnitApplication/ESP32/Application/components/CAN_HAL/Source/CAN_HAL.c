@@ -1,6 +1,6 @@
 /**
  * ****************************************************************************
- * CAN_HAL.c
+ * @file    CAN_HAL.c
  *
  * ****************************************************************************
  */
@@ -16,13 +16,13 @@
 #include <inttypes.h>
 #include "sdkconfig.h"
 #include "CAN_HAL.h"
+#include "J1939.h"
 #include "Common.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-#define CAN_TX_PIN  GPIO_NUM_5
-#define CAN_RX_PIN  GPIO_NUM_4
+
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -243,7 +243,11 @@ esp_err_t send_CAN_message(uint32_t message_id, const uint8_t *data, uint8_t dat
 
         /* Specify the TWAI flags for the message. The flags are used to specify the message type, such as standard or extended frame, 
         remote frame, single shot transmission, self reception request, and data length code non-compliant. */
+#if (J1939_ENABLED == 1)
+        message.extd = 1;         // 1 - Extended Frame Format (29bit ID) or 0 - Standard Frame Format (11bit ID)
+#else
         message.extd = 0;         // 1 - Extended Frame Format (29bit ID) or 0 - Standard Frame Format (11bit ID)
+#endif
         message.rtr = 0;          // 1 - Message is a Remote Frame or 0 - Message is a Data Frame
         message.ss = 0;           // 1 - Transmit as a Single Shot Transmission (the message will not be retransmitted upon error or arbitration loss)
         message.self = 0;         // 1 - Transmit as a Self Reception Request (the msg will be received by the transmitting device) or 0 for normal transmission
