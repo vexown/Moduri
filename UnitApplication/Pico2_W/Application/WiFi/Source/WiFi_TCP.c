@@ -85,6 +85,40 @@ static err_t tcp_client_send(const char *data, uint16_t length);
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
 /*******************************************************************************/
 
+#ifdef DEBUG_BUILD
+/**
+ * Function: tcp_send_debug
+ * 
+ * Description: Formats a debug message using printf-style arguments and sends it via TCP.
+ * 
+ * Parameters:
+ *  - const char *format: Printf-style format string
+ *  - ...: Variable arguments corresponding to format string
+ * 
+ * Returns: err_t indicating the result of the send operation
+ */
+err_t tcp_send_debug(const char* format, ...)
+{
+    char debug_buffer[256]; /* Fixed size buffer for debug messages */
+    va_list args;
+    
+    /* Add [PICO] prefix to the buffer */
+    strcpy(debug_buffer, "[PICO] ");
+    size_t prefix_len = strlen(debug_buffer);
+    
+    /* Format the message with variable arguments */
+    va_start(args, format);
+    vsnprintf(debug_buffer + prefix_len, sizeof(debug_buffer) - prefix_len - 1, format, args);
+    va_end(args);
+    
+    /* Ensure null termination */
+    debug_buffer[sizeof(debug_buffer) - 1] = '\0';
+    
+    /* Send the formatted message */
+    return tcp_send(debug_buffer, (uint16_t)strlen(debug_buffer)); //cast is safe because debug_buffer is fixed size and not bigger than UINT16_MAX
+}
+#endif
+
 /* 
  * Function: tcp_send
  * 

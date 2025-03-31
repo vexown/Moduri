@@ -12,13 +12,20 @@
 /* Configuration includes */
 #include "ModuriConfig.h"
 
+/* WiFi includes */
+#include "WiFi_TCP.h"
+
+#ifdef DEBUG_BUILD
+#include <stdarg.h>
+#endif
+
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
 
 /* Enable printf only in Debug builds */
 #ifdef DEBUG_BUILD
-    #define LOG printf
+    #define LOG(...) (tcp_client_is_connected() ? tcp_send_debug(__VA_ARGS__) : printf(__VA_ARGS__))
 #else /* RELEASE_BUILD or build type not defined (or defined with invalid type) */
     #define LOG(...)
 #endif

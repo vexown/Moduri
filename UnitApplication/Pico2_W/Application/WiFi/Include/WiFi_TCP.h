@@ -54,6 +54,10 @@ extern TCP_Client_t *clientGlobal;
 err_t tcp_send(const char *data, uint16_t length);
 void tcp_receive_cmd(uint8_t *received_command);
 
+#ifdef DEBUG_BUILD
+err_t tcp_send_debug(const char* format, ...);
+#endif
+
 #if (PICO_W_AS_TCP_SERVER == ON)
 /* Global server instance */
 extern tcpServerType *tcpServerGlobal;
