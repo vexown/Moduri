@@ -42,6 +42,21 @@ typedef struct
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
+/**
+ * @brief Handles analyzing and responding to a Remote Frame Request
+ * 
+ * @param message Pointer to the received TWAI message
+ * @return esp_err_t Returns ESP_OK if the response was successfully sent or the error code if it failed
+ * 
+ */
+static esp_err_t remote_frame_responder(twai_message_t *message);
+
+/**
+ * @brief Process and print active TWAI alerts
+ * 
+ * @param alerts Combined alerts value from twai_read_alerts
+ */
+static void process_twai_alerts(uint32_t alerts);
 
 /*******************************************************************************/
 /*                            STATIC VARIABLES                                 */
@@ -105,13 +120,6 @@ static const char* twai_state_to_string(twai_state_t state)
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
-/**
- * @brief Handles analyzing and responding to a Remote Frame Request
- * 
- * @param message Pointer to the received TWAI message
- * @return esp_err_t Returns ESP_OK if the response was successfully sent or the error code if it failed
- * 
- */
 static esp_err_t remote_frame_responder(twai_message_t *message)
 {
     const uint8_t* response = NULL;
@@ -137,11 +145,6 @@ static esp_err_t remote_frame_responder(twai_message_t *message)
     return status;
 }
 
-/**
- * @brief Process and print active TWAI alerts
- * 
- * @param alerts Combined alerts value from twai_read_alerts
- */
 static void process_twai_alerts(uint32_t alerts) 
 {
     if (alerts == 0) 

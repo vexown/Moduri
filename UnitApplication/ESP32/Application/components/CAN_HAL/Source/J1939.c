@@ -77,6 +77,7 @@
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
+
 /**
  * @brief Assembles a J1939 29-bit CAN message identifier.
  *
@@ -88,22 +89,56 @@
  * @param src_address  Source Address (0-255, excluding 254/255 usually).
  * @return uint32_t The assembled 29-bit J1939 identifier.
  */
-static uint32_t assembleJ1939MessageID(uint8_t priority,
-                                uint8_t data_page,
-                                uint8_t pdu_format,
-                                uint8_t pdu_specific,
-                                uint8_t src_address)
+static uint32_t assembleJ1939MessageID( uint8_t priority,
+                                        uint8_t data_page,
+                                        uint8_t pdu_format,
+                                        uint8_t pdu_specific,
+                                        uint8_t src_address);
+
+/**
+* @brief Disassembles a J1939 29-bit CAN message identifier into its components.
+*
+* @param messageID    The 29-bit J1939 identifier to disassemble.
+* @param priority     Pointer to store the extracted priority (0-7).
+* @param data_page    Pointer to store the extracted Data Page (0 or 1).
+* @param pdu_format   Pointer to store the extracted PDU Format (0-255).
+* @param pdu_specifics Pointer to store the extracted PDU Specific (0-255).
+* @param src_address  Pointer to store the extracted Source Address (0-255).
+*/
+static void disassembleJ1939MessageID(  uint32_t messageID,
+                                        uint8_t *priority,
+                                        uint8_t *data_page,
+                                        uint8_t *pdu_format,
+                                        uint8_t *pdu_specifics,
+                                        uint8_t *src_address);
+/*******************************************************************************/
+/*                            STATIC VARIABLES                                 */
+/*******************************************************************************/
+
+/*******************************************************************************/
+/*                            GLOBAL VARIABLES                                 */
+/*******************************************************************************/
+
+/*******************************************************************************/
+/*                        STATIC FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
+
+static uint32_t assembleJ1939MessageID( uint8_t priority,
+                                        uint8_t data_page,
+                                        uint8_t pdu_format,
+                                        uint8_t pdu_specific,
+                                        uint8_t src_address)
 {
     uint32_t messageID = 0;
 
     /* J1939 ID Structure (based on J1939-21 Rev Dec 2006):
-     *      Bits 28-26: Priority (P)
-     *      Bit 25:     Extended Data Page (EDP) - Must be 0 for standard messages per this revision.
-     *      Bit 24:     Data Page (DP)
-     *      Bits 23-16: PDU Format (PF)
-     *      Bits 15-8:  PDU Specific (PS)
-     *      Bits 7-0:   Source Address (SA)
-     */
+    *      Bits 28-26: Priority (P)
+    *      Bit 25:     Extended Data Page (EDP) - Must be 0 for standard messages per this revision.
+    *      Bit 24:     Data Page (DP)
+    *      Bits 23-16: PDU Format (PF)
+    *      Bits 15-8:  PDU Specific (PS)
+    *      Bits 7-0:   Source Address (SA)
+    */
 
     /* Validate the non-8-bits elements to throw an error if they exceed their limits (should never happen) */
     assert((priority & ~J1939_PRIORITY_MASK) == 0); // Make sure priority fits in 3 bits
@@ -122,17 +157,12 @@ static uint32_t assembleJ1939MessageID(uint8_t priority,
     return messageID;
 }
 
-/**
- * @brief Disassembles a J1939 29-bit CAN message identifier into its components.
- *
- * @param messageID    The 29-bit J1939 identifier to disassemble.
- * @param priority     Pointer to store the extracted priority (0-7).
- * @param data_page    Pointer to store the extracted Data Page (0 or 1).
- * @param pdu_format   Pointer to store the extracted PDU Format (0-255).
- * @param pdu_specifics Pointer to store the extracted PDU Specific (0-255).
- * @param src_address  Pointer to store the extracted Source Address (0-255).
- */
-static void disassembleJ1939MessageID(uint32_t messageID, uint8_t *priority, uint8_t *data_page, uint8_t *pdu_format, uint8_t *pdu_specifics, uint8_t *src_address) 
+static void disassembleJ1939MessageID(  uint32_t messageID,
+                                        uint8_t *priority,
+                                        uint8_t *data_page,
+                                        uint8_t *pdu_format,
+                                        uint8_t *pdu_specifics,
+                                        uint8_t *src_address) 
 {
     /* Extract the components from the message ID */
     *priority = (uint8_t)((messageID >> J1939_PRIORITY_SHIFT) & J1939_PRIORITY_MASK);
@@ -143,12 +173,9 @@ static void disassembleJ1939MessageID(uint32_t messageID, uint8_t *priority, uin
 }
 
 /*******************************************************************************/
-/*                            STATIC VARIABLES                                 */
+/*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
-/*******************************************************************************/
-/*                            GLOBAL VARIABLES                                 */
-/*******************************************************************************/
 esp_err_t send_J1393_message(const uint8_t *data_field, uint8_t data_field_length)
 {
     /* Below core values are often taken from one of the predefined PGNs defined in the J1939-71 standard (except manufacturer specific PGNs)
@@ -172,16 +199,6 @@ esp_err_t send_J1393_message(const uint8_t *data_field, uint8_t data_field_lengt
 
     return send_CAN_message(message_id, data_field, data_field_length);
 }
-
-/*******************************************************************************/
-/*                        STATIC FUNCTION DEFINITIONS                          */
-/*******************************************************************************/
-
-
-/*******************************************************************************/
-/*                        GLOBAL FUNCTION DEFINITIONS                          */
-/*******************************************************************************/
-
 
 
 
