@@ -70,7 +70,7 @@ static bool udp_client_init(void);
 void udp_client_process_recv_message(uint8_t *received_command) 
 {
     // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, NON_BLOCKING) == pdTRUE) 
     {
         // Access the receive buffer
         uint8_t *buffer = recv_data;
@@ -240,7 +240,7 @@ static void udp_receive_callback(void *arg, struct udp_pcb *pcb, struct pbuf *p,
     if (p != NULL) 
     {
         // Wait for the mutex before accessing the buffer
-        if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+        if (xSemaphoreTake(bufferMutex, NON_BLOCKING) == pdTRUE) 
         {
             memset(recv_data, 0, sizeof(recv_data));
         

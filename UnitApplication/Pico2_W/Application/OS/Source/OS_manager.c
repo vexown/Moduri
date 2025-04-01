@@ -336,7 +336,7 @@ static void monitorTask(__unused void *taskParams)
 
         /* Check if the monitoring task was notified to toggle the monitoring state.
             Clear the notification after receiving it. Do not block the task to wait for the notification, just check if it is available. */
-        if(ulTaskNotifyTake(pdTRUE, NO_TIMEOUT) > 0) // Checks task's notification count before it is cleared (pdTRUE means we clear it after checking)
+        if(ulTaskNotifyTake(pdTRUE, NON_BLOCKING) > 0) // Checks task's notification count before it is cleared (pdTRUE means we clear it after checking)
         {
             /* Toggle the monitoring state */
             monitoringEnabled = !monitoringEnabled;

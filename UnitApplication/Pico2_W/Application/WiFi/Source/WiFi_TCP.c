@@ -724,7 +724,7 @@ static err_t tcp_server_recv_callback(void *arg, struct tcp_pcb *pcb, struct pbu
     cyw43_arch_lwip_check();
 
     /* Wait for the mutex before accessing the buffer */
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, NON_BLOCKING) == pdTRUE) 
     {
         /* Allocate a buffer to hold the received data plus one byte for the null terminator. */
         /* Copy the received data from the pbuf to the newly allocated buffer. */
@@ -964,7 +964,7 @@ static bool tcp_server_open(void)
 static void tcp_server_process_recv_message(uint8_t *received_command) 
 {
     // Wait for the mutex before accessing the buffer
-    if (xSemaphoreTake(bufferMutex, NO_TIMEOUT) == pdTRUE) 
+    if (xSemaphoreTake(bufferMutex, NON_BLOCKING) == pdTRUE) 
     {
         // Access the receive buffer
         uint8_t *buffer = tcpServerGlobal->receive_buffer;

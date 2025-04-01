@@ -46,7 +46,7 @@
 #define E_OK           0
 #define ERRNO_FAIL     -1
 #define NO_FLAG        0
-#define NO_TIMEOUT     0
+#define NON_BLOCKING     0
 
 /*******************************************************************************/
 /*                         GLOBAL FUNCTION DECLARATIONS                        */
