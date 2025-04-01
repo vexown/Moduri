@@ -27,7 +27,7 @@
 #define PICO_DO_NOTHING                 0
 #define PICO_TRANSITION_TO_ACTIVE_MODE  1
 #define PICO_TRANSITION_TO_LISTEN_MODE  2
-#define PICO_TRANSITION_TO_MONITOR_MODE 3
+#define PICO_TOGGLE_MONITORING_STATE    3
 #define PICO_TRANSITION_TO_UPDATE_MODE  4
 
 /*******************************************************************************/
@@ -45,8 +45,7 @@ typedef enum {
     INIT = 0,
     LISTENING = 1,
     ACTIVE_SEND_AND_RECEIVE = 2,
-    MONITOR = 3,
-    UPDATE = 4
+    UPDATE = 3
 } WiFiStateType;
 
 /*******************************************************************************/

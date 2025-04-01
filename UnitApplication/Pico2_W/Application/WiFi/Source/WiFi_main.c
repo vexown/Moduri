@@ -62,7 +62,6 @@ WiFiStateType WiFiState = INIT;
 static void WiFi_ProcessCommand(uint8_t command);
 static void WiFi_ListenState(void);
 static void WiFi_ActiveState(void);
-static void WiFi_MonitorState(void);
 static void WiFi_InitCommunication(void);
 static void WiFi_UpdateState(void);
 
@@ -92,9 +91,6 @@ void WiFi_MainFunction(void)
             break;
         case ACTIVE_SEND_AND_RECEIVE:
             WiFi_ActiveState();
-            break;
-        case MONITOR:
-            WiFi_MonitorState();
             break;
         case UPDATE:
             WiFi_UpdateState();
@@ -137,13 +133,9 @@ static void WiFi_ProcessCommand(uint8_t command)
             LOG("Transitioning to Listen Mode...\n");
             WiFiState = LISTENING;
             break;
-        case PICO_TRANSITION_TO_MONITOR_MODE:
-#if (MONITORING_ENABLED == ON)
-            LOG("Transitioning to Monitor Mode...\n");
-            WiFiState = MONITOR;
-#else
-            LOG("Monitoring not enabled - turn it on in ModuriConfig.h\n");
-#endif
+        case PICO_TOGGLE_MONITORING_STATE:
+            LOG("Pressing on/off button to toggle monitoring...\n");
+            xTaskNotifyGive(monitorTaskHandle); // Signal Monitor Task to enable/disable monitoring
             break;
         case PICO_TRANSITION_TO_UPDATE_MODE:
             LOG("Transitioning to Update Mode...\n");
@@ -233,44 +225,6 @@ static void WiFi_ActiveState(void)
         /************** TX **************/
         /* Send a message (for now just a test message) */
         udp_client_send(message);
-    }
-    else
-    {
-        LOG("Communication Type not supported\n");
-    }
-}
-
-/* 
- * Function: WiFi_MonitorState
- * 
- * Description: State in which the Pico W sends out Monitor data
- * 
- * 
- * Parameters:
- *   - none
- * 
- * Returns: void
- *
- */
-static void WiFi_MonitorState(void)
-{
-    uint8_t received_command = PICO_DO_NOTHING;
-
-    if(TransportLayer == TCP_COMMUNICATION)
-    {
-        /************** RX **************/
-        /* Handle any received commands */
-        tcp_receive_cmd(&received_command);
-
-        WiFi_ProcessCommand(received_command); 
-
-         /************** TX **************/
-        /* Signal Monitor Task to send data */
-        xTaskNotifyGive(monitorTaskHandle);
-    }
-    else if(TransportLayer == UDP_COMMUNICATION)
-    {
-        /* Monitoring supported only over TCP for now */
     }
     else
     {

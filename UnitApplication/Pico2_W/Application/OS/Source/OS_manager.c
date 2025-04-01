@@ -319,6 +319,12 @@ static void monitorTask(__unused void *taskParams)
 	/*******************************************************************************/
 	TickType_t xLastWakeTime;
 
+#if (MONITORING_ENABLED == ON)
+    static bool monitoringEnabled = true; //start off with monitoring enabled
+#else
+    static bool monitoringEnabled = false; //start off with monitoring disabled
+#endif
+
 	/* Initialize xLastWakeTime - this only needs to be done once. */
 	xLastWakeTime = xTaskGetTickCount();
 	/*******************************************************************************/
@@ -327,9 +333,33 @@ static void monitorTask(__unused void *taskParams)
     for( ;; )
 	{
 		vTaskDelayUntil(&xLastWakeTime, MONITOR_TASK_PERIOD_TICKS); // Execute periodically at consistent intervals based on a reference time
-#if (MONITORING_ENABLED == ON)
-		Monitor_MainFunction();
-#endif
+
+        /* Check if the monitoring task was notified to toggle the monitoring state.
+            Clear the notification after receiving it. Do not block the task to wait for the notification, just check if it is available. */
+        if(ulTaskNotifyTake(pdTRUE, NO_TIMEOUT) > 0) // Checks task's notification count before it is cleared (pdTRUE means we clear it after checking)
+        {
+            /* Toggle the monitoring state */
+            monitoringEnabled = !monitoringEnabled;
+
+            if(monitoringEnabled)
+            {
+                LOG("Monitoring enabled \n");
+            }
+            else
+            {
+                LOG("Monitoring disabled \n");
+            }
+        }
+
+        /* If monitoring is enabled, call the main function of the monitoring module */
+        if(monitoringEnabled)
+        {
+            Monitor_MainFunction();
+        }
+        else
+        {
+            /* Do nothing, monitoring is disabled */
+        }
     }
 }
 
