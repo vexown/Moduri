@@ -1156,27 +1156,42 @@ static TCP_Client_t* tcp_client_init(void)
  *            (e.g., ERR_CONN if the client is not connected or other 
  *            error codes from tcp_write() or tcp_output()) of the send operation.
  */
-static err_t tcp_client_send(const char *data, uint16_t length) {
+static err_t tcp_client_send(const char *data, uint16_t length) 
+{
     err_t err = ERR_OK;
     
-    // Check if clientGlobal exists and is connected
-    if (clientGlobal == NULL || !tcp_client_is_connected() || clientGlobal->pcb == NULL) {
-        LOG("Cannot send - client not connected\n");
-        return ERR_CONN;
+    /* Check if clientGlobal and its PCB exist and we are connected */
+    if (clientGlobal == NULL || !tcp_client_is_connected() || clientGlobal->pcb == NULL) 
+    {
+        LOG("Cannot send - client not connected. Please connect first.\n"); // You can try reconnecting via tcp_client_connect() when handling this error
+        err = ERR_CONN;
     }
+    else
+    {
+        /* Write data for sending (but does not send it immediately) */
+        /* It waits in the expectation of more data being sent soon (as it can send them more efficiently by combining them together).
+            To prompt the system to send data now, call tcp_output() after calling tcp_write(). Use TCP_WRITE_FLAG_MORE if you want to 
+            send more data in the same segment. TCP_WRITE_FLAG_COPY indicates that new memory should be allocated for the data to be copied into. */
+        err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
+        if (err == ERR_OK) 
+        {
+            /* Actually send the data */
+            err = tcp_output(clientGlobal->pcb);
+            if (err != ERR_OK) 
+            {
+                LOG("tcp_output failed: %d\n", err);
+            }
     
-    // Send data
-    err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
-    if (err == ERR_OK) {
-        // Actually send the data
-        err = tcp_output(clientGlobal->pcb);
-        if (err != ERR_OK) {
-            LOG("tcp_output failed: %d\n", err);
+        } else if (err == ERR_MEM) 
+        {
+            LOG("tcp_write failed with ERR_MEM - length of data exceeds the current send buffer size\n");
         }
-    } else {
-        LOG("tcp_write failed: %d\n", err);
+        else 
+        {
+            LOG("tcp_write failed: %d\n", err);
+        }   
     }
-    
+      
     return err;
 }
 

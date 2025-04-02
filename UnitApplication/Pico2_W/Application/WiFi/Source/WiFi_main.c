@@ -211,9 +211,9 @@ static void WiFi_ActiveState(void)
 
         WiFi_ProcessCommand(received_command); 
 
-         /************** TX **************/
+        /************** TX **************/
         /* Send a message (for now just a test message) */
-        tcp_send(message, (uint16_t)strlen(message));
+        (void)tcp_send(message, (uint16_t)strlen(message));
     }
     else if(TransportLayer == UDP_COMMUNICATION)
     {
