@@ -1073,66 +1073,67 @@ static err_t tcp_server_send(const char *data, uint16_t length)
  * 
  * Returns: 
  *  - TCP_Client_t*: A pointer to the initialized TCP client structure if 
- *                   successful; NULL if initialization or connection 
+ *                   successful or NULL if initialization or connection 
  *                   fails.
  */
 static TCP_Client_t* tcp_client_init(void) 
 {
     ip_addr_t server_ip;
-    
-    // Allocate client structure
-    TCP_Client_t *client = (TCP_Client_t*)pvPortMalloc(sizeof(TCP_Client_t));
-    if (client == NULL) {
-        LOG("Failed to allocate client structure\n");
-        return NULL;
-    }
 
+    /* Allocate memory for the TCP client structure on the heap */
+    TCP_Client_t *client = (TCP_Client_t*)pvPortCalloc(1, sizeof(TCP_Client_t));
+
+    /* Create a binary semaphore for signaling data availability */
     tcp_data_available_semaphore = xSemaphoreCreateBinary();
-    if (tcp_data_available_semaphore == NULL) 
+
+    if (client == NULL) 
+    {
+        LOG("Failed to allocate client structure\n");
+    }
+    else if (tcp_data_available_semaphore == NULL) 
     {
         LOG("Failed to create semaphore\n");
         vPortFree(client);
         client = NULL;
-        return NULL;
     }
+    else
+    {
+        /* Create new TCP PCB (Protocol Control Block) for the client */
+        /* PCB is a central data structure for managing an active TCP connection. Each TCP connection is represented by one tcp_pcb instance, 
+         * which contains all the necessary information. This structure is manipulated by the TCP stack to implement the protocol according to 
+         * RFC 793 and its extensions. It maintains all necessary state to handle the TCP connection lifecycle from establishment to termination. */
+        client->pcb = tcp_new();
+        if (client->pcb == NULL) 
+        {
+            LOG("Failed to create TCP PCB\n");
+            vPortFree(client);
+            return NULL;
+        }
 
-    // Initialize client structure
-    client->pcb = NULL;
-    client->receive_length = 0;
-    client->is_closing = false;
+        /* Set client structure as an argument for callback functions (meaning that the callbacks will have access to the client structure) */
+        tcp_arg(client->pcb, client);
 
-    // Create new TCP PCB
-    client->pcb = tcp_new();
-    if (client->pcb == NULL) {
-        LOG("Failed to create TCP PCB\n");
-        vPortFree(client);
-        return NULL;
-    }
-
-    // Set client structure as argument for callbacks
-    tcp_arg(client->pcb, client);
-
-    // Set up error callback
-    tcp_err(client->pcb, tcp_client_err_callback);
+        /* Set up error callback */
+        tcp_err(client->pcb, tcp_client_err_callback);
 
 #if (OTA_ENABLED == ON)
-    // Set up the TCP client to connect to the external server
-    ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
+        /* Convert server IP string to IP address structure */
+        ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
+        /* Send connection request to server */
+        err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
 #else
-    // Convert server IP string to IP address structure
-    ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
-    // Connect to server
-    err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
+        /* Convert server IP string to IP address structure */
+        ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
+        /* Send connection request to server */
+        err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
 #endif
-
-
-    if (err != ERR_OK) {
-        LOG("TCP connect failed: %d\n", err);
-        tcp_close(client->pcb);
-        vPortFree(client);
-        return NULL;
+        if (err != ERR_OK) 
+        {
+            LOG("Failed to send connection request. Error code: %d\n", err);
+            (void)tcp_close(client->pcb); // Closes the connection held by the PCB and frees the pcb.
+            vPortFree(client);
+            client = NULL;
+        }
     }
 
     return client;
