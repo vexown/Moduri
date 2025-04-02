@@ -1386,7 +1386,7 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
  */
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) 
 {
-    TCP_Client_t *client = (TCP_Client_t*)arg;
+    (void)arg; // Client structure not used currently in this callback
     
     if (err != ERR_OK) // Connection failed (Host unreachable, Connection refused, etc.)
     {
