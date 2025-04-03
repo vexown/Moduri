@@ -1057,7 +1057,7 @@ static err_t tcp_server_send(const char *data, uint16_t length)
     return err;
 }
 
-#else
+#else // PICO_W_AS_TCP_SERVER == OFF
 
 /* 
  * Function: tcp_client_init
@@ -1307,64 +1307,85 @@ static void tcp_client_process_recv_message(char* output_buffer, uint16_t* outpu
  *      This callback function is called automatically when data arrives 
  *      at the TCP client. It handles the incoming data by storing it in 
  *      the client's buffer, prints the received data (for testing), and 
- *      sends an acknowledgment back to the server.
+ *      sends an acknowledgment back to the server. Look for TCP_EVENT_RECV
+ *      in the lwIP TCP code/documentation for more info on how this callback
+ *      is used.
  * 
  * Parameters:
- *  - void *arg: A pointer to the TCP client structure (TCP_Client_t) that 
- *                is passed when the callback is registered.
+ *  - void *arg: Additional argument passed to the callback, configured
+ *               via tcp_arg() for the given PCB. In this case, it is the
+ *               pointer to the TCP_Client_t structure (not really used rn).
  *  - struct tcp_pcb *tpcb: Pointer to the TCP protocol control block 
- *                            associated with the connection.
- *  - struct pbuf *p: Pointer to the pbuf structure containing the received data.
- *  - err_t err: An error code indicating the result of the receive operation.
+ *                          associated with the connection that received the data.
+ *  - struct pbuf *rcv_data: Pointer to the pbuf structure containing the 
+ *                           received data (or NULL if the connection is closed).
+ *  - err_t err: As of today's state of lwIP, this is always ERR_OK (0)
  * 
  * Returns: 
- *  - err_t: An error code indicating the success (ERR_OK) or failure 
- *            (e.g., ERR_MEM if the received data exceeds the buffer size 
- *            or other error codes related to handling the incoming data).
+ *  - err_t: For TCP receive callbacks (tcp_recv_fn), you should almost always return `ERR_OK` (0) 
+ *           which indicates normal processing. This tells lwIP you've handled the data correctly 
+ *           (by copying it, processing it, or discarding it) and want the connection to continue. 
+ *           You must properly free the pbuf with `pbuf_free()` before returning, unless you're storing 
+ *           it for later use (rare). The only exception is when you've called `tcp_abort()` within your 
+ *           callback to forcibly terminate the connection - in that specific case, return `ERR_ABRT`. 
  */
-static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err) {
-    TCP_Client_t* client = (TCP_Client_t*)arg;
+static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *rcv_data, err_t err) 
+{
+    (void)arg; // Unused parameter, we use the global client structure (clientGlobal)
+    (void)err; // This is always ERR_OK (0) so we don't need to check it (as of now)
     
-    if (p == NULL) {
-        // Connection closed by remote host
-        return ERR_OK;
-    }
+    err_t status = ERR_OK;
 
-    if (err != ERR_OK) {
-        pbuf_free(p);
-        return err;
+    if (rcv_data == NULL) // Special condtion where connection has been closed
+    {
+        LOG("Connection closed by remote host\n");
     }
+    else // We have received data - process it
+    {
+        if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(1000)) == pdTRUE) // make sure noone else is accessing the buffer right now
+        {
+            uint16_t occupied_buffer_size = clientGlobal->receive_length;
+            uint16_t received_data_size = rcv_data->tot_len;
+            if ((occupied_buffer_size + received_data_size) <= TCP_RECV_BUFFER_SIZE) // Check if the received data fits in the remaining buffer
+            {
+                /* Copy the received data from the pbuf to the receive buffer */
+                uint8_t* next_free_buffer_position = &clientGlobal->receive_buffer[clientGlobal->receive_length];
+                pbuf_copy_partial(rcv_data, next_free_buffer_position, received_data_size, 0 /* offset */);
 
-    // Handle incoming data
-    if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-        if (p->tot_len + client->receive_length <= TCP_RECV_BUFFER_SIZE) {
-            // Copy data from pbuf to our buffer
-            pbuf_copy_partial(p, client->receive_buffer + client->receive_length, p->tot_len, 0);
-            client->receive_length += p->tot_len;
-            
-            LOG("Appended %d bytes to receive_buffer, total %d\n", 
-                p->tot_len, client->receive_length);
-            
-            // Signal that data is available
-            xSemaphoreGive(tcp_data_available_semaphore);
-        } 
+                /* Update the total length of received data */
+                clientGlobal->receive_length += received_data_size;
+                
+                LOG("Appended %d bytes to receive_buffer, total %d\n", rcv_data->tot_len, clientGlobal->receive_length);
+                
+                /* Signal that data is available */
+                xSemaphoreGive(tcp_data_available_semaphore);
+            } 
+            else // There is not enough space in the receive buffer
+            {
+                LOG("[CRITICAL] Receive buffer overflow: %d + %d > %d\n", clientGlobal->receive_length, rcv_data->tot_len, TCP_RECV_BUFFER_SIZE);
+            }
+        
+            /* Let other tasks access the buffer */
+            xSemaphoreGive(bufferMutex);
+        }
         else 
         {
-            LOG("Receive buffer overflow: %d + %d > %d\n", 
-                client->receive_length, p->tot_len, TCP_RECV_BUFFER_SIZE);
+            LOG("[CRITICAL] Failed to acquire mutex after 1s - network congestion or deadlock detected\n");
         }
+
+        /* Inform lwIP that the received data of size rcv_data->tot_len has been processed */
+        /* This is important for the TCP flow control mechanism, so that the sender can send more data
+        if needed. Otherwise it would seem like the receiver is not ready to receive more data */
+        tcp_recved(tpcb, rcv_data->tot_len);
         
-        xSemaphoreGive(bufferMutex);
+        /* Free the pbuf to release memory used for receiving data  This is important to avoid memory leaks. 
+        The pbuf is no longer needed after processing */
+        pbuf_free(rcv_data);
     }
-    
-    // Always acknowledge the data
-    tcp_recved(tpcb, p->tot_len);
-    
-    // Free the pbuf
-    pbuf_free(p);
-    
+
     return ERR_OK;
 }
+
 /* 
  * Function: tcp_client_connected_callback
  * 
