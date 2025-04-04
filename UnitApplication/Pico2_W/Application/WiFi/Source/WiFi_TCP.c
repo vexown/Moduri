@@ -1402,8 +1402,6 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
 {
     (void)arg; // Unused parameter, we use the global client structure (clientGlobal)
     (void)err; // This is always ERR_OK (0) so we don't need to check it (as of now)
-    
-    err_t status = ERR_OK;
 
     if (rcv_data == NULL) // Special condtion where connection has been closed
     {
@@ -1452,7 +1450,7 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
         pbuf_free(rcv_data);
     }
 
-    return ERR_OK;
+    return ERR_OK; // For now we always return ERR_OK (0) to indicate that we have processed the data correctly
 }
 
 /* 
