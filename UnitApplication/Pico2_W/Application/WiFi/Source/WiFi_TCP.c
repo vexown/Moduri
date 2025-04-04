@@ -465,7 +465,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
  */
 void tcp_client_disconnect(void) 
 {
-    if (clientGlobal && clientGlobal->pcb) // double-check if client and its pcb are not NULL
+    if ((clientGlobal && clientGlobal->pcb) && clientGlobal->is_closing == false) // check if client exists and is not already closing
     {
         clientGlobal->is_closing = true; // indicate that the client is closing the connection
 
@@ -479,14 +479,17 @@ void tcp_client_disconnect(void)
         err_t err = tcp_close(clientGlobal->pcb);
 
         /* According to lwIP documentation in pico-sdk, if tcp_close() returns ERR_OK, the connection was closed successfully
-           and if it returns ERR_MEM, the connection was not closed and the application should wait and try again */
-        if(err != ERR_OK)
+            and if it returns ERR_MEM, the connection was not closed and the application should wait and try again 
+            However, in my further testing I have found that tcp_close() returns ERR_OK means that closing of the connection was
+            INITIATED, but not necessarily completed yet. To ensure the connection is fully closed (4-way handshake), we need to
+            wait for the connection state to be TIME_WAIT or CLOSED. */
+        if((err != ERR_OK))
         {
-            /* So let's wait for the connection to close if needed - but not forever */
+            /* So let's not give up yet and try to initiate the connection closure a few more times */
             TickType_t xStartTime = xTaskGetTickCount();
-            TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // 2s
+            TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // Try over the next 2 seconds
 
-            while (clientGlobal->is_closing) 
+            while (err != ERR_OK) 
             {
                 /* Check if timeout has occurred */
                 if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
@@ -494,11 +497,9 @@ void tcp_client_disconnect(void)
                     LOG("Connection close timeout\n");
                     break;
                 }
-                else if(tcp_close(clientGlobal->pcb) == ERR_OK) /* Try again to close the connection */
+                else if((err = tcp_close(clientGlobal->pcb), err)) /* Try again to close the connection */
                 {
-                    LOG("Connection closed\n");
-                    clientGlobal->is_closing = false;
-                    clientGlobal->pcb = NULL;
+                    LOG("Connection closure initiated successfully after a bit of waiting (Ticks waited: %lu)\n", xTaskGetTickCount() - xStartTime);
                     break;
                 }
                 else /* Block this task for 10ms allowing other tasks to run and try again after */
@@ -507,13 +508,81 @@ void tcp_client_disconnect(void)
                 }
             }
         }
-
-        /* As a last resort, if after the timeout the connection is still open, 
-           force the abort which sends a RST segment to remote host. Ugly but never fails */
-        if (tcp_client_is_connected() == true)
+        else
         {
-            LOG("Error closing TCP connection - forcing abort... \n");
+            LOG("Connection closure initiated successfully. Client state: %d\n", clientGlobal->pcb->state);
+        }
+
+        /* If the connection closure was initiated successfully but is not fully closed yet (4-way handshake not completed) then wait a bit */
+        /* TIME_WAIT state (value 10) indicates that the TCP connection's 4-way closing handshake has completed successfully.
+        * When a connection enters TIME_WAIT:
+        * 1. Both sides have exchanged and acknowledged FIN packets
+        * 2. The network-level connection is effectively closed
+        * 3. The socket remains in this state for 2MSL (typically 2 minutes) to:
+        *    - Handle any delayed duplicate packets
+        *    - Ensure reliable delivery of the final ACK
+        *    - Prevent confusion between old and new connections
+        * 
+        * For our purposes, a connection in TIME_WAIT state can be considered successfully closed,
+        * even though it hasn't reached the final CLOSED state yet.
+        */
+        if((err == ERR_OK) && (clientGlobal->pcb->state != CLOSED) && (clientGlobal->pcb->state != TIME_WAIT))
+        {
+            /* Wait for the connection to complete its handshake */
+            TickType_t xStartTime = xTaskGetTickCount();
+            TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // 2s
+
+            while ((clientGlobal->pcb->state != CLOSED) && (clientGlobal->pcb->state != TIME_WAIT)) 
+            {
+                /* Check if timeout has occurred */
+                if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
+                {
+                    LOG("Connection close timeout\n");
+                    break;
+                }
+                else if((clientGlobal->pcb->state == CLOSED) || (clientGlobal->pcb->state == TIME_WAIT)) /* Connection closed successfully */
+                {
+                    LOG("Connection closed successfully after a bit of waiting (Ticks waited: %lu). Client state: %d\n", xTaskGetTickCount() - xStartTime,
+                                                                                                                         clientGlobal->pcb->state);
+                    clientGlobal->is_closing = false;
+                    clientGlobal->pcb = NULL;
+                    break;
+                }
+                else /* Block this task for 100ms allowing other tasks to run */
+                {
+                    vTaskDelay(pdMS_TO_TICKS(100));
+                }
+            }
+        }
+        else
+        {
+            LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
+            clientGlobal->is_closing = false;
+            clientGlobal->pcb = NULL;
+        }
+
+        /* As a last resort, if after the timeout the connection is still not fully closed, 
+           force the abort which sends a RST segment to remote host. Ugly but never fails */
+        if ((clientGlobal->pcb != NULL) && 
+            (clientGlobal->pcb->state != CLOSED) && 
+            (clientGlobal->pcb->state != TIME_WAIT))
+        {
+            LOG("Error closing TCP connection (Client state: %d) - forcing abort... \n", clientGlobal->pcb->state);
+
+            /* Forcefully abort the connection */
+            /* This will send a RST segment to the remote host and free the PCB */
             tcp_abort(clientGlobal->pcb);
+
+            clientGlobal->pcb = NULL;
+            clientGlobal->is_closing = false;
+
+            LOG("Connection aborted\n");
+        }
+        else
+        {
+            LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
+            clientGlobal->pcb = NULL;
+            clientGlobal->is_closing = false;
         }
     }
 }
