@@ -35,7 +35,7 @@
  #endif
  
  /* Use this option to enable printing (or TCP sending) of monitoring data such as Tasks Statistics, Heap and Stack usage etc. */
- #define MONITORING_ENABLED      ON
+ #define MONITORING_ENABLED      OFF
  
  /* Use this option to enable a periodically flashing on-board LED which signalizes the software is running (as opposed to being stuck) */
  #define ALIVE_LED_ENABLED       ON
@@ -46,7 +46,7 @@
  #define WATCHDOG_ENABLED        OFF //TODO - reenable this once you figure out how to pet it during TLS operations during OTA
  
  /* Enables the OTA (Over-The-Air) firmware update feature. A TCP client will connect to specified server and download updated firmware if available */
- #define OTA_ENABLED             OFF
+ #define OTA_ENABLED             ON
  #if (OTA_ENABLED == ON)
      #if (PICO_W_AS_TCP_SERVER == ON) 
      #error "OTA_ENABLED requires the Pico to be set up as a TCP client"

@@ -79,6 +79,8 @@ static void tcp_client_err_callback(void *arg, err_t err);
 /* Send/receive functions */
 static void tcp_client_process_recv_message(char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command);
 static err_t tcp_client_send(const char *data, uint16_t length);
+/* Helper functions */
+static void tcp_client_cleanup(void);
 #endif
 
 /*******************************************************************************/
@@ -370,6 +372,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
     if(clientGlobal == NULL || clientGlobal->pcb == NULL)
     {
         LOG("TCP client not initialized or PCB is NULL\n");
+        WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
         return false;
     }
     
@@ -433,7 +436,7 @@ bool tcp_client_connect(const char *host, uint16_t port)
 
     /* Wait for connection to establish */
     TickType_t xStartTime = xTaskGetTickCount();
-    TickType_t xTimeoutTicks = pdMS_TO_TICKS(10000); // 10s
+    TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // 2s
 
     while (!tcp_client_is_connected() && !clientGlobal->is_closing) 
     {
@@ -544,8 +547,6 @@ void tcp_client_disconnect(void)
                 {
                     LOG("Connection closed successfully after a bit of waiting (Ticks waited: %lu). Client state: %d\n", xTaskGetTickCount() - xStartTime,
                                                                                                                          clientGlobal->pcb->state);
-                    clientGlobal->is_closing = false;
-                    clientGlobal->pcb = NULL;
                     break;
                 }
                 else /* Block this task for 100ms allowing other tasks to run */
@@ -557,8 +558,6 @@ void tcp_client_disconnect(void)
         else
         {
             LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
-            clientGlobal->is_closing = false;
-            clientGlobal->pcb = NULL;
         }
 
         /* As a last resort, if after the timeout the connection is still not fully closed, 
@@ -573,45 +572,57 @@ void tcp_client_disconnect(void)
             /* This will send a RST segment to the remote host and free the PCB */
             tcp_abort(clientGlobal->pcb);
 
-            clientGlobal->pcb = NULL;
-            clientGlobal->is_closing = false;
+            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
 
             LOG("Connection aborted\n");
         }
         else
         {
             LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
-            clientGlobal->pcb = NULL;
-            clientGlobal->is_closing = false;
+            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
         }
+    }
+    else if(clientGlobal->is_closing == true)
+    {
+        LOG("Client is already closing the connection\n");
+    }
+    else if(clientGlobal != NULL && clientGlobal->pcb == NULL)
+    {
+        LOG("Client PCB is NULL but client itself is not. Cleaning up...\n");
+        tcp_client_cleanup();
+    }
+    else
+    {
+        LOG("Client is already closed\n");
     }
 }
 
 /* 
  * Function: start_TCP_client
  * 
- * Description: Starts the TCP client and reports the status
+ * Description: Initializes the TCP client and attempts to connect to the specified server IP address and port.
+ * 
+ * Parameters:
+ *  - const char* host: IP address or hostname of the server to connect to.
+ *  - uint16_t port: Port number of the server to connect to.
  * 
  * Returns: bool indicating the success (true) or failure (false) of starting the TCP client.
  */
-bool start_TCP_client(void) 
+bool start_TCP_client(const char *host, uint16_t port) 
 {
-    bool status = false;
+    bool status = true;
 
     /* Check the initialization and connection status of the TCP client */
     if(clientGlobal != NULL && tcp_client_is_connected())
     {
         LOG("TCP client already started and connected \n");
-        status = true;
     }
     else if (clientGlobal != NULL && !tcp_client_is_connected())
     {
         LOG("TCP client is initialized but the connection is not established. Freeing resources and reinitializing... \n");
+        status = false;
         
-        tcp_client_disconnect();
-        
-        vPortFree(clientGlobal);
-        clientGlobal = NULL;
+        tcp_client_disconnect(); // Disconnect and free the resources
     }
     else
     {
@@ -621,15 +632,27 @@ bool start_TCP_client(void)
         if (clientGlobal != NULL) 
         {
             LOG("TCP client initialized successfully\n");
-            status = true;
         } 
         else 
         {
             LOG("TCP client initialization failed\n");
+            status = false;
+        }
+
+        bool connected = tcp_client_connect(host, port);
+        if (!connected) 
+        {
+            LOG("Failed to connect to the TCP server\n");
+            WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
+            status = false;
+        }
+        else
+        {
+            LOG("Connection to the TCP server established successfully\n");
         }
     }
 
-    /* If the client was successfully initialized, create a mutex for the buffer */
+    /* If the client was successfully initialized and has connected to the server, create a mutex for accessing the buffer */
     if(status == true)
     {
         bufferMutex = xSemaphoreCreateMutex();
@@ -637,30 +660,6 @@ bool start_TCP_client(void)
         {
             LOG("Failed to create mutex\n");
             status = false;
-        }
-    }
-
-    /* If the client was successfully initialized, but not connected yet, wait for the connection to establish */
-    if((status == true) && (!tcp_client_is_connected()))
-    {
-        LOG("Giving the network a few seconds to establish a connection... \n");
-
-        /* Wait for connection to establish */
-        TickType_t xStartTime = xTaskGetTickCount();
-        TickType_t xTimeoutTicks = pdMS_TO_TICKS(2500); // 2.5s
-
-        while (!tcp_client_is_connected()) 
-        {
-            /* Check if timeout has occurred */
-            if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
-            {
-                LOG("Connection timeout\n");
-                status = false;
-                break;
-            }
-            
-            /* Block this task for 10ms allowing other tasks to run */
-            vTaskDelay(pdMS_TO_TICKS(10));
         }
     }
         
@@ -1147,8 +1146,6 @@ static err_t tcp_server_send(const char *data, uint16_t length)
  */
 static TCP_Client_t* tcp_client_init(void) 
 {
-    ip_addr_t server_ip;
-
     /* Allocate memory for the TCP client structure on the heap */
     TCP_Client_t *client = (TCP_Client_t*)pvPortCalloc(1, sizeof(TCP_Client_t));
 
@@ -1184,25 +1181,6 @@ static TCP_Client_t* tcp_client_init(void)
 
         /* Set up error callback */
         tcp_err(client->pcb, tcp_client_err_callback);
-
-#if (OTA_ENABLED == ON)
-        /* Convert server IP string to IP address structure */
-        ipaddr_aton(OTA_HTTPS_SERVER_IP_ADDRESS, &server_ip);
-        /* Send connection request to server */
-        err_t err = tcp_connect(client->pcb, &server_ip, OTA_HTTPS_SERVER_PORT, tcp_client_connected_callback);
-#else
-        /* Convert server IP string to IP address structure */
-        ipaddr_aton(REMOTE_TCP_SERVER_IP_ADDRESS, &server_ip);
-        /* Send connection request to server */
-        err_t err = tcp_connect(client->pcb, &server_ip, TCP_PORT, tcp_client_connected_callback);
-#endif
-        if (err != ERR_OK) 
-        {
-            LOG("Failed to send connection request. Error code: %d\n", err);
-            (void)tcp_close(client->pcb); // Closes the connection held by the PCB and frees the pcb.
-            vPortFree(client);
-            client = NULL;
-        }
     }
 
     return client;
@@ -1535,6 +1513,37 @@ static void tcp_client_err_callback(void *arg, err_t err)
 
     /* Attempt to recover connection by reinitializing the client */
     WiFiState = INIT;
+}
+
+/**
+ * Function: tcp_client_cleanup
+ * 
+ * Description: Cleans up TCP client resources by resetting state flags,
+ *              freeing memory, and nullifying pointers.
+ * 
+ * Parameters: None - operates on the global client structure
+ * 
+ * Returns: void
+ */
+static void tcp_client_cleanup(void)
+{
+    if (clientGlobal != NULL)
+    {
+        clientGlobal->pcb = NULL;
+        /* PCB is already freed in tcp_close() function, but we do need to free the clientGlobal structure manually */
+        if(clientGlobal != NULL)
+        {
+            vPortFree(clientGlobal);
+            clientGlobal = NULL;
+            LOG("TCP client resources cleaned up\n");
+        }
+        else
+        {
+            LOG("TCP client already deallocated\n");
+        }
+
+        /* Setting clientGlobal->is_closing=false is not done here since we are deallocating the clientGlobal structure */
+    }
 }
 
 #endif

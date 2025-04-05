@@ -70,7 +70,7 @@ void tcp_close_client_connection(struct tcp_pcb *client_pcb);
 /* Global client instance */
 extern TCP_Client_t *clientGlobal;
 /* Client initialization */
-bool start_TCP_client(void);
+bool start_TCP_client(const char *host, uint16_t port);
 /* Connection management */
 bool tcp_client_connect(const char *host, uint16_t port);
 void tcp_client_disconnect(void);

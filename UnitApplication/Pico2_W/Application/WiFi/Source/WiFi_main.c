@@ -260,7 +260,7 @@ static void WiFi_InitCommunication(void)
 #if (PICO_W_AS_TCP_SERVER == ON)
         if(start_TCP_server() == true) WiFiState = LISTENING;
 #else /* defaults to Pico as TCP client */
-        if(start_TCP_client() == true) WiFiState = LISTENING;
+        if(start_TCP_client(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT) == true) WiFiState = LISTENING;
 #endif
     }
     else if(TransportLayer == UDP_COMMUNICATION)
@@ -277,6 +277,23 @@ static void WiFi_UpdateState(void)
 {
 #if (OTA_ENABLED == ON)
     LOG("Initiating firmware download...\n");
+
+    /* Disconnect from the current server */
+    tcp_client_disconnect();
+
+    /* Connect to the OTA server */
+    bool status = start_TCP_client(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
+    if (!status) 
+    {
+        LOG("Failed to connect to OTA server\n");
+        WiFiState = INIT; // Reinitialize the TCP client in attempt to connect again
+        return;
+    }
+    else
+    {
+        LOG("Connected to OTA server, attempting to download firmware...\n");
+    }
+
     int download_result = download_firmware();
     
     if (download_result == 0) 
