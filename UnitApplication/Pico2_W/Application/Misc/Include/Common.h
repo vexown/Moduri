@@ -25,7 +25,11 @@
 
 /* Enable printf only in Debug builds */
 #ifdef DEBUG_BUILD
-    #define LOG(...) (tcp_client_is_connected() ? tcp_send_debug(__VA_ARGS__) : printf(__VA_ARGS__))
+    #if (OTA_ENABLED == ON) // During OTA, we don't want to send any debug logs to the OTA server which we will be connected to
+        #define LOG printf  // TODO - divide OTA and debug logs into different ports? Connect one client to OTA server and one to debug server?
+    #else
+        #define LOG(...) (tcp_client_is_connected() ? tcp_send_debug(__VA_ARGS__) : printf(__VA_ARGS__))
+    #endif
 #else /* RELEASE_BUILD or build type not defined (or defined with invalid type) */
     #define LOG(...)
 #endif
