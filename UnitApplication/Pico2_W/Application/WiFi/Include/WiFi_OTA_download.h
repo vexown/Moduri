@@ -15,7 +15,7 @@
  * 
  * To verify the firmware is accessible: 
  *      sudo systemctl restart apache2
- *      open a browser and go to https://192.168.1.194/firmware.bin or use curl: curl -k https://192.1.168.194/firmware.bin -o downloaded_firmware.bin
+ *      open a browser and go to https://192.168.1.194/firmware.bin or use curl: curl -k https://192.168.1.194//firmware.bin -o downloaded_firmware.bin
  * 
  * /etc/ssl/certs is the location of the CA certificates on Ubuntu (which includes our self-signed certificate for the apache server: apache-selfsigned.crt)
  * 
