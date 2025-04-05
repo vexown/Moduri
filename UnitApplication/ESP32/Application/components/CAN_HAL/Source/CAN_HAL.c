@@ -272,16 +272,16 @@ esp_err_t send_CAN_message(uint32_t message_id, const uint8_t *data, uint8_t dat
     return status;
 } 
 
-esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length)
+esp_err_t receive_CAN_message(uint32_t* message_id, uint8_t* buffer, uint8_t* buffer_length)
 {
     bool message_received = false;
     esp_err_t status = ESP_OK;
     twai_message_t message;
 
     /* Check for NULL pointers */
-    if (buffer == NULL || buffer_length == NULL) 
+    if (buffer == NULL || buffer_length == NULL || message_id == NULL) 
     {
-        LOG("Invalid parameters: buffer or buffer_length is NULL\n");
+        LOG("Invalid parameters: buffer, buffer_length or message_id are NULL\n");
         status = ESP_ERR_INVALID_ARG;
     }
     else
@@ -292,6 +292,8 @@ esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length)
             message_received = true;
             LOG("Message received with ID=0x%lX (Extended=%d, RTR=%d, SS=%d, Self=%d, DLC Non-Comp=%d)\n", 
                 (unsigned long)message.identifier, message.extd, message.rtr, message.ss, message.self, message.dlc_non_comp);
+                
+            *message_id = message.identifier; // Store the received message ID
         } 
         else 
         {

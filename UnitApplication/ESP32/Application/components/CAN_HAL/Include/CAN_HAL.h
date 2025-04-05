@@ -72,7 +72,7 @@ esp_err_t send_CAN_message(uint32_t message_id, const uint8_t *data, uint8_t dat
  * @param buffer_length The length of the buffer (input) and the length of the data received (output)
  * @return esp_err_t Returns ESP_OK if a message was successfully received or the error code if it failed
  */
-esp_err_t receive_CAN_message(uint8_t* buffer, uint8_t* buffer_length);
+esp_err_t receive_CAN_message(uint32_t* message_id, uint8_t* buffer, uint8_t* buffer_length);
 
 /**
  * @brief Monitors the CAN bus checking the alerts and the status of the driver

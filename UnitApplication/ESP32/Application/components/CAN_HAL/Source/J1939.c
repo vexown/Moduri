@@ -2,6 +2,18 @@
  * ****************************************************************************
  * @file    J1939.c
  *
+ * @details SAE J1939 is a higher-layer protocol based on CAN (Controller Area Network)
+ *          that is widely used in the automotive and heavy-duty vehicle industries.
+ *          The particular characteristics of J1939 are:
+ *          - 29-bit CAN identifiers
+ *          - Bit rate of 250 kbps
+ *          - Peer-to-peer and broadcast communication
+ *          - Transport Protocols for large messages up to 1785 bytes
+ *          - Parameter Group Numbers (PGNs) to identify messages for commercial vehicles and others
+ *          - Address claiming for dynamic addressing
+ *          - Network management for node status and control 
+ *          - Diagnostic messages for troubleshooting
+ * 
  * ****************************************************************************
  */
 
@@ -21,9 +33,6 @@
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-/* PGN (Parameter Group Number) is a key to understanding the content of a J1939 message.It enables you to find the definitions 
-    of standard messages within the J1939 documentation. It is the primary way that the J1939 standard organizes its message definitions.
-    PGN is not directly placed into the message ID, but is used to derive the PDU format and PDU specifics. */
 #define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
 #define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
 
@@ -54,18 +63,18 @@
 /* Macro to extract the group extension from the PS field, if the message is PDU2 */
 #define J1939_GROUP_EXTENSION(pf, ps) (J1939_IS_PDU2(pf) ? ps : 0xFF) //0xff is commonly used to signify no group extension.
 
-// Define masks and shifts for J1939 fields
+/* Define masks and shifts for J1939 CAN ID fields */
 #define J1939_PRIORITY_MASK     0x07 // 3 bits
 #define J1939_DP_MASK           0x01 // 1 bit
 #define J1939_PF_MASK           0xFF // 8 bits
 #define J1939_PS_MASK           0xFF // 8 bits
 #define J1939_SA_MASK           0xFF // 8 bits
-
 #define J1939_PRIORITY_SHIFT    26
 #define J1939_DP_SHIFT          24
 #define J1939_PF_SHIFT          16
 #define J1939_PS_SHIFT          8
 #define J1939_SA_SHIFT          0
+
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -94,6 +103,19 @@ static uint32_t assembleJ1939MessageID( uint8_t priority,
                                         uint8_t pdu_format,
                                         uint8_t pdu_specific,
                                         uint8_t src_address);
+
+/**
+* @brief Fills the data field with SPN (Suspect Parameter Number) values based on the PGN 
+*        (Parameter Group Number).
+*
+* @param data_field        Pointer to the data field to fill.
+* @param data_field_length Length of the data field in bytes.
+* @return void
+*
+* Note: (TODO) This function is a placeholder and should be implemented to fill the data field
+*       with meaningful values based on the PGN and SPN definitions.
+*/
+static void assembleJ1939DataField(uint8_t *data_field, uint8_t data_field_length);
 
 /**
 * @brief Disassembles a J1939 29-bit CAN message identifier into its components.
@@ -131,7 +153,7 @@ static uint32_t assembleJ1939MessageID( uint8_t priority,
 {
     uint32_t messageID = 0;
 
-    /* J1939 ID Structure (based on J1939-21 Rev Dec 2006):
+    /* J1939 CAN ID Structure (based on J1939-21 Rev Dec 2006):
     *      Bits 28-26: Priority (P)
     *      Bit 25:     Extended Data Page (EDP) - Must be 0 for standard messages per this revision.
     *      Bit 24:     Data Page (DP)
@@ -157,6 +179,15 @@ static uint32_t assembleJ1939MessageID( uint8_t priority,
     return messageID;
 }
 
+static void assembleJ1939DataField(uint8_t *data_field, uint8_t data_field_length)
+{
+    /* Fill the data field with some example values (for demonstration purposes) TODO - make this more meaningful */
+    for (uint8_t i = 0; i < data_field_length; i++)
+    {
+        data_field[i] = i + 3; // Example data
+    }
+}
+
 static void disassembleJ1939MessageID(  uint32_t messageID,
                                         uint8_t *priority,
                                         uint8_t *data_page,
@@ -176,7 +207,7 @@ static void disassembleJ1939MessageID(  uint32_t messageID,
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
-esp_err_t send_J1393_message(const uint8_t *data_field, uint8_t data_field_length)
+esp_err_t send_J1393_message(void)
 {
     /* Below core values are often taken from one of the predefined PGNs defined in the J1939-71 standard (except manufacturer specific PGNs)
         Example of a standard PGN: 
@@ -186,6 +217,9 @@ esp_err_t send_J1393_message(const uint8_t *data_field, uint8_t data_field_lengt
             -> PDU Format: 240
             -> PDU Specifics: 3
             -> Default Priority: 3 */
+    /* PGN (Parameter Group Number) is a key to understanding the content of a J1939 message. It enables you to find the definitions 
+        of standard messages within the J1939 documentation. It is the primary way that the J1939 standard organizes its message definitions.
+        PGN is not directly placed into the message ID, but is used to derive the PDU format and PDU specifics. */
     uint8_t priority = PRIORITY_NORMAL; // Decide the priority level for the message (0-7, lower number = higher priority)
     uint8_t data_page = 0;    // Data page (0 or 1, used for multi-page messages)
     uint8_t pdu_format = 240; // PDU format (0-255, decides whether PDU Specific Field is a destination address (PDU1) or group extension (PDU2))
@@ -197,8 +231,22 @@ esp_err_t send_J1393_message(const uint8_t *data_field, uint8_t data_field_lengt
 
     uint32_t message_id = assembleJ1939MessageID(priority, data_page, pdu_format, pdu_specifics, src_address);
 
+    /* J1939 CAN ID is then used along with the Data Field to form a PDU (Protocol Data Unit)
+       For messages with 8 bytes of data or less, the PDU fits in a single CAN frame.
+       For messages with more than 8 bytes of data, the PDU is split into multiple frames using the J1939 Transport Protocol (TP) */
+    /* Data Field contains the actual data of the chosen PGN. This data is identified by the corresponding SPN (Source Parameter Number)
+        Example of Data Field for EEC1 (PGN 61444) from J1939-71 (2003):
+        Bit Start Position/Bytes    Length    SPN Description                           SPN
+        1.1                         4 bits    Engine Torque Mode                        899
+        2                           1 byte    Driver Demand Engine - Percent Torque     512
+        and so on... */
+    uint8_t data_field[8] = {0};
+    uint8_t data_field_length = 8;
+    assembleJ1939DataField(data_field, data_field_length);
+
+    /* At the absolute lowest level of J1939, what actually gets transmitted on the CAN bus is just an extended CAN frame (29-bit ID) */
+    /* J1939-specific information is encoded in the CAN ID and the data field of the frame */
     return send_CAN_message(message_id, data_field, data_field_length);
 }
-
 
 

@@ -165,7 +165,8 @@ void app_main(void)
         vTaskDelay(pdMS_TO_TICKS(1000));
         
         /* Receive a CAN message */
-        esp_err_t recv_result = receive_CAN_message(buffer, &buffer_length);
+        uint32_t message_id;
+        esp_err_t recv_result = receive_CAN_message(&message_id, buffer, &buffer_length);
         if (recv_result != ESP_OK) 
         {
             LOG("Error receiving CAN message: %s", esp_err_to_name(recv_result));
