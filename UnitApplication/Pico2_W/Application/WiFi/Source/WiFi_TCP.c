@@ -55,6 +55,9 @@ static SemaphoreHandle_t tcp_data_available_semaphore = NULL;
 /* Common mutex for accessing the TCP receive buffer */
 static SemaphoreHandle_t bufferMutex;
 
+/* Mutex for sending data */
+static SemaphoreHandle_t sendMutex;
+
 /*******************************************************************************/
 /*                         STATIC FUNCTION DECLARATIONS                        */
 /*******************************************************************************/
@@ -652,13 +655,19 @@ bool start_TCP_client(const char *host, uint16_t port)
         }
     }
 
-    /* If the client was successfully initialized and has connected to the server, create a mutex for accessing the buffer */
+    /* If the client was successfully initialized and has connected to the server, create the mutexes */
     if(status == true)
     {
         bufferMutex = xSemaphoreCreateMutex();
         if (bufferMutex == NULL) 
         {
             LOG("Failed to create mutex\n");
+            status = false;
+        }
+        sendMutex = xSemaphoreCreateMutex();
+        if (sendMutex == NULL) 
+        {
+            LOG("Failed to create send mutex\n");
             status = false;
         }
     }
@@ -1215,28 +1224,40 @@ static err_t tcp_client_send(const char *data, uint16_t length)
     }
     else
     {
-        /* Write data for sending (but does not send it immediately) */
-        /* It waits in the expectation of more data being sent soon (as it can send them more efficiently by combining them together).
-            To prompt the system to send data now, call tcp_output() after calling tcp_write(). Use TCP_WRITE_FLAG_MORE if you want to 
-            send more data in the same segment. TCP_WRITE_FLAG_COPY indicates that new memory should be allocated for the data to be copied into. */
-        err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
-        if (err == ERR_OK) 
+        /* Use a mutex to protect the send operation (only one task can send data at a time) */
+        if (xSemaphoreTake(sendMutex, pdMS_TO_TICKS(1000)) == pdTRUE) 
         {
-            /* Actually send the data */
-            err = tcp_output(clientGlobal->pcb);
-            if (err != ERR_OK) 
+            /* Write data for sending (but does not send it immediately) */
+            /* It waits in the expectation of more data being sent soon (as it can send them more efficiently by combining them together).
+                To prompt the system to send data now, call tcp_output() after calling tcp_write(). Use TCP_WRITE_FLAG_MORE if you want to 
+                send more data in the same segment. TCP_WRITE_FLAG_COPY indicates that new memory should be allocated for the data to be copied into. */
+            err = tcp_write(clientGlobal->pcb, data, length, TCP_WRITE_FLAG_COPY);
+            if (err == ERR_OK) 
             {
-                LOG("tcp_output failed: %d\n", err);
+                /* Actually send the data */
+                err = tcp_output(clientGlobal->pcb);
+                if (err != ERR_OK) 
+                {
+                    LOG("tcp_output failed: %d\n", err);
+                }
+        
+            } else if (err == ERR_MEM) 
+            {
+                LOG("tcp_write failed with ERR_MEM - length of data exceeds the current send buffer size\n");
             }
-    
-        } else if (err == ERR_MEM) 
-        {
-            LOG("tcp_write failed with ERR_MEM - length of data exceeds the current send buffer size\n");
+            else 
+            {
+                LOG("tcp_write failed: %d\n", err);
+            }   
+
+            /* Release the mutex after sending */
+            xSemaphoreGive(sendMutex); 
         }
         else 
         {
-            LOG("tcp_write failed: %d\n", err);
-        }   
+            LOG("Failed to acquire the mutex for sending data.\n");
+            err = ERR_TIMEOUT; // Indicate that the send operation timed out trying to acquire the mutex
+        }
     }
       
     return err;
