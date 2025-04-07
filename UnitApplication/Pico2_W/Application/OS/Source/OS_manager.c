@@ -88,7 +88,7 @@
 */
 /* Task periods */
 #define ALIVE_TASK_PERIOD_TICKS			    pdMS_TO_TICKS(500)  //500ms
-#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(1000)  //1s
+#define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(200)  //200ms
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
