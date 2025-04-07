@@ -16,7 +16,7 @@
 #define TCP_PORT                    8080
 #define TCP_HTTP_PORT               80
 #define OTA_HTTPS_SERVER_PORT       443
-#define TCP_RECV_BUFFER_SIZE        65536             //in bytes
+#define TCP_RECV_BUFFER_SIZE        65535             //in bytes
 #define UDP_SERVER_PORT             5000
 #define UDP_CLIENT_PORT             5001
 #define UDP_RECV_BUFFER_SIZE        1024
