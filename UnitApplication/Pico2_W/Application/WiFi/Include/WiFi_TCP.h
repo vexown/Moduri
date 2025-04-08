@@ -51,8 +51,10 @@ extern TCP_Client_t *clientGlobal;
 /*******************************************************************************/
 /*                        GLOBAL FUNCTION DELCARATION                          */
 /*******************************************************************************/
-err_t tcp_send(const char *data, uint16_t length);
+/* Send/receive functions */
+err_t tcp_send(const void *data, uint16_t length);
 void tcp_receive_cmd(uint8_t *received_command);
+void tcp_receive_data(unsigned char* buffer, uint16_t* buffer_length);
 
 #ifdef DEBUG_BUILD
 err_t tcp_send_debug(const char* format, ...);

@@ -80,8 +80,8 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
 static err_t tcp_client_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err);
 static void tcp_client_err_callback(void *arg, err_t err);
 /* Send/receive functions */
-static void tcp_client_process_recv_message(char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command);
-static err_t tcp_client_send(const char *data, uint16_t length);
+static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command);
+static err_t tcp_client_send(const void *data, uint16_t length);
 /* Helper functions */
 static void tcp_client_cleanup(void);
 #endif
@@ -132,12 +132,12 @@ err_t tcp_send_debug(const char* format, ...)
  *              or client.
  * 
  * Parameters:
- *  - const char *data: Pointer to the data to be sent.
+ *  - const void *data: Pointer to the data to be sent.
  *  - uint16_t length: Length of the data to be sent.
  * 
  * Returns: err_t indicating the result of the send operation.
  */
-err_t tcp_send(const char* data, uint16_t length)
+err_t tcp_send(const void* data, uint16_t length)
 {
 #if (PICO_W_AS_TCP_SERVER == ON)
     return tcp_server_send(data, length);
@@ -166,7 +166,7 @@ void tcp_receive_cmd(uint8_t* cmd)
 #if (PICO_W_AS_TCP_SERVER == ON)
     tcp_server_process_recv_message(cmd); // Fetch data received in tcp_server_recv_callback
 #else
-    char received_cmd[CMD_MAX_SIZE_BYTES] = {0};
+    unsigned char received_cmd[CMD_MAX_SIZE_BYTES] = {0};
     uint16_t received_cmd_length = sizeof(received_cmd);
 
     tcp_client_process_recv_message(received_cmd, &received_cmd_length, cmd); // Fetch data received in tcp_client_recv_callback
@@ -181,12 +181,12 @@ void tcp_receive_cmd(uint8_t* cmd)
  *              or client.
  * 
  * Parameters:
- *  - char* buffer: Pointer to the buffer where the received data will be stored.
+ *  - unsigned char* buffer: Pointer to the buffer where the received data will be stored.
  *  - uint16_t* buffer_length: Pointer to the length of the received data.
  * 
  * Returns: void
  */
-void tcp_receive_data(char* buffer, uint16_t* buffer_length)
+void tcp_receive_data(unsigned char* buffer, uint16_t* buffer_length)
 {
 #if (PICO_W_AS_TCP_SERVER == ON)
     //tcp_server_process_recv_message(cmd); // Fetch data received in tcp_server_recv_callback - TODO, only receiving commands for now
@@ -1204,7 +1204,7 @@ static TCP_Client_t* tcp_client_init(void)
  *      the queued data over the network.
  * 
  * Parameters:
- *  - const char *data: Pointer to the data buffer to be sent.
+ *  - const void *data: Pointer to the data buffer to be sent.
  *  - uint16_t length: Length of the data to be sent.
  * 
  * Returns: 
@@ -1212,7 +1212,7 @@ static TCP_Client_t* tcp_client_init(void)
  *            (e.g., ERR_CONN if the client is not connected or other 
  *            error codes from tcp_write() or tcp_output()) of the send operation.
  */
-static err_t tcp_client_send(const char *data, uint16_t length) 
+static err_t tcp_client_send(const void *data, uint16_t length) 
 {
     err_t err = ERR_OK;
     
@@ -1280,7 +1280,7 @@ static err_t tcp_client_send(const char *data, uint16_t length)
  * Returns: 
  *  - void
  */
-static void tcp_client_process_recv_message(char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command)
+static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command)
 {
     /* Initialize output parameters to default values */
     *received_command = 0;
