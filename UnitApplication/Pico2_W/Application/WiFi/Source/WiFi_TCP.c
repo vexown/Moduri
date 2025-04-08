@@ -278,82 +278,112 @@ bool start_TCP_server(void)
 
 #else // PICO_W_AS_TCP_SERVER == OFF
 
-// Custom send function for Mbed TLS
-int tcp_client_send_ssl_callback(void *ctx, const unsigned char *buf, size_t len) 
+/**
+ * Function: tcp_send_mbedtls_callback
+ * 
+ * Description: Callback function used by mbedTLS to send data over TCP connection.
+ *              This function wraps tcp_send() to provide the interface required by mbedTLS.
+ * 
+ * Parameters:
+ *   - shared_context: Unused context pointer that could be used to access TCP client structure
+ *   - buf: Pointer to the data buffer to be sent
+ *   - len: Length of the data to be sent in bytes
+ * 
+ * Returns:
+ *   - On success: Number of bytes sent (same as len)
+ *   - On failure: MBEDTLS_ERR_NET_SEND_FAILED (negative value indicating error)
+ * 
+ */
+int tcp_send_mbedtls_callback(void *shared_context, const unsigned char *buf, size_t len) 
 {
-    TCP_Client_t *client = (TCP_Client_t *)ctx;
+    (void)shared_context; // Unused, it can be used for accessing the TCP client structure but we use clientGlobal currently 
 
-    // Check if the client is valid and connected
-    if (client == NULL || !tcp_client_is_connected || client->pcb == NULL) {
-        LOG("Cannot send - client not connected\n");
-        return MBEDTLS_ERR_NET_SEND_FAILED;
-    }
-
-    // Use your existing tcp_send function
-    err_t err = tcp_send((const char *)buf, len);
-    if (err != ERR_OK) {
+    uint16_t buf_length = (uint16_t)len; // Cast to uint16_t, as the send function expects a 16-bit length
+    err_t err = tcp_send((const char *)buf, buf_length);
+    if (err != ERR_OK) 
+    {
         LOG("tcp_send failed: %d\n", err);
-        return MBEDTLS_ERR_NET_SEND_FAILED;
+        return MBEDTLS_ERR_NET_SEND_FAILED; // To my konwledge, we only need to return x<0 to indicate failure but specific error code will help debugging
     }
 
-    // Since tcp_send doesn't return bytes sent, assume full send on success
-    // Note: lwIP's tcp_write is non-blocking, but tcp_output flushes, so this is usually safe
-    LOG("Sent %u bytes\n", len); 
+    /* Since tcp_send doesn't return bytes sent, assume full send on success. I mention this because the mbedtls_ssl_send_t
+       function is expected to return the number of bytes sent. */
     return (int)len;
 }
 
-// Custom receive function for Mbed TLS
-int tcp_client_recv_ssl_callback(void *ctx, unsigned char *buf, size_t len) {
-    TCP_Client_t *client = (TCP_Client_t*)ctx;
-    size_t bytes_to_read = 0;
-    TickType_t start_time = xTaskGetTickCount();
-    
-    // Wait for data with timeout (5 seconds)
-    while (bytes_to_read == 0) {
-        // Check for timeout
-        if ((xTaskGetTickCount() - start_time) > pdMS_TO_TICKS(5000)) {
-            return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_TIMEOUT;
-        }
-        
-        // Check if connection closed
-        if (!tcp_client_is_connected || client->is_closing) {
-            return MBEDTLS_ERR_NET_CONN_RESET;
-        }
-        
-        // Check if we already have data in the buffer
-        if (xSemaphoreTake(bufferMutex, pdMS_TO_TICKS(100)) == pdTRUE) {
-            if (client->receive_length > 0) {
-                // Copy data to caller's buffer
-                bytes_to_read = client->receive_length > len ? len : client->receive_length;
-                memcpy(buf, client->receive_buffer, bytes_to_read);
-                
-                // If there's more data left, move it to the beginning of the buffer
-                if (bytes_to_read < client->receive_length) {
-                    memmove(client->receive_buffer, 
-                            client->receive_buffer + bytes_to_read, 
-                            client->receive_length - bytes_to_read);
-                    client->receive_length -= bytes_to_read;
-                    
-                    // Signal that there's still data available
-                    xSemaphoreGive(tcp_data_available_semaphore);
-                } else {
-                    // All data consumed - reset buffer
-                    client->receive_length = 0;
-                }
+/**
+ * Function: tcp_receive_mbedtls_callback
+ * 
+ * Description: Callback function used by mbedTLS to receive data over TCP connection.
+ * 
+ * Parameters:
+ *  - shared_context: Unused context pointer that could be used to access TCP client structure
+ *  - buf: Pointer to the buffer where received data will be stored
+ *  - len: Length of the buffer in bytes
+ * 
+ * Returns:
+ * - On success: Number of bytes received (same as len)
+ * - On failure: Negative value indicating error (e.g. MBEDTLS_ERR_NET_CONN_RESET, MBEDTLS_ERR_SSL_TIMEOUT)
+ *               0 if connection was closed
+ */
+int tcp_receive_mbedtls_callback(void *shared_context, unsigned char *buf, size_t len) 
+{
+    (void)shared_context; // Unused, it can be used for accessing the TCP client structure but we use clientGlobal currently
+
+    if(tcp_client_is_connected() == false)
+    {
+        LOG("Connection to the OTA server is lost\n");
+        return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
+    }
+
+    if(clientGlobal->receive_length == 0)
+    {
+        LOG("No data available in the TCP receive buffer. Waiting for data...\n");
+
+        /* Wait for data notification for up to 5 seconds. Check if the semaphore is available every 100 ms. In the
+        meantime, allow other tasks to run. If after 5 seconds no data is available, return a timeout error. */
+        TickType_t start_time = xTaskGetTickCount();
+        while (xSemaphoreTake(tcp_data_available_semaphore, pdMS_TO_TICKS(100)) != pdTRUE)
+        {
+            if ((xTaskGetTickCount() - start_time) > pdMS_TO_TICKS(5000)) // Wait for new data for max 5 seconds
+            {
+                LOG("Timeout waiting for data\n");
+                return MBEDTLS_ERR_SSL_TIMEOUT;
             }
-            xSemaphoreGive(bufferMutex);
         }
-        
-        // If no data was read and we need to wait
-        if (bytes_to_read == 0) {
-            // Wait for data notification
-            if (xSemaphoreTake(tcp_data_available_semaphore, pdMS_TO_TICKS(100)) != pdTRUE) {
-                // No data yet, continue waiting loop
-            }
+        LOG("Data available in the TCP receive buffer\n");
+
+        /* Double check if the connection is still alive */
+        if(tcp_client_is_connected() == false)
+        {
+            LOG("Connection to the OTA server is lost\n");
+            return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
         }
     }
-    
-    return bytes_to_read > 0 ? bytes_to_read : MBEDTLS_ERR_SSL_WANT_READ;
+
+    /**
+     * Maximum fragment length in bytes which determines the size of each of the two internal I/O buffers is 16384 bytes (MBEDTLS_SSL_MAX_CONTENT_LEN).
+     * This is due to RFC 5246 (TLS 1.2) and other TLS specs, where the maximum size for a TLS record payload is defined as 2^14 bytes (16,384 bytes).
+     * Therefore, our tcp_receive_data function should be able to handle this size (it fits in uint16_t). */
+    uint16_t buf_size = (uint16_t)len; // Cast to uint16_t, as the receive function expects a 16-bit length
+    tcp_receive_data(buf, &buf_size);
+
+    if(buf_size == len)
+    {
+        LOG("All data received successfully: %d bytes\n", buf_size);
+        LOG("Remaining data in buffer: %d bytes\n", clientGlobal->receive_length);
+    }
+    else if(buf_size > 0)
+    {
+        LOG("Partial data received: %d bytes\n", buf_size);
+    }
+    else
+    {
+        LOG("No data received\n");
+        return MBEDTLS_ERR_SSL_WANT_READ; // No data available, try again
+    }
+
+    return (int)buf_size; // Return the number of bytes received
 }
 
 
@@ -1158,6 +1188,10 @@ static TCP_Client_t* tcp_client_init(void)
     /* Allocate memory for the TCP client structure on the heap */
     TCP_Client_t *client = (TCP_Client_t*)pvPortCalloc(1, sizeof(TCP_Client_t));
 
+    /* Set flow control parameters */
+    client->flow_control_threshold = (TCP_RECV_BUFFER_SIZE / 2 ); // 50% of the buffer size
+    client->flow_throttled = false;
+
     /* Create a binary semaphore for signaling data availability */
     tcp_data_available_semaphore = xSemaphoreCreateBinary();
 
@@ -1311,15 +1345,34 @@ static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16
         /* Check if the output buffer is large enough to store the received data */
         if(clientGlobal->receive_length > *output_buffer_length)
         {
-            LOG("Output buffer is too small to store the received data. Data will be truncated.\n");
+            LOG("Output buffer is too small to store the received data. Not all data will be read. Call this function again to process the next batch.\n");
+            memcpy(output_buffer, clientGlobal->receive_buffer, *output_buffer_length); // Copy only the data that fits in the output buffer
+
+            /* Remove ONLY the data that was copied to the output buffer from the receive buffer */
+            uint16_t remaining_data_length = clientGlobal->receive_length - *output_buffer_length;
+
+            /* Move the remaining data to the beginning of the receive buffer */
+            memmove(clientGlobal->receive_buffer, &clientGlobal->receive_buffer[*output_buffer_length], remaining_data_length);
+
+            /* Clear the rest of the receive buffer */
+            memset(&clientGlobal->receive_buffer[remaining_data_length], 0, sizeof(clientGlobal->receive_buffer) - remaining_data_length);
+
+            /* Update the receive length to reflect the remaining data */
+            clientGlobal->receive_length = remaining_data_length;
         }
         else
         {
             *output_buffer_length = clientGlobal->receive_length; // Update the output buffer length with the actual received data length
-        }
 
-        /* Copy the received data from the TCP receive_buffer to the output buffer */
-        memcpy(output_buffer, clientGlobal->receive_buffer, *output_buffer_length);
+            /* Copy the received data from the TCP receive_buffer to the output buffer */
+            memcpy(output_buffer, clientGlobal->receive_buffer, *output_buffer_length);
+
+            /* Clear the buffer after processing */
+            memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
+
+            /* Set the receive length to 0 */
+            clientGlobal->receive_length = 0;
+        }
 
         /* Check if the message starts with "cmd:" and if it's even long enough to contain a command */
         if (*output_buffer_length >= CMD_MIN_SIZE_BYTES && strncmp((const char *)output_buffer, "cmd:", 4) == 0) 
@@ -1349,16 +1402,32 @@ static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16
             /* Print the entire received buffer (if not empty) */
             if(strlen((const char *)output_buffer) > 0)
             {
-                LOG("Received message: %s\n", output_buffer);
                 LOG("Data has been stored in the output buffer\n");
             }
         }
+        
+        /* After processing, update flow control status */
+        if (clientGlobal->flow_throttled && 
+            clientGlobal->receive_length < (clientGlobal->flow_control_threshold / 2)) 
+        {
+            /* Buffer has emptied enough, resume normal flow */
+            clientGlobal->flow_throttled = false;
+            
+            /* Send window update to server to resume normal flow */
+            /* This increases the advertised window size */
+            if (tcp_client_is_connected()) 
+            {
+                /* When you call `tcp_recved(pcb, len)`, you're saying: "I've processed `len` bytes, please increase my receive window by that amount." 
+                    Normally, you would call this function in the tcp_recv callback after processing the received data. However, in this case, we are calling 
+                    it here to indicate that the client has recovered from the throttling condition and is ready to receive more data.
+                    When you call `tcp_recved(pcb, TCP_RECV_BUFFER_SIZE - receive_length)`, you're essentially resetting the window to match your current 
+                    buffer availability rather than incrementally updating it. This is a bit of a hack, but it works for our use case. (TODO - find out if this is the right way to do it) */
+                tcp_recved(clientGlobal->pcb, ((uint16_t)TCP_RECV_BUFFER_SIZE - clientGlobal->receive_length));
 
-        /* Clear the buffer after processing */
-        memset(clientGlobal->receive_buffer, 0, sizeof(clientGlobal->receive_buffer));
-        /* Set the receive length to 0 */
-        clientGlobal->receive_length = 0;
-
+                LOG("Flow control: resuming normal flow, buffer now %d/%d bytes\n", clientGlobal->receive_length, TCP_RECV_BUFFER_SIZE);
+            }
+        }
+        
         /* Release the mutex after access */
         xSemaphoreGive(bufferMutex); 
     } 
@@ -1425,10 +1494,69 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
                 
                 /* Signal that data is available */
                 xSemaphoreGive(tcp_data_available_semaphore);
+
+                /* Flow control based on buffer occupancy */
+                if (clientGlobal->receive_length >= clientGlobal->flow_control_threshold) 
+                {
+                    /* Buffer is getting full - throttle the flow */
+                    if (!clientGlobal->flow_throttled) 
+                    {
+                        LOG("Buffer filling up, throttling flow (%d/%d bytes)\n", clientGlobal->receive_length, TCP_RECV_BUFFER_SIZE);
+
+                        clientGlobal->flow_throttled = true;
+                    }
+                    
+                    /* Options to impose reduced flow on the sender:
+                    * 1. Acknowledge only a portion of the received data
+                    * 2. Don't acknowledge at all (zero window)
+                    * 3. Acknowledge but at a reduced rate
+                    * 
+                    * Here we are using option 2 - deliberately NOT calling tcp_recved(), which creates a "zero window condition"
+                    * 
+                    * TCP Zero Window Explanation:
+                    * - In TCP, the "receive window" advertises how many more bytes a receiver can accept
+                    * - When a receiver processes data, it calls tcp_recved() to increase this window
+                    * - If the receiver STOPS acknowledging data (by not calling tcp_recved()), the sender's
+                    *   usable window gradually shrinks to zero as more unacknowledged data arrives
+                    * - Once the window reaches zero, TCP protocol prohibits the sender from transmitting ANY
+                    *   more data (except "window probe" packets)
+                    * - This creates a complete pause in data transmission - a "zero window condition"
+                    * 
+                    * Implementation:
+                    * - When buffer occupancy exceeds threshold -> we stop calling tcp_recved()
+                    * - This naturally leads to a zero window as more data arrives
+                    * - Once flow_throttled=true, we maintain zero window until buffer is processed
+                    * 
+                    * Recovery:
+                    * - When buffer drops below threshold -> we call tcp_recved() with available space
+                    * - This reopens the window and allows sender to resume transmission
+                    * - See tcp_client_process_recv_message() for recovery logic
+                    *
+                    * Advantages: Simple to implement, very effective at stopping transmission
+                    * Disadvantages: Binary on/off control rather than gradual slowdown
+                    */
+                } 
+                else 
+                {
+                    /* Buffer has space - normal flow */
+                    if (clientGlobal->flow_throttled) {
+                        LOG("Resuming normal flow, buffer: %d/%d bytes\n", 
+                            clientGlobal->receive_length, TCP_RECV_BUFFER_SIZE);
+                        clientGlobal->flow_throttled = false;
+                    }
+                    /* Inform lwIP that the received data of size rcv_data->tot_len has been processed */
+                    tcp_recved(tpcb, received_data_size);  // Normal acknowledgment
+                }
+
             } 
             else // There is not enough space in the receive buffer
             {
                 LOG("[CRITICAL] Receive buffer overflow: %d + %d > %d\n", clientGlobal->receive_length, rcv_data->tot_len, TCP_RECV_BUFFER_SIZE);
+                
+                /* Buffer full - set zero window to stop sender completely */
+                clientGlobal->flow_throttled = true;
+                /* Don't call tcp_recved() here to advertise zero window */
+                
             }
         
             /* Let other tasks access the buffer */
@@ -1438,11 +1566,6 @@ static err_t tcp_client_recv_callback(void *arg, struct tcp_pcb *tpcb, struct pb
         {
             LOG("[CRITICAL] Failed to acquire mutex after 1s - network congestion or deadlock detected\n");
         }
-
-        /* Inform lwIP that the received data of size rcv_data->tot_len has been processed */
-        /* This is important for the TCP flow control mechanism, so that the sender can send more data
-        if needed. Otherwise it would seem like the receiver is not ready to receive more data */
-        tcp_recved(tpcb, rcv_data->tot_len);
         
         /* Free the pbuf to release memory used for receiving data  This is important to avoid memory leaks. 
         The pbuf is no longer needed after processing */

@@ -197,10 +197,23 @@ int download_firmware(void) {
         goto cleanup;
     }
 
-    // Set up I/O callbacks for mbedtls to use TCP client's recv/send functions
+    /**
+     * Configure the SSL I/O callbacks for TLS communication
+     * 
+     * This function links the SSL/TLS layer with our TCP client's network functions.
+     * It sets up how encrypted data will be sent and received over the network:
+     * - ssl: The SSL context that will use these callbacks
+     * - clientGlobal: Connection context passed to callbacks (contains socket info)
+     * - tcp_send_mbedtls_callback: Function called when SSL needs to send data
+     * - tcp_receive_mbedtls_callback: Function called when SSL needs to receive data
+     * - NULL: blocking read callback with timeout, not used here (non-blocking)
+     * 
+     * This is a critical part of the TLS setup that allows mbedTLS to handle the 
+     * encryption/decryption while delegating actual network I/O to our TCP layer.
+     */
     mbedtls_ssl_set_bio(&ssl, clientGlobal, 
-                        (mbedtls_ssl_send_t*)tcp_client_send_ssl_callback,
-                        (mbedtls_ssl_recv_t*)tcp_client_recv_ssl_callback,
+                        (mbedtls_ssl_send_t*)tcp_send_mbedtls_callback,
+                        (mbedtls_ssl_recv_t*)tcp_receive_mbedtls_callback,
                         NULL);
 
     // Perform TLS handshake
