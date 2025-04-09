@@ -11,7 +11,7 @@
 # 3. Verifies ESP-IDF is at the correct version
 # 4. Installs the ESP32 toolchain
 # 5. Sets the ESP32 as the target
-# 6. Builds the project using idf.py
+# 6. Builds the project using idf.py and checks its exit code
 # 7. Copies output files to the output directory (TODO)
 #
 # Usage:
@@ -19,17 +19,11 @@
 #
 # ****************************************************************************
 
-# Exit immediately if any command fails
-set -e
-
 # If a command in a pipeline fails, the whole pipeline fails
 set -o pipefail
 
-echo "########## Build.sh - start ##########"
-
 # Store the script's directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LOG_FILE="$SCRIPT_DIR/build.log"
 
 # Check for required system packages
 echo "Checking for required system packages..."
@@ -37,7 +31,7 @@ echo "Checking for required system packages..."
 # Check if we're on a system with apt
 if command -v apt-get &> /dev/null; then
     MISSING_PACKAGES=""
-    
+
     # List of required packages
     REQUIRED_PACKAGES=(
         "git"
@@ -56,15 +50,15 @@ if command -v apt-get &> /dev/null; then
         "dfu-util"
         "libusb-1.0-0"
     )
-    
+
     # Check each required package
     for pkg in "${REQUIRED_PACKAGES[@]}"; do
-        if ! dpkg-query -W -f='${Status}' $pkg 2>/dev/null | grep -q "ok installed"; then
+        if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q "ok installed"; then
             echo "Package $pkg is not installed."
             MISSING_PACKAGES="$MISSING_PACKAGES $pkg"
         fi
     done
-    
+
     # Install missing packages if any
     if [ ! -z "$MISSING_PACKAGES" ]; then
         echo "Installing missing packages:$MISSING_PACKAGES"
@@ -129,18 +123,21 @@ cd "$ESP_IDF_DIR"
 # Return to the Application directory
 cd ../../ESP32/Application
 
-# Build the project and save output to build.log with full path
+# Define the log file (adjust the path as needed)
+LOG_FILE="../build.log"
+
 echo "Building project... This may take a while, be patient."
 echo "Starting build at $(date)" > "$LOG_FILE"
-idf.py build >> "$LOG_FILE" 2>&1
-BUILD_RESULT=$?
+
+# Run the build command, pipe output to tee for both terminal and log file
+idf.py build 2>&1 | tee -a "$LOG_FILE"
+BUILD_RESULT=${PIPESTATUS[0]}  # Capture the exit status of idf.py build
+
 echo "Build finished at $(date), exit code: $BUILD_RESULT" >> "$LOG_FILE"
 
 if [ $BUILD_RESULT -eq 0 ]; then
     echo "Build succeeded. Log saved to $LOG_FILE"
 else
     echo "Build failed with exit code $BUILD_RESULT. See $LOG_FILE for details."
-    # Uncomment next line if you want script to exit on build failure
-    # exit $BUILD_RESULT
 fi
 
