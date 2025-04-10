@@ -43,7 +43,7 @@
  /* Watchdog timer (WDT) is fundamentally a hardware timer that requires periodic "kicks" or "refreshes" from the software to confirm 
  * that the system is running as expected. If the timer expires (i.e., the software fails to refresh it in time), it triggers a 
  predefined action, typically a system reset (which is our case) */
- #define WATCHDOG_ENABLED        OFF //TODO - reenable this once you figure out how to pet it during TLS operations during OTA
+ #define WATCHDOG_ENABLED        ON
  
  /* Enables the OTA (Over-The-Air) firmware update feature. A TCP client will connect to specified server and download updated firmware if available */
  #define OTA_ENABLED             ON

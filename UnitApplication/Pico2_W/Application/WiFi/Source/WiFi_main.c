@@ -331,7 +331,8 @@ static void WiFi_UpdateState(void)
 
             write_metadata_to_flash(&current_metadata);
         }
-        //restart_device(); //TODO - implement restart_device function
+
+        reset_system(); // Reboot the device to apply the update
 
         while(1)
         { /* should never reach here - update should be applied and device restarted */

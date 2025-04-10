@@ -48,11 +48,7 @@
 /* Library includes. */
 #include <stdio.h>
 #include "pico/stdlib.h"
-
-/*******************************************************************************/
-/*                        GLOBAL FUNCTION DECLARATIONS                         */
-/*******************************************************************************/
-extern void OS_start( void );
+#include "OS_manager.h"
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */

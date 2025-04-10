@@ -138,6 +138,7 @@ static uint8_t watchdogResetCount __attribute__((section(".uninitialized_data"))
 /*                             GLOBAL VARIABLES                                */
 /*******************************************************************************/
 TaskHandle_t monitorTaskHandle = NULL;
+TaskHandle_t aliveTaskHandle = NULL;
 
 /*******************************************************************************/
 /*                          STATIC FUNCTION DEFINITIONS                        */
@@ -254,7 +255,7 @@ void OS_start( void )
 										STACK_1024_BYTES,           /* The size of the stack to allocate to the task (in words) */
 										NULL,                       /* The parameter passed to the task - not used in this case. */
 										ALIVE_TASK_PRIORITY,        /* The priority assigned to the task. */
-										NULL );                     /* The task handle, if not needed put NULL */
+										&aliveTaskHandle );         /* The task handle, if not needed put NULL */
 	taskCreationStatus[1] = xTaskCreate( networkTask, "Network", STACK_8192_BYTES, NULL, NETWORK_TASK_PRIORITY, NULL);
 	taskCreationStatus[2] = xTaskCreate( monitorTask, "Monitor", STACK_2048_BYTES, NULL, MONITOR_TASK_PRIORITY, &monitorTaskHandle);
 	taskCreationStatus[3] = xTaskCreate( cyw43initTask, "CYW43_Init", STACK_1024_BYTES, NULL, CYW43_INIT_TASK_PRIORITY, NULL); // Must be highest priority, will be deleted after it runs
@@ -296,6 +297,24 @@ void OS_start( void )
 	FreeRTOS web site for more details on the FreeRTOS heap
 	http://www.freertos.org/a00111.html. */
 	for( ;; );
+}
+
+/* 
+ * Function: reset_system
+ * 
+ * Description: Reset the system by notifying the aliveTask to stop petting the watchdog
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: void
+ */
+void reset_system(void)
+{
+    /* Tell the aliveTask to stop petting the watchdog in turn causing a reset */
+    xTaskNotifyGive(aliveTaskHandle);
+
+    vTaskDelay(pdMS_TO_TICKS(WATCHDOG_TIMEOUT_MS + ALIVE_TASK_PERIOD_TICKS)); // Wait for the watchdog to reset the system
 }
 
 /*******************************************************************************/
@@ -470,8 +489,16 @@ static void aliveTask(__unused void *taskParams)
 #if (WATCHDOG_ENABLED == ON)
 		/* TODO - add additional critical system checks that should be done before resetting the watchdog */
 
-		/* Pet the watchdog to keep him from barking (rebooting the system) */
-		watchdog_update();
+        /* Check if a reset was requested, in which case we don't pet the watchdog */
+        if(ulTaskNotifyTake(pdTRUE, NON_BLOCKING) > 0) // Checks task's notification count before it is cleared (pdTRUE means we clear it after checking)
+        {
+            vTaskDelay(pdMS_TO_TICKS(WATCHDOG_TIMEOUT_MS + 100)); // Wait long enough to let the watchdog timeout (trigger a reset)
+        }
+        else
+        {
+            /* Pet the watchdog to keep him from barking (rebooting the system) */
+            watchdog_update();
+        }
 #endif
 
 	}

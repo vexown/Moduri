@@ -1,3 +1,12 @@
+/**
+ * File: WiFi_OTA_download.c
+ * Description: Implementation of the firmware download process over WiFi using mbedTLS and our lwIP-based TCP stack.
+ */
+
+/*******************************************************************************/
+/*                                 INCLUDES                                    */
+/*******************************************************************************/
+
 /* Standard includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +21,7 @@
 #include "pico/cyw43_arch.h"
 #include "hardware/flash.h"
 #include "hardware/sync.h"
+#include "hardware/watchdog.h"
 
 /* MBEDTLS includes */
 #include "mbedtls/ssl.h"
@@ -140,6 +150,8 @@ int download_firmware(void) {
     
     LOG("=== Starting firmware download ===\n");
     LOG("Target server: https://%s%s\n", OTA_HTTPS_SERVER_IP_ADDRESS, FIRMWARE_PATH);
+
+    watchdog_disable(); // Disable watchdog during OTA process
 
     // Initialize TLS components
     mbedtls_ssl_init(&ssl);
@@ -468,6 +480,8 @@ cleanup:
     mbedtls_entropy_free(&entropy);
     
     LOG("=== Firmware download complete ===\n");
+    watchdog_enable(((uint32_t)2000), true);
+
     return result;
 }
 
