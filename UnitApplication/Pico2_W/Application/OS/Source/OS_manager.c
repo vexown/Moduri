@@ -268,7 +268,7 @@ void OS_start( void )
      *  	pause_on_debug: If the watchdog should be paused when the debugger is stepping through code */
 	watchdog_enable(WATCHDOG_TIMEOUT_MS, true);
 
-	LOG("Watchdog enabled with %d ms timeout \n", WATCHDOG_TIMEOUT_MS);
+	LOG("Watchdog enabled with %ld ms timeout \n", WATCHDOG_TIMEOUT_MS);
 #endif
 
 	/* Check if the tasks were created successfully */
