@@ -35,6 +35,7 @@
 #include "WiFi_Common.h"
 #include "Common.h"
 
+/* Disable this module if OTA is not enabled */
 #if (OTA_ENABLED == ON)
 
 /**********************************************************************/
@@ -42,7 +43,7 @@
 /**********************************************************************/
 #define FIRMWARE_PATH           "/firmware.bin"
 #define CHUNK_SIZE              65536       /* 32KB read chunks */
-#define FIRMWARE_SIZE           364492      /* Expected size */
+#define MAX_FIRMWARE_SIZE       1048576     /* 1MB maximum size */
 #define FLASH_TARGET_OFFSET     0x00220000  /* Flash write address */
 #define HTTP_HEADER_MAX_SIZE    2048        /* Max HTTP header size */
 #define HANDSHAKE_TIMEOUT_MS    15000       /* 15 seconds for TLS handshake */
@@ -142,6 +143,7 @@ int download_firmware(void) {
     size_t flash_buf_pos = 0;
     size_t total_received = 0;
     size_t content_length = 0;
+    size_t expected_size = 0; 
     bool headers_processed = false;
     static uint8_t header_buffer[HTTP_HEADER_MAX_SIZE];
     size_t header_buf_pos = 0;
@@ -265,7 +267,8 @@ int download_firmware(void) {
 
     // Main download loop
     timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
-    while (total_received < FIRMWARE_SIZE && xTaskGetTickCount() < timeout_time) {
+    while (xTaskGetTickCount() < timeout_time) 
+    {
         // Read data from TLS connection
         uint8_t recv_buffer[1024];
         ret = mbedtls_ssl_read(&ssl, recv_buffer, sizeof(recv_buffer));
@@ -304,10 +307,19 @@ int download_firmware(void) {
                         char *cl_str = strstr((char*)header_buffer, "Content-Length:");
                         if (cl_str) {
                             content_length = strtoul(cl_str + 15, NULL, 10);
-                            if (content_length != FIRMWARE_SIZE) {
-                                LOG("Warning: Content-Length (%zu) doesn't match expected size (%d)\n", 
-                                    content_length, FIRMWARE_SIZE);
-                            }
+                            expected_size = content_length;
+                            LOG("Firmware size from Content-Length: %zu bytes\n", expected_size);
+                        } else {
+                            LOG("Warning: Content-Length header not found\n");
+                            result = -1;
+                            goto cleanup;
+                        }
+
+                        if (content_length > MAX_FIRMWARE_SIZE) {
+                            LOG("Error: Content-Length (%zu) exceeds maximum firmware size (%d)\n", 
+                                content_length, MAX_FIRMWARE_SIZE);
+                            result = -1;
+                            goto cleanup;
                         }
                         
                         LOG("HTTP headers processed, starting firmware download...\n");
@@ -323,7 +335,8 @@ int download_firmware(void) {
                 size_t bytes_left = ret - data_pos;
                 
                 // Copy data to flash buffer
-                while (bytes_left > 0) {
+                while (bytes_left > 0) 
+                {
                     size_t copy_size = CHUNK_SIZE - flash_buf_pos;
                     if (copy_size > bytes_left) copy_size = bytes_left;
                     
@@ -333,7 +346,8 @@ int download_firmware(void) {
                     bytes_left -= copy_size;
                     
                     // If flash buffer is full, write it to flash
-                    if (flash_buf_pos == CHUNK_SIZE) {
+                    if (flash_buf_pos == CHUNK_SIZE) 
+                    {
                         uint32_t write_offset = FLASH_TARGET_OFFSET + total_received;
                         LOG("Writing %d bytes to flash at offset 0x%x\n", CHUNK_SIZE, write_offset);
                         
@@ -349,10 +363,15 @@ int download_firmware(void) {
                         // Progress reporting
                         if (total_received % (CHUNK_SIZE * 10) == 0) {
                             LOG("Download progress: %zu/%d bytes (%.1f%%)\n", 
-                                total_received, FIRMWARE_SIZE, 
-                                (float)total_received * 100 / FIRMWARE_SIZE);
+                                total_received, expected_size, 
+                                (float)total_received * 100 / expected_size);
                         }
                     }
+                }
+                if (headers_processed && total_received >= expected_size) 
+                {
+                    LOG("Download complete, received %zu of %zu bytes\n", total_received, expected_size);
+                    break;
                 }
             }
         } else if (ret == 0) {
@@ -420,7 +439,7 @@ int download_firmware(void) {
                 "User-Agent: Pico-W-OTA/1.0\r\n"
                 "\r\n", 
                 FIRMWARE_PATH, OTA_HTTPS_SERVER_IP_ADDRESS,
-                total_received, FIRMWARE_SIZE - 1);
+                total_received, expected_size - 1);
             
             if (mbedtls_ssl_write(&ssl, (const unsigned char *)request, strlen(request)) <= 0) {
                 LOG("Failed to send HTTP resume request\n");
@@ -454,11 +473,11 @@ int download_firmware(void) {
     }
     
     // Check if we received all the expected data
-    if (total_received == FIRMWARE_SIZE) {
+    if (total_received == expected_size) {
         LOG("Firmware download completed successfully: %zu bytes\n", total_received);
         result = 0;  // Success
     } else if (total_received > 0) {
-        LOG("Firmware download partial: %zu/%d bytes\n", total_received, FIRMWARE_SIZE);
+        LOG("Firmware download partial: %zu/%d bytes\n", total_received, expected_size);
         result = total_received;  // Partial success
     } else {
         LOG("Firmware download failed\n");
