@@ -85,6 +85,23 @@ static const unsigned char *ca_cert =
 /**********************************************************************/
 /*                  STATIC FUNCTION DECLARATIONS                      */
 /**********************************************************************/
+
+/**
+ * Find the end of HTTP headers in a buffer
+ * 
+ * This function scans through an HTTP response buffer to locate the boundary
+ * between HTTP headers and the message body. In HTTP/1.1, headers are separated
+ * from the body by a specific sequence: CRLF CRLF (carriage return + line feed twice).
+ * 
+ * Specifically, it searches for the "\r\n\r\n" pattern which indicates:
+ * 1. The end of the last header field
+ * 2. An empty line (\r\n)
+ * 3. The beginning of the actual content (firmware binary data in our case)
+ * 
+ * @param buf Buffer containing HTTP response (headers + possibly some body data)
+ * @param len Buffer length
+ * @return Pointer to the first byte after headers (start of body), or NULL if header end not found
+ */
 static const char* find_header_end(const uint8_t *buf, size_t len);
 
 /**********************************************************************/
@@ -469,22 +486,6 @@ cleanup:
 /*                  STATIC FUNCTION DEFINITIONS                       */
 /**********************************************************************/
 
-/**
- * Find the end of HTTP headers in a buffer
- * 
- * This function scans through an HTTP response buffer to locate the boundary
- * between HTTP headers and the message body. In HTTP/1.1, headers are separated
- * from the body by a specific sequence: CRLF CRLF (carriage return + line feed twice).
- * 
- * Specifically, it searches for the "\r\n\r\n" pattern which indicates:
- * 1. The end of the last header field
- * 2. An empty line (\r\n)
- * 3. The beginning of the actual content (firmware binary data in our case)
- * 
- * @param buf Buffer containing HTTP response (headers + possibly some body data)
- * @param len Buffer length
- * @return Pointer to the first byte after headers (start of body), or NULL if header end not found
- */
 static const char* find_header_end(const uint8_t *buf, size_t len) 
 {
     /* Check each position in the buffer for the header termination sequence
