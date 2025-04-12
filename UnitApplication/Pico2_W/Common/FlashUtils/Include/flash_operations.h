@@ -1,11 +1,21 @@
 #ifndef FLASH_OPERATIONS_H
 #define FLASH_OPERATIONS_H
 
-#include <stdio.h>
-#include "pico/stdlib.h"
-#include "hardware/flash.h"
-#include "hardware/sync.h"
-#include "metadata.h"
+/*
+ * Flash Memory Summary – W25Q32RVXHJQ (see https://datasheets.raspberrypi.com/picow/pico-2-w-schematic.pdf)
+ *
+ * The RP2350 board uses a Winbond W25Q32RVXHJQ external NOR flash memory.
+ * - 32 Mbit (4 MB) serial NOR flash
+ * - Connected via QSPI (Quad SPI) interface
+ * - Supports Execute-In-Place (XIP) operation
+ * - Sector size: 4 KB (smallest erasable unit)
+ * - Page size: 256 bytes (write operations must fit within a page)
+ * - Erase-before-write: required due to NOR flash limitations (can only change bits from 1 → 0)
+ * - Default erase value: 0xFF
+ *
+ * NOTE: Flash operations must be carefully managed to avoid executing from flash
+ * while it is being programmed or erased.
+ */
 
 /*********************** WARNING ***********************/
 /* FLASH ADDRESSING QUICK REFERENCE
@@ -23,6 +33,12 @@
  * flash_range_erase(0x10040000, FLASH_SECTOR_SIZE); // ✗ Incorrect (XIP address)
  */
 /******************************************************/
+
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "hardware/flash.h"
+#include "hardware/sync.h"
+#include "metadata.h"
 
 /**
  * @brief Reads bootloader metadata from flash memory into RAM
@@ -52,6 +68,19 @@ bool read_metadata_from_flash(boot_metadata_t *ram_metadata);
  */
 bool write_metadata_to_flash(const boot_metadata_t *ram_metadata);
 
+/**
+ * Write data to flash memory
+ * 
+ * This function writes data to the RP2350's on-board (external) flash memory.
+ * Because the flash is mapped into the address space via an XIP (Execute-In-Place) interface,
+ * special precautions are needed to safely perform write and erase operations.
+ * 
+ * @param flash_offset Flash address offset where data will be written
+ * @param data Pointer to the data buffer that will be written to flash
+ * @param length Number of bytes to write
+ * @return true if successful, false otherwise
+ */
+bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length);
 
 bool validate_app_image(uint32_t addr);
 

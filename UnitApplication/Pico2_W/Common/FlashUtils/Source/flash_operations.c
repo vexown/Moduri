@@ -71,3 +71,49 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata)
     return true;
 }
 
+bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length) 
+{
+    /* Save and disable interrupts during flash operations.
+     * This is important on the RP2350 because:
+     * 1. Code executes directly from external flash via XIP (Execute In Place).
+     *    During write or erase operations, XIP access is stalled, which can lead to faults or hangs.
+     * 2. The QSPI flash interface is temporarily repurposed for programming,
+     *    making code execution from flash unsafe during this time.
+     * 3. On a dual-core system (Cortex-M33), both cores must avoid flash access
+     *    during flash operations to prevent contention and potential corruption.
+     */
+    uint32_t ints = save_and_disable_interrupts();
+    
+    /* Align the erase range to 4KB sector boundaries.
+     * The W25Q32 flash used with the RP2350 supports erasing only in fixed 4KB sectors.
+     * This alignment ensures proper erase granularity.
+     */
+    uint32_t aligned_offset = flash_offset & ~(FLASH_SECTOR_SIZE - 1);  // Round down to sector boundary
+    uint32_t end_offset = (flash_offset + length + FLASH_SECTOR_SIZE - 1) & ~(FLASH_SECTOR_SIZE - 1);  // Round up
+    uint32_t sectors = (end_offset - aligned_offset) / FLASH_SECTOR_SIZE;
+    
+    /* Erase the required flash sectors.
+     * NOR flash only allows changing bits from 1 to 0 (when programming).
+     * Erasing sets all bits in a sector to 1 (0xFF), enabling them to be programmed again.
+     * Erasing does NOT work on the level of individual bytes or bits - only whole sectors (due to several fundemental
+     * physical and engineering constraints, such as: floating-gate transistor structure, high-voltage injection, electrical complexity etc.)
+     * This means that if any bits in the sector need to be changed from 0 to 1, the entire sector must be erased first
+     * and only then programmed to get the desired values in the flash.
+     */
+    flash_range_erase(aligned_offset, sectors * FLASH_SECTOR_SIZE);
+    
+    /* Program the data to flash.
+     * The flash_range_program function handles 256-byte page programming internally.
+     * Ensure the region being written was previously erased to avoid data corruption.
+     */
+    flash_range_program(flash_offset, data, length);
+    
+    /* Restore the previous interrupt state,
+     * re-enabling interrupts if they were enabled before.
+     */
+    restore_interrupts(ints);
+    
+    return true; // All the operations are void functions, so no error checking is done, we always return true (TODO - maybe add readback verification?)
+}
+
+

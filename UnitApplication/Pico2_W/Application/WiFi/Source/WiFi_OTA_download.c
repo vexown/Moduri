@@ -30,6 +30,7 @@
 #include "mbedtls/ctr_drbg.h"
 
 /* Project includes */
+#include "flash_operations.h"
 #include "WiFi_OTA_download.h"
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
@@ -51,10 +52,10 @@
 #define RECONNECT_MAX_ATTEMPTS  3           /* Maximum reconnection attempts */
 
 /**********************************************************************/
-/*                    CERTIFICATE DATA                                */
+/*                   STATIC VARIABLE DECLARATIONS                     */
 /**********************************************************************/
 /* Self-signed certificate for the Apache server */
-const unsigned char *ca_cert = 
+static const unsigned char *ca_cert = 
     "-----BEGIN CERTIFICATE-----\n"
     "MIIECTCCAvGgAwIBAgIUB3E9K+/DmBkIOefd2ZOLzTZncuUwDQYJKoZIhvcNAQEL\n"
     "BQAwgZMxCzAJBgNVBAYTAlBMMRUwEwYDVQQIDAxXaWVsa29wb2xza2ExFTATBgNV\n"
@@ -80,55 +81,14 @@ const unsigned char *ca_cert =
     "KktqIH7GPGgMmtHo5uofNt2EUrzPMHQwDz9SxN4=\n"
     "-----END CERTIFICATE-----\n";
 
-/**********************************************************************/
-/*                    HELPER FUNCTIONS                                */
-/**********************************************************************/
-
-/**
- * Find the end of HTTP headers in a buffer
- * 
- * @param buf Buffer containing HTTP response
- * @param len Buffer length
- * @return Pointer to the end of headers or NULL if not found
- */
-static const char *find_header_end(const uint8_t *buf, size_t len) {
-    for (size_t i = 0; i < len - 3; i++) {
-        if (buf[i] == '\r' && buf[i + 1] == '\n' && 
-            buf[i + 2] == '\r' && buf[i + 3] == '\n') {
-            return (const char *)(buf + i + 4);  // Point to start of body
-        }
-    }
-    return NULL;
-}
-
-/**
- * Write data to flash memory
- * 
- * @param flash_offset Flash address offset
- * @param data Data buffer to write
- * @param length Length of data to write
- * @return true if successful, false otherwise
- */
-static bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length) {
-    uint32_t ints = save_and_disable_interrupts();
-    
-    // Calculate sector-aligned offsets
-    uint32_t aligned_offset = flash_offset & ~(FLASH_SECTOR_SIZE - 1);
-    uint32_t end_offset = (flash_offset + length + FLASH_SECTOR_SIZE - 1) & ~(FLASH_SECTOR_SIZE - 1);
-    uint32_t sectors = (end_offset - aligned_offset) / FLASH_SECTOR_SIZE;
-    
-    // Erase the required flash sectors
-    flash_range_erase(aligned_offset, sectors * FLASH_SECTOR_SIZE);
-    
-    // Program the data
-    flash_range_program(flash_offset, data, length);
-    
-    restore_interrupts(ints);
-    return true;
-}
 
 /**********************************************************************/
-/*                       MAIN FUNCTION                                */
+/*                  STATIC FUNCTION DECLARATIONS                      */
+/**********************************************************************/
+static const char* find_header_end(const uint8_t *buf, size_t len);
+
+/**********************************************************************/
+/*                  GLOBAL FUNCTION DEFINITIONS                       */
 /**********************************************************************/
 
 int download_firmware(void) {
@@ -502,6 +462,47 @@ cleanup:
     watchdog_enable(((uint32_t)2000), true);
 
     return result;
+}
+
+
+/**********************************************************************/
+/*                  STATIC FUNCTION DEFINITIONS                       */
+/**********************************************************************/
+
+/**
+ * Find the end of HTTP headers in a buffer
+ * 
+ * This function scans through an HTTP response buffer to locate the boundary
+ * between HTTP headers and the message body. In HTTP/1.1, headers are separated
+ * from the body by a specific sequence: CRLF CRLF (carriage return + line feed twice).
+ * 
+ * Specifically, it searches for the "\r\n\r\n" pattern which indicates:
+ * 1. The end of the last header field
+ * 2. An empty line (\r\n)
+ * 3. The beginning of the actual content (firmware binary data in our case)
+ * 
+ * @param buf Buffer containing HTTP response (headers + possibly some body data)
+ * @param len Buffer length
+ * @return Pointer to the first byte after headers (start of body), or NULL if header end not found
+ */
+static const char* find_header_end(const uint8_t *buf, size_t len) 
+{
+    /* Check each position in the buffer for the header termination sequence
+     * We need at least 4 bytes to check for \r\n\r\n, so stop 3 bytes before the end */
+    for (size_t i = 0; i < len - 3; i++) 
+    {
+        /* Look for the sequence: CR LF CR LF (\r\n\r\n) */
+        if (buf[i] == '\r' && buf[i + 1] == '\n' && buf[i + 2] == '\r' && buf[i + 3] == '\n') 
+        {
+            /* Found! Return pointer to the first byte AFTER the sequence.
+             * This is where the actual HTTP body (firmware binary) begins */
+            return (const char *)(buf + i + 4);  // Point to start of body
+        }
+    }
+
+    /* If we've searched the entire buffer without finding the pattern,
+     * it means we don't have the complete headers yet - more data needed */
+    return NULL; // Headers end not found in this buffer
 }
 
 #endif // OTA_ENABLED
