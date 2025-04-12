@@ -47,6 +47,7 @@
 #define MAX_FIRMWARE_SIZE       1048576     /* 1MB maximum size */
 #define FLASH_TARGET_OFFSET     0x00220000  /* Flash write address */
 #define HTTP_HEADER_MAX_SIZE    2048        /* Max HTTP header size */
+#define HTTP_REQUEST_MAX_SIZE   512         /* Max HTTP request size */
 #define HANDSHAKE_TIMEOUT_MS    15000       /* 15 seconds for TLS handshake */
 #define READ_TIMEOUT_MS         30000       /* 30 seconds for reads */
 #define RECONNECT_MAX_ATTEMPTS  3           /* Maximum reconnection attempts */
@@ -55,7 +56,7 @@
 /*                   STATIC VARIABLE DECLARATIONS                     */
 /**********************************************************************/
 /* Self-signed certificate for the Apache server */
-static const unsigned char *ca_cert = 
+static const unsigned char *CA_cert_OTA_server_raw = 
     "-----BEGIN CERTIFICATE-----\n"
     "MIIECTCCAvGgAwIBAgIUB3E9K+/DmBkIOefd2ZOLzTZncuUwDQYJKoZIhvcNAQEL\n"
     "BQAwgZMxCzAJBgNVBAYTAlBMMRUwEwYDVQQIDAxXaWVsa29wb2xza2ExFTATBgNV\n"
@@ -108,24 +109,64 @@ static const char* find_header_end(const uint8_t *buf, size_t len);
 /*                  GLOBAL FUNCTION DEFINITIONS                       */
 /**********************************************************************/
 
-int download_firmware(void) {
+int download_firmware(void) 
+{
+    /******************************* Variable declarations/definitions *******************************/
+    /* Status variable */
     int result = -1;
-    mbedtls_ssl_context ssl;
-    mbedtls_ssl_config conf;
-    mbedtls_x509_crt cacert;
-    mbedtls_ctr_drbg_context ctr_drbg;
-    mbedtls_entropy_context entropy;
-    static char request[512];
+    
+    /* MbedTLS structures */
+    /* SSL context is the main structure for an SSL/TLS connection,
+     * storing the current session state, negotiated parameters, I/O buffers,
+     * cryptographic keys, and connection settings. It maintains the entire 
+     * lifecycle of an SSL/TLS connection, including handshake phases, record 
+     * processing, and connection termination. This context is initialized with
+     * mbedtls_ssl_init() and configured via mbedtls_ssl_setup() before use. */
+    mbedtls_ssl_context ssl_context;
+
+    /* SSL configuration that holds settings for the TLS connection including security
+     * parameters, certificate verification options, and allowed cipher suites. This serves
+     * as a template of settings applied to the ssl_context during setup. It allows
+     * configuring the TLS/SSL connection behavior before the handshake begins. */
+    mbedtls_ssl_config ssl_config;
+
+    /* X.509 certificate structure that stores and manages the parsed CA (Certificate Authority)
+     * certificate used to verify the server's identity. For TLS clients, this holds the trusted
+     * root certificates used to validate the server's certificate, establishing a chain of trust. */
+    mbedtls_x509_crt CA_cert_OTA_server;
+
+    /* CTR_DRBG (Counter-mode Deterministic Random Bit Generator) is a NIST-standardized 
+     * cryptographically secure pseudorandom number generator that uses a block cipher
+     * in counter mode operation. As defined in NIST SP 800-90A, it provides strong
+     * cryptographic randomness for security-critical applications. Here, it generates
+     * random values for the TLS handshake and secure communications. The implementation
+     * uses AES as the underlying block cipher. */
+    mbedtls_ctr_drbg_context ctr_drbg_context;
+
+    /* Entropy context that accumulates randomness from multiple sources (hardware or system)
+     * to provide seed material for the DRBG. This structure is critical for initializing
+     * cryptographically secure random number generation by collecting true entropy from
+     * the system, which is then used to seed the deterministic random bit generator. */
+    mbedtls_entropy_context entropy_context;
+
+    /* HTTP variables */
+    static char http_request[HTTP_REQUEST_MAX_SIZE];
+    static uint8_t http_header_buffer[HTTP_HEADER_MAX_SIZE];
+    bool http_headers_processed = false;
+    size_t header_buf_pos = 0;
+
+    /* Flash variables */
     static uint8_t flash_buffer[CHUNK_SIZE];
     size_t flash_buf_pos = 0;
+
+    /* Download variables */
     size_t total_received = 0;
     size_t content_length = 0;
     size_t expected_size = 0; 
-    bool headers_processed = false;
-    static uint8_t header_buffer[HTTP_HEADER_MAX_SIZE];
-    size_t header_buf_pos = 0;
     TickType_t timeout_time;
     int reconnect_attempts = 0;
+    
+    /******************************* Initialization *******************************/
     
     LOG("=== Starting firmware download ===\n");
     LOG("Target server: https://%s%s\n", OTA_HTTPS_SERVER_IP_ADDRESS, FIRMWARE_PATH);
@@ -133,15 +174,15 @@ int download_firmware(void) {
     watchdog_disable(); // Disable watchdog during OTA process
 
     // Initialize TLS components
-    mbedtls_ssl_init(&ssl);
-    mbedtls_ssl_config_init(&conf);
-    mbedtls_x509_crt_init(&cacert);
-    mbedtls_ctr_drbg_init(&ctr_drbg);
-    mbedtls_entropy_init(&entropy);
+    mbedtls_ssl_init(&ssl_context);
+    mbedtls_ssl_config_init(&ssl_config);
+    mbedtls_x509_crt_init(&CA_cert_OTA_server);
+    mbedtls_ctr_drbg_init(&ctr_drbg_context);
+    mbedtls_entropy_init(&entropy_context);
 
     // Seed the random number generator
     LOG("Seeding random number generator...\n");
-    if(mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, 
+    if(mbedtls_ctr_drbg_seed(&ctr_drbg_context, mbedtls_entropy_func, &entropy_context, 
                              (const unsigned char *)"pico_w_ota", 9) != 0) {
         LOG("Failed to seed RNG\n");
         goto cleanup;
@@ -149,7 +190,7 @@ int download_firmware(void) {
 
     // Load CA certificate
     LOG("Loading CA certificate...\n");
-    if (mbedtls_x509_crt_parse(&cacert, (const unsigned char *)ca_cert, strlen(ca_cert) + 1)) 
+    if (mbedtls_x509_crt_parse(&CA_cert_OTA_server, (const unsigned char *)CA_cert_OTA_server_raw, strlen(CA_cert_OTA_server_raw) + 1)) 
     {
         LOG("Failed to parse CA certificate\n");
         goto cleanup;
@@ -163,7 +204,7 @@ int download_firmware(void) {
     
     // Setup TLS configuration
     LOG("Setting up TLS configuration...\n");
-    if(mbedtls_ssl_config_defaults(&conf,
+    if(mbedtls_ssl_config_defaults(&ssl_config,
                                    MBEDTLS_SSL_IS_CLIENT,
                                    MBEDTLS_SSL_TRANSPORT_STREAM,
                                    MBEDTLS_SSL_PRESET_DEFAULT) != 0) {
@@ -172,18 +213,18 @@ int download_firmware(void) {
     }
 
     // Setup CA certificate
-    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_OPTIONAL);
-    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
-    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+    mbedtls_ssl_conf_authmode(&ssl_config, MBEDTLS_SSL_VERIFY_OPTIONAL);
+    mbedtls_ssl_conf_ca_chain(&ssl_config, &CA_cert_OTA_server, NULL);
+    mbedtls_ssl_conf_rng(&ssl_config, mbedtls_ctr_drbg_random, &ctr_drbg_context);
 
     // Apply configuration to SSL context
-    if(mbedtls_ssl_setup(&ssl, &conf) != 0) {
+    if(mbedtls_ssl_setup(&ssl_context, &ssl_config) != 0) {
         LOG("Failed to setup SSL\n");
         goto cleanup;
     }
 
     // Set hostname for verification
-    if(mbedtls_ssl_set_hostname(&ssl, OTA_HTTPS_SERVER_IP_ADDRESS) != 0) {
+    if(mbedtls_ssl_set_hostname(&ssl_context, OTA_HTTPS_SERVER_IP_ADDRESS) != 0) {
         LOG("Failed to set hostname\n");
         goto cleanup;
     }
@@ -193,7 +234,7 @@ int download_firmware(void) {
      * 
      * This function links the SSL/TLS layer with our TCP client's network functions.
      * It sets up how encrypted data will be sent and received over the network:
-     * - ssl: The SSL context that will use these callbacks
+     * - ssl_context: The SSL context that will use these callbacks
      * - clientGlobal: Connection context passed to callbacks (contains socket info)
      * - tcp_send_mbedtls_callback: Function called when SSL needs to send data
      * - tcp_receive_mbedtls_callback: Function called when SSL needs to receive data
@@ -202,7 +243,7 @@ int download_firmware(void) {
      * This is a critical part of the TLS setup that allows mbedTLS to handle the 
      * encryption/decryption while delegating actual network I/O to our TCP layer.
      */
-    mbedtls_ssl_set_bio(&ssl, clientGlobal, 
+    mbedtls_ssl_set_bio(&ssl_context, clientGlobal, 
                         (mbedtls_ssl_send_t*)tcp_send_mbedtls_callback,
                         (mbedtls_ssl_recv_t*)tcp_receive_mbedtls_callback,
                         NULL);
@@ -211,7 +252,7 @@ int download_firmware(void) {
     LOG("Performing TLS handshake...\n");
     timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
     int ret;
-    while ((ret = mbedtls_ssl_handshake(&ssl)) != 0) {
+    while ((ret = mbedtls_ssl_handshake(&ssl_context)) != 0) {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
             LOG("TLS handshake failed: %08x\n", -ret);
             goto cleanup;
@@ -227,8 +268,8 @@ int download_firmware(void) {
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    // Send HTTP request
-    snprintf(request, sizeof(request), 
+    // Send HTTP http_request
+    snprintf(http_request, sizeof(http_request), 
         "GET %s HTTP/1.1\r\n"
         "Host: %s\r\n"
         "Connection: keep-alive\r\n"
@@ -237,8 +278,8 @@ int download_firmware(void) {
         "\r\n", 
         FIRMWARE_PATH, OTA_HTTPS_SERVER_IP_ADDRESS);
     
-    if (mbedtls_ssl_write(&ssl, (const unsigned char *)request, strlen(request)) <= 0) {
-        LOG("Failed to send HTTP request\n");
+    if (mbedtls_ssl_write(&ssl_context, (const unsigned char *)http_request, strlen(http_request)) <= 0) {
+        LOG("Failed to send HTTP http_request\n");
         goto cleanup;
     }
 
@@ -248,7 +289,7 @@ int download_firmware(void) {
     {
         // Read data from TLS connection
         uint8_t recv_buffer[1024];
-        ret = mbedtls_ssl_read(&ssl, recv_buffer, sizeof(recv_buffer));
+        ret = mbedtls_ssl_read(&ssl_context, recv_buffer, sizeof(recv_buffer));
         
         if (ret > 0) {
             // Reset timeout on successful read
@@ -258,30 +299,30 @@ int download_firmware(void) {
             size_t data_pos = 0;
             
             // Process HTTP headers if not done yet
-            if (!headers_processed) {
+            if (!http_headers_processed) {
                 // Copy data to header buffer
                 while (data_pos < ret && header_buf_pos < HTTP_HEADER_MAX_SIZE) {
-                    header_buffer[header_buf_pos++] = recv_buffer[data_pos++];
+                    http_header_buffer[header_buf_pos++] = recv_buffer[data_pos++];
                     
                     // Check if we've reached the end of the headers
                     if (header_buf_pos >= 4 && 
-                        header_buffer[header_buf_pos-4] == '\r' && 
-                        header_buffer[header_buf_pos-3] == '\n' && 
-                        header_buffer[header_buf_pos-2] == '\r' && 
-                        header_buffer[header_buf_pos-1] == '\n') {
+                        http_header_buffer[header_buf_pos-4] == '\r' && 
+                        http_header_buffer[header_buf_pos-3] == '\n' && 
+                        http_header_buffer[header_buf_pos-2] == '\r' && 
+                        http_header_buffer[header_buf_pos-1] == '\n') {
                         
                         // Null-terminate the header buffer
-                        header_buffer[header_buf_pos] = 0;
+                        http_header_buffer[header_buf_pos] = 0;
                         
                         // Parse status code
-                        if (strncmp((char*)header_buffer, "HTTP/1.1 200", 12) != 0) {
-                            LOG("HTTP error: %.*s\n", 32, header_buffer);
+                        if (strncmp((char*)http_header_buffer, "HTTP/1.1 200", 12) != 0) {
+                            LOG("HTTP error: %.*s\n", 32, http_header_buffer);
                             result = -1;
                             goto cleanup;
                         }
                         
                         // Parse content length
-                        char *cl_str = strstr((char*)header_buffer, "Content-Length:");
+                        char *cl_str = strstr((char*)http_header_buffer, "Content-Length:");
                         if (cl_str) {
                             content_length = strtoul(cl_str + 15, NULL, 10);
                             expected_size = content_length;
@@ -300,14 +341,14 @@ int download_firmware(void) {
                         }
                         
                         LOG("HTTP headers processed, starting firmware download...\n");
-                        headers_processed = true;
+                        http_headers_processed = true;
                         break;
                     }
                 }
             }
             
             // If headers are processed, we can save firmware data
-            if (headers_processed && data_pos < ret) {
+            if (http_headers_processed && data_pos < ret) {
                 // Process firmware data
                 size_t bytes_left = ret - data_pos;
                 
@@ -345,7 +386,7 @@ int download_firmware(void) {
                         }
                     }
                 }
-                if (headers_processed && total_received >= expected_size) 
+                if (http_headers_processed && total_received >= expected_size) 
                 {
                     LOG("Download complete, received %zu of %zu bytes\n", total_received, expected_size);
                     break;
@@ -369,7 +410,7 @@ int download_firmware(void) {
             }
             
             // Reset TLS session
-            mbedtls_ssl_session_reset(&ssl);
+            mbedtls_ssl_session_reset(&ssl_context);
             
             // Attempt to reconnect TCP client
             if (tcp_client_is_connected()) {
@@ -388,7 +429,7 @@ int download_firmware(void) {
             LOG("Performing handshake after reconnect...\n");
             timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
             
-            while ((ret = mbedtls_ssl_handshake(&ssl)) != 0) {
+            while ((ret = mbedtls_ssl_handshake(&ssl_context)) != 0) {
                 if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
                     LOG("TLS handshake failed after reconnect: %08x\n", -ret);
                     break;
@@ -406,8 +447,8 @@ int download_firmware(void) {
                 break;
             }
             
-            // Send HTTP request with Range header to resume download
-            snprintf(request, sizeof(request), 
+            // Send HTTP http_request with Range header to resume download
+            snprintf(http_request, sizeof(http_request), 
                 "GET %s HTTP/1.1\r\n"
                 "Host: %s\r\n"
                 "Connection: close\r\n"
@@ -418,13 +459,13 @@ int download_firmware(void) {
                 FIRMWARE_PATH, OTA_HTTPS_SERVER_IP_ADDRESS,
                 total_received, expected_size - 1);
             
-            if (mbedtls_ssl_write(&ssl, (const unsigned char *)request, strlen(request)) <= 0) {
-                LOG("Failed to send HTTP resume request\n");
+            if (mbedtls_ssl_write(&ssl_context, (const unsigned char *)http_request, strlen(http_request)) <= 0) {
+                LOG("Failed to send HTTP resume http_request\n");
                 break;
             }
             
             // Reset headers for new response
-            headers_processed = false;
+            http_headers_processed = false;
             header_buf_pos = 0;
             
             // Reset timeout
@@ -465,15 +506,15 @@ cleanup:
     // Try to close the SSL connection gracefully
     if (clientGlobal && tcp_client_is_connected()) {
         LOG("Closing TLS connection...\n");
-        mbedtls_ssl_close_notify(&ssl);
+        mbedtls_ssl_close_notify(&ssl_context);
     }
     
     // Free TLS resources
-    mbedtls_ssl_free(&ssl);
-    mbedtls_ssl_config_free(&conf);
-    mbedtls_x509_crt_free(&cacert);
-    mbedtls_ctr_drbg_free(&ctr_drbg);
-    mbedtls_entropy_free(&entropy);
+    mbedtls_ssl_free(&ssl_context);
+    mbedtls_ssl_config_free(&ssl_config);
+    mbedtls_x509_crt_free(&CA_cert_OTA_server);
+    mbedtls_ctr_drbg_free(&ctr_drbg_context);
+    mbedtls_entropy_free(&entropy_context);
     
     LOG("=== Firmware download complete ===\n");
     watchdog_enable(((uint32_t)2000), true);
