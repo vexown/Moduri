@@ -198,7 +198,7 @@ int download_firmware(void)
         goto cleanup;
     }
 
-    /****************************** Download Process ******************************/
+    /************** Establishing Connection and Requesting Download ***************/
 
     /* Perform the TLS handshake. 
      * This process might require multiple steps when using non-blocking I/O, as configured with mbedtls_ssl_set_bio.
@@ -233,22 +233,31 @@ int download_firmware(void)
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
-    // Send HTTP http_request
+    /* Craft the HTTP GET request to download the firmware. It follows a standard HTTP/1.1 format */
     snprintf(http_request, sizeof(http_request), 
-        "GET %s HTTP/1.1\r\n"
-        "Host: %s\r\n"
-        "Connection: keep-alive\r\n"
-        "Cache-Control: no-cache\r\n"
-        "User-Agent: Pico-W-OTA/1.0\r\n"
-        "\r\n", 
-        FIRMWARE_PATH, OTA_HTTPS_SERVER_IP_ADDRESS);
+            "GET %s HTTP/1.1\r\n"               // Specifies the GET method, the resource path, and the HTTP version.
+            "Host: %s\r\n"                      // Specifies the host header with the server IP address.
+            "Connection: keep-alive\r\n"        // Indicates that the TCP connection should be kept alive after the response.
+            "Cache-Control: no-cache\r\n"       // Instructs the server to not use cached data (always get the latest version).
+            "User-Agent: Pico-W-OTA/1.0\r\n"    // Identifies the client making the request (can be any string).
+            "\r\n",                             // End of HTTP headers (\r\n\r\n), indicating the start of the body.
+            FIRMWARE_PATH, OTA_HTTPS_SERVER_IP_ADDRESS);
     
-    if (mbedtls_ssl_write(&ssl_context, (const unsigned char *)http_request, strlen(http_request)) <= 0) {
+    /* Send the composed HTTP GET request to the server through the established secure TLS connection.
+     * mbedtls_ssl_write handles the encryption of the request data before sending it over the underlying TCP socket.
+     * It returns the number of bytes successfully written, or a negative error code.
+     * 
+     * Note: In non-blocking mode, this could also return MBEDTLS_ERR_SSL_WANT_WRITE, indicating the underlying network layer is not ready to send yet.
+     *       However, this specific implementation doesn't explicitly handle WANT_WRITE here, assuming the send buffer has enough space or blocking slightly. */
+    LOG("Sending HTTP request...\n");
+    if (mbedtls_ssl_write(&ssl_context, (const unsigned char *)http_request, strlen(http_request)) <= 0) 
+    {
         LOG("Failed to send HTTP http_request\n");
         goto cleanup;
     }
 
-    // Main download loop
+    /****************************** Download Process ******************************/
+
     timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
     int ret;
     while (xTaskGetTickCount() < timeout_value) 
