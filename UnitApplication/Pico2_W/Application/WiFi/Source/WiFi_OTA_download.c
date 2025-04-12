@@ -181,7 +181,7 @@ int download_firmware(void)
     size_t total_received = 0;
     size_t content_length = 0;
     size_t expected_size = 0; 
-    TickType_t timeout_time;
+    TickType_t timeout_value;
     int reconnect_attempts = 0;
     
     /******************************* Initialization *******************************/
@@ -198,22 +198,38 @@ int download_firmware(void)
         goto cleanup;
     }
 
+    /****************************** Download Process ******************************/
+
+    /* Perform the TLS handshake. 
+     * This process might require multiple steps when using non-blocking I/O, as configured with mbedtls_ssl_set_bio.
+     * The mbedtls_ssl_handshake function will return specific error codes MBEDTLS_ERR_SSL_WANT_READ or MBEDTLS_ERR_SSL_WANT_WRITE if it needs
+     * to wait for network data to be received or sent, respectively. This loop handles these non-fatal "want" conditions by calling the function again
+     * after short delay, allowing other tasks (like the network stack) to run and potentially satisfy the read/write requirement.
+     * The loop continues until the handshake completes successfully (ret == 0), a fatal error occurs (ret is neither 0, WANT_READ, nor WANT_WRITE)
+     * or the timeout expires. */
     LOG("Performing TLS handshake...\n");
-    timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
-    int ret;
-    while ((ret = mbedtls_ssl_handshake(&ssl_context)) != 0) {
-        if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-            LOG("TLS handshake failed: %08x\n", -ret);
+    timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
+    int handshake_result = mbedtls_ssl_handshake(&ssl_context);
+    while (handshake_result != 0) 
+    {
+        /* Check for fatal errors, non-fatal "want" conditions or timeout */
+        if ((handshake_result != MBEDTLS_ERR_SSL_WANT_READ) && (handshake_result != MBEDTLS_ERR_SSL_WANT_WRITE)) 
+        {
+            LOG("TLS handshake failed: %08x\n", -handshake_result);
             goto cleanup;
         }
-        
-        // Check for timeout
-        if (xTaskGetTickCount() >= timeout_time) {
+        else if (xTaskGetTickCount() >= timeout_value)
+        {
             LOG("TLS handshake timeout\n");
             goto cleanup;
         }
+        else
+        {
+            /* Continue the handshake process */
+            handshake_result = mbedtls_ssl_handshake(&ssl_context);
+        }
         
-        // Give other tasks a chance to run
+        /* Give other tasks a chance to run while we wait for handshake data to be available */
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 
@@ -233,8 +249,9 @@ int download_firmware(void)
     }
 
     // Main download loop
-    timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
-    while (xTaskGetTickCount() < timeout_time) 
+    timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
+    int ret;
+    while (xTaskGetTickCount() < timeout_value) 
     {
         // Read data from TLS connection
         uint8_t recv_buffer[1024];
@@ -242,7 +259,7 @@ int download_firmware(void)
         
         if (ret > 0) {
             // Reset timeout on successful read
-            timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
+            timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
             
             // Process the received data
             size_t data_pos = 0;
@@ -376,7 +393,7 @@ int download_firmware(void)
             
             // Try handshake again
             LOG("Performing handshake after reconnect...\n");
-            timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
+            timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(HANDSHAKE_TIMEOUT_MS);
             
             while ((ret = mbedtls_ssl_handshake(&ssl_context)) != 0) {
                 if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
@@ -384,7 +401,7 @@ int download_firmware(void)
                     break;
                 }
                 
-                if (xTaskGetTickCount() >= timeout_time) {
+                if (xTaskGetTickCount() >= timeout_value) {
                     LOG("TLS handshake timeout after reconnect\n");
                     break;
                 }
@@ -418,7 +435,7 @@ int download_firmware(void)
             header_buf_pos = 0;
             
             // Reset timeout
-            timeout_time = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
+            timeout_value = xTaskGetTickCount() + pdMS_TO_TICKS(READ_TIMEOUT_MS);
         } else {
             LOG("SSL read error: %d\n", ret);
             break;
