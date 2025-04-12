@@ -57,6 +57,7 @@
 /**********************************************************************/
 /* Self-signed certificate for the Apache server */
 static const unsigned char *CA_cert_OTA_server_raw = 
+    (const unsigned char *) // cast to unsigned char since mbedtls_x509_crt_parse expects it
     "-----BEGIN CERTIFICATE-----\n"
     "MIIECTCCAvGgAwIBAgIUB3E9K+/DmBkIOefd2ZOLzTZncuUwDQYJKoZIhvcNAQEL\n"
     "BQAwgZMxCzAJBgNVBAYTAlBMMRUwEwYDVQQIDAxXaWVsa29wb2xza2ExFTATBgNV\n"
@@ -190,7 +191,7 @@ int download_firmware(void)
 
     // Load CA certificate
     LOG("Loading CA certificate...\n");
-    if (mbedtls_x509_crt_parse(&CA_cert_OTA_server, (const unsigned char *)CA_cert_OTA_server_raw, strlen(CA_cert_OTA_server_raw) + 1)) 
+    if (mbedtls_x509_crt_parse(&CA_cert_OTA_server, CA_cert_OTA_server_raw, strlen((const char *)CA_cert_OTA_server_raw) + 1)) // +1 for null terminator
     {
         LOG("Failed to parse CA certificate\n");
         goto cleanup;
