@@ -174,58 +174,143 @@ int download_firmware(void)
 
     watchdog_disable(); // Disable watchdog during OTA process
 
-    // Initialize TLS components
+    /* Initialize mbedTLS structures to a clean, defined state */
     mbedtls_ssl_init(&ssl_context);
     mbedtls_ssl_config_init(&ssl_config);
     mbedtls_x509_crt_init(&CA_cert_OTA_server);
     mbedtls_ctr_drbg_init(&ctr_drbg_context);
     mbedtls_entropy_init(&entropy_context);
 
-    // Seed the random number generator
+    /* Seed the CTR_DRBG (Counter-mode Deterministic Random Bit Generator).
+     * This function initializes the internal state of the DRBG using entropy
+     * gathered from the system, making its output cryptographically secure.
+     *
+     * Explanation of the crucial parameters:
+     * - mbedtls_entropy_func: The callback function used to retrieve entropy
+     *                         from the registered sources within the entropy_context.
+     * - &entropy_context: The entropy context holding the accumulated randomness
+     *                     sources (e.g., hardware RNG, timing variations).
+     * - "pico_w_ota": A personalization string. This is application-specific data
+     *                 mixed with the entropy during seeding. Its purpose, as defined
+     *                 in NIST SP 800-90A, is to make this specific DRBG instance unique.
+     *                 Using "pico_w_ota" helps differentiate this RNG instance used for
+     *                 the OTA download process from any other potential RNG usage on
+     *                 the device.
+     *
+     * A successful seeding is critical for generating unpredictable random numbers
+     * required for the TLS handshake (e.g., nonces, key generation). */
     LOG("Seeding random number generator...\n");
-    if(mbedtls_ctr_drbg_seed(&ctr_drbg_context, mbedtls_entropy_func, &entropy_context, 
-                             (const unsigned char *)"pico_w_ota", 9) != 0) {
+    const unsigned char *personalization_string = (const unsigned char *)"pico_w_ota";
+    const size_t personalization_string_len = strlen((const char *)personalization_string);
+    if(mbedtls_ctr_drbg_seed(&ctr_drbg_context, mbedtls_entropy_func, &entropy_context, personalization_string, personalization_string_len) != 0) 
+    {
         LOG("Failed to seed RNG\n");
         goto cleanup;
     }
 
-    // Load CA certificate
+    /**
+     * Parse the CA certificate for the OTA server.
+     * 
+     * This function decodes one or more X.509 certificates from a given buffer (CA_cert_OTA_server_raw) and populates an `mbedtls_x509_crt` 
+     * (CA_cert_OTA_server) structure. Input buffer can contain a cert in either PEM (Privacy-Enhanced Mail, typically Base64 encoded 
+     * with -----BEGIN/END----- markers) or DER (Distinguished Encoding Rules, usually a hex string) format. The function auto detects the format.
+     * 
+     * CA_cert_OTA_server structure with the parsed cert will later be passed to `mbedtls_ssl_conf_ca_chain` to configure the
+     * SSL/TLS context (`ssl_config`). This tells the TLS client (our Pico W) which CAs it should trust when verifying the certificate 
+     * presented by the OTA server during the TLS handshake. This step is essential for authenticating the server and ensuring
+     * we are connecting to the legitimate OTA server, preventing man-in-the-middle attacks. */
     LOG("Loading CA certificate...\n");
-    if (mbedtls_x509_crt_parse(&CA_cert_OTA_server, CA_cert_OTA_server_raw, strlen((const char *)CA_cert_OTA_server_raw) + 1)) // +1 for null terminator
+    size_t CA_cert_OTA_server_raw_len = strlen((const char *)CA_cert_OTA_server_raw) + 1; // +1 for null terminator
+    if (mbedtls_x509_crt_parse(&CA_cert_OTA_server, CA_cert_OTA_server_raw, CA_cert_OTA_server_raw_len) != 0) 
     {
         LOG("Failed to parse CA certificate\n");
         goto cleanup;
     }
-
-    // Make sure TCP client is initialized and connected
-    if (!clientGlobal) {
-        LOG("TCP client not initialized\n");
-        goto cleanup;
-    }
     
-    // Setup TLS configuration
+    /**
+     * Load default SSL/TLS configuration values into the ssl_config structure.
+     * 
+     * This function initializes the `mbedtls_ssl_config` structure (`ssl_config`) with a set of standard default values appropriate 
+     * for the specified role (client/server), transport type (stream/datagram), and a chosen preset profile. These defaults typically 
+     * include enabling secure protocol versions (like TLS 1.2 or higher), selecting a list of strong cipher suites, and setting reasonable 
+     * buffer sizes. It serves as a convenient starting point, ensuring the configuration is in a known, sensible state before applying 
+     * specific customizations. */
     LOG("Setting up TLS configuration...\n");
-    if(mbedtls_ssl_config_defaults(&ssl_config,
-                                   MBEDTLS_SSL_IS_CLIENT,
-                                   MBEDTLS_SSL_TRANSPORT_STREAM,
-                                   MBEDTLS_SSL_PRESET_DEFAULT) != 0) {
+    if(mbedtls_ssl_config_defaults(&ssl_config, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT) != 0) 
+    {
         LOG("Failed to set TLS configuration defaults\n");
         goto cleanup;
     }
 
-    // Setup CA certificate
+    /**
+     * Set the certificate verification mode for the SSL/TLS configuration.
+     * 
+     * This function configures how the peer's certificate chain should be verified during the TLS handshake. It determines the 
+     * level of authentication required.
+     * 
+     * Authentication modes:
+     *              - `MBEDTLS_SSL_VERIFY_NONE`: Peer certificate is not checked (Insecure, vulnerable to MITM attacks).
+     *              - `MBEDTLS_SSL_VERIFY_OPTIONAL`: Peer certificate is checked if presented, but the handshake continues even 
+     *                 if verification fails or no certificate is sent. The verification result is available via `mbedtls_ssl_get_verify_result`.
+     *              - `MBEDTLS_SSL_VERIFY_REQUIRED`: Peer must present a certificate, and it must be validly verified against the configured 
+     *                 trusted CAs. Handshake fails if verification fails. (Most common for clients). */
     mbedtls_ssl_conf_authmode(&ssl_config, MBEDTLS_SSL_VERIFY_OPTIONAL);
+
+    /**
+     * Set the trusted Certificate Authority (CA) chain for certificate verification.
+     * 
+     * This function provides the SSL/TLS configuration with the set of CA certificates that should be considered trustworthy for verifying 
+     * the peer's certificate chain.
+     * 
+     * CA_cert_OTA_server is the parsed CA certificate structure that contains the trusted root CA certificate(s) used to validate the server's
+     * certificate during the TLS handshake. This is crucial for establishing a secure connection and ensuring that the server's identity is
+     * authentic.
+     * 
+     * Last parameter ca_crl is a pointer to an `mbedtls_x509_crl` structure that contains Certificate Revocation Lists (CRLs) associated with the CAs.
+     * It can be `NULL` if CRL checking is not required or not available. */
     mbedtls_ssl_conf_ca_chain(&ssl_config, &CA_cert_OTA_server, NULL);
+
+    /**
+     * Set the random number generator (RNG) callback function for the SSL/TLS configuration.
+     * 
+     * This function, `mbedtls_ssl_conf_rng`, configures the source of randomness that the SSL/TLS stack will use for cryptographic operations, 
+     * such as generating session keys, nonces, and other security-critical values during the handshake and subsequent communication.
+     * 
+     * f_rng argument is a pointer to the RNG function. This function will be called by mbedTLS whenever it needs random bytes. 
+     * We use `mbedtls_ctr_drbg_random`, which is the standard function to get random bytes from a CTR-DRBG context. */
     mbedtls_ssl_conf_rng(&ssl_config, mbedtls_ctr_drbg_random, &ctr_drbg_context);
 
-    // Apply configuration to SSL context
-    if(mbedtls_ssl_setup(&ssl_context, &ssl_config) != 0) {
+    /**
+     * Apply the configured settings to the SSL context.
+     * 
+     * This function takes the settings defined in the `mbedtls_ssl_config` structure (`ssl_config`) and applies them to the 
+     * `mbedtls_ssl_context` structure (`ssl_context`). This effectively prepares the SSL context for initiating a connection using 
+     * the specified configuration, including the trusted CA certificates, authentication mode, RNG functions, etc. */
+    if(mbedtls_ssl_setup(&ssl_context, &ssl_config) != 0) 
+    {
         LOG("Failed to setup SSL\n");
         goto cleanup;
     }
 
-    // Set hostname for verification
-    if(mbedtls_ssl_set_hostname(&ssl_context, OTA_HTTPS_SERVER_IP_ADDRESS) != 0) {
+    /**
+     * Set the hostname to check against the received server certificate. 
+     * 
+     * It sets the ServerName TLS extension too, if that extension is enabled. (client-side only)
+     * 
+     * This function informs the SSL context about the hostname (or IP address string) of the server it intends to connect to. 
+     * This serves two primary purposes:
+     * 
+     * 1. Server Name Indication (SNI): During the TLS handshake (ClientHello message), the client sends this hostname to the server. 
+     *    This allows servers hosting multiple secure websites on a single IP address to identify which site the client wants 
+     *    and present the corresponding correct certificate.
+     * 
+     * 2. Hostname Verification: After receiving the server's certificate, the TLS client (if verification is enabled via 
+     *    `mbedtls_ssl_conf_authmode`) checks if the hostname set here matches the identity presented in the certificate 
+     *    (usually in the Subject Alternative Name (SAN) extension or, as a fallback, the Common Name (CN) field).
+     *    This is a crucial security step to prevent Man-in-the-Middle (MitM) attacks, ensuring that the certificate is valid 
+     *    not just cryptographically, but specifically for the server we intended to connect to. */
+    if(mbedtls_ssl_set_hostname(&ssl_context, OTA_HTTPS_SERVER_IP_ADDRESS) != 0) 
+    {
         LOG("Failed to set hostname\n");
         goto cleanup;
     }
