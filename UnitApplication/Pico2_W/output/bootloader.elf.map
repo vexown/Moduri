@@ -1604,6 +1604,8 @@ Discarded input sections
  .text          0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .data          0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .bss           0x0000000000000000        0x0 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .text.write_to_flash
+                0x0000000000000000       0x3c ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .text          0x0000000000000000       0x58 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
  .data          0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libm.a(lib_a-wf_sqrt.o)
@@ -3679,7 +3681,7 @@ LOAD linker stubs
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
  .comment       0x0000000000000033       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/crtend.o
 
-.debug_info     0x0000000000000000    0x1c8fb
+.debug_info     0x0000000000000000    0x1ca52
  .debug_info    0x0000000000000000      0x9ed CMakeFiles/bootloader.dir/main.c.o
  .debug_info    0x00000000000009ed     0x1c30 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_info    0x000000000000261d      0x19b CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
@@ -3711,13 +3713,13 @@ LOAD linker stubs
  .debug_info    0x0000000000018d6b     0x15c8 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_info    0x000000000001a333     0x158b CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_info    0x000000000001b8be      0x3b1 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_info    0x000000000001bc6f      0x310 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
- .debug_info    0x000000000001bf7f       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_info    0x000000000001bfa5      0x717 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_info    0x000000000001c6bc       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
- .debug_info    0x000000000001c6e2       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
- .debug_info    0x000000000001c708      0x137 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_info    0x000000000001c83f       0xbc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_info    0x000000000001bc6f      0x467 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_info    0x000000000001c0d6       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_info    0x000000000001c0fc      0x717 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_info    0x000000000001c813       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x000000000001c839       0x26 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_info    0x000000000001c85f      0x137 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_info    0x000000000001c996       0xbc /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
 .debug_abbrev   0x0000000000000000     0x55e8
  .debug_abbrev  0x0000000000000000      0x26c CMakeFiles/bootloader.dir/main.c.o
@@ -3759,7 +3761,7 @@ LOAD linker stubs
  .debug_abbrev  0x00000000000054bb       0xb4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
  .debug_abbrev  0x000000000000556f       0x79 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_loc      0x0000000000000000     0xfed6
+.debug_loc      0x0000000000000000    0x10020
  .debug_loc     0x0000000000000000      0x184 CMakeFiles/bootloader.dir/main.c.o
  .debug_loc     0x0000000000000184     0x1311 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_loc     0x0000000000001495      0x3d3 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/common/hardware_claim/claim.c.o
@@ -3786,12 +3788,12 @@ LOAD linker stubs
  .debug_loc     0x000000000000d366      0x9df CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_loc     0x000000000000dd45      0xd43 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_loc     0x000000000000ea88      0x152 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_loc     0x000000000000ebda       0xc5 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
- .debug_loc     0x000000000000ec9f      0xfe6 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_loc     0x000000000000fc85      0x22c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_loc     0x000000000000feb1       0x25 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_loc     0x000000000000ebda      0x20f ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_loc     0x000000000000ede9      0xfe6 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_loc     0x000000000000fdcf      0x22c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_loc     0x000000000000fffb       0x25 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_aranges  0x0000000000000000      0xe50
+.debug_aranges  0x0000000000000000      0xe58
  .debug_aranges
                 0x0000000000000000       0x40 CMakeFiles/bootloader.dir/main.c.o
  .debug_aranges
@@ -3855,21 +3857,21 @@ LOAD linker stubs
  .debug_aranges
                 0x0000000000000d20       0x48 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
  .debug_aranges
-                0x0000000000000d68       0x28 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                0x0000000000000d68       0x30 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
  .debug_aranges
-                0x0000000000000d90       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+                0x0000000000000d98       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
  .debug_aranges
-                0x0000000000000db0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+                0x0000000000000db8       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
  .debug_aranges
-                0x0000000000000dd0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+                0x0000000000000dd8       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
  .debug_aranges
-                0x0000000000000df0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+                0x0000000000000df8       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
  .debug_aranges
-                0x0000000000000e10       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+                0x0000000000000e18       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
  .debug_aranges
-                0x0000000000000e30       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+                0x0000000000000e38       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_ranges   0x0000000000000000     0x3400
+.debug_ranges   0x0000000000000000     0x3408
  .debug_ranges  0x0000000000000000       0x30 CMakeFiles/bootloader.dir/main.c.o
  .debug_ranges  0x0000000000000030      0x1a8 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_ranges  0x00000000000001d8       0x18 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
@@ -3900,11 +3902,11 @@ LOAD linker stubs
  .debug_ranges  0x0000000000002e10      0x2f0 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_ranges  0x0000000000003100      0x1b8 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_ranges  0x00000000000032b8       0x38 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_ranges  0x00000000000032f0       0x18 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
- .debug_ranges  0x0000000000003308       0xe8 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_ranges  0x00000000000033f0       0x10 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_ranges  0x00000000000032f0       0x20 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_ranges  0x0000000000003310       0xe8 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_ranges  0x00000000000033f8       0x10 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_line     0x0000000000000000    0x11452
+.debug_line     0x0000000000000000    0x114f0
  .debug_line    0x0000000000000000      0x694 CMakeFiles/bootloader.dir/main.c.o
  .debug_line    0x0000000000000694      0xf59 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_line    0x00000000000015ed      0x1d5 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
@@ -3936,15 +3938,15 @@ LOAD linker stubs
  .debug_line    0x000000000000e8da      0xd7f CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_line    0x000000000000f659      0xd51 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_line    0x00000000000103aa      0x3da CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_line    0x0000000000010784      0x2d1 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
- .debug_line    0x0000000000010a55       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_line    0x0000000000010ab5      0x5c7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_line    0x000000000001107c       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
- .debug_line    0x00000000000110dc       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
- .debug_line    0x000000000001119d      0x1c1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_line    0x000000000001135e       0xf4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_line    0x0000000000010784      0x36f ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_line    0x0000000000010af3       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_line    0x0000000000010b53      0x5c7 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_line    0x000000000001111a       0x60 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_line    0x000000000001117a       0xc1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_line    0x000000000001123b      0x1c1 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_line    0x00000000000113fc       0xf4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
 
-.debug_str      0x0000000000000000     0x68b4
+.debug_str      0x0000000000000000     0x68e5
  .debug_str     0x0000000000000000      0xa0a CMakeFiles/bootloader.dir/main.c.o
                                         0xa8c (size before relaxing)
  .debug_str     0x0000000000000a0a      0x889 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
@@ -4007,21 +4009,21 @@ LOAD linker stubs
                                         0x896 (size before relaxing)
  .debug_str     0x0000000000005db9      0x1b6 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
                                         0x38a (size before relaxing)
- .debug_str     0x0000000000005f6f      0x119 ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
-                                        0x357 (size before relaxing)
- .debug_str     0x0000000000006088       0xac /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_str     0x0000000000006134      0x545 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_str     0x0000000000005f6f      0x14a ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+                                        0x39b (size before relaxing)
+ .debug_str     0x00000000000060b9       0xac /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_str     0x0000000000006165      0x545 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
                                         0x653 (size before relaxing)
- .debug_str     0x0000000000006679       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
+ .debug_str     0x00000000000066aa       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_dvmd_tls.o)
                                          0xb0 (size before relaxing)
- .debug_str     0x00000000000066a9       0xab /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
+ .debug_str     0x00000000000066da       0xab /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memcpy.o)
                                          0xb7 (size before relaxing)
- .debug_str     0x0000000000006754      0x11f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_str     0x0000000000006785      0x11f /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
                                         0x1c9 (size before relaxing)
- .debug_str     0x0000000000006873       0x41 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_str     0x00000000000068a4       0x41 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
                                         0x1c7 (size before relaxing)
 
-.debug_frame    0x0000000000000000     0x211c
+.debug_frame    0x0000000000000000     0x213c
  .debug_frame   0x0000000000000000       0x80 CMakeFiles/bootloader.dir/main.c.o
  .debug_frame   0x0000000000000080      0x308 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_gpio/gpio.c.o
  .debug_frame   0x0000000000000388       0x4c CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_platform_panic/panic.c.o
@@ -4050,8 +4052,8 @@ LOAD linker stubs
  .debug_frame   0x0000000000001c38      0x160 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/pico_stdio_uart/stdio_uart.c.o
  .debug_frame   0x0000000000001d98      0x1f0 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_flash/flash.c.o
  .debug_frame   0x0000000000001f88       0x98 CMakeFiles/bootloader.dir/home/blankmcu/Repos/Moduri/UnitApplication/Dependencies/pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c.o
- .debug_frame   0x0000000000002020       0x4c ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
- .debug_frame   0x000000000000206c       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
- .debug_frame   0x0000000000002098       0x38 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
- .debug_frame   0x00000000000020d0       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
- .debug_frame   0x00000000000020fc       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
+ .debug_frame   0x0000000000002020       0x6c ../Common/FlashUtils/libflash_utils.a(flash_operations.c.o)
+ .debug_frame   0x000000000000208c       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_aeabi_uldivmod.o)
+ .debug_frame   0x00000000000020b8       0x38 /usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v8-m.main+fp/softfp/libgcc.a(_udivmoddi4.o)
+ .debug_frame   0x00000000000020f0       0x2c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-memset.o)
+ .debug_frame   0x000000000000211c       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/v8-m.main+fp/softfp/libg.a(lib_a-strlen-stub.o)
