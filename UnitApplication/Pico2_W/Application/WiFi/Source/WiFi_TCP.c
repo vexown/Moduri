@@ -333,7 +333,15 @@ int tcp_receive_mbedtls_callback(void *shared_context, unsigned char *buf, size_
     if(tcp_client_is_connected() == false)
     {
         LOG("Connection to the OTA server is lost\n");
-        return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
+        if((clientGlobal != NULL) && clientGlobal->receive_length > 0) // No connection but there is remaining data in the TCP buffer
+        {   
+            LOG("Connection is lost but there is remaining data in buffer: %d bytes\n", clientGlobal->receive_length);
+        }
+        else
+        {
+            LOG("Connection is lost and the client was deallocated. We cannot process the data anymore\n");
+            return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
+        }
     }
 
     if(clientGlobal->receive_length == 0)
@@ -357,7 +365,17 @@ int tcp_receive_mbedtls_callback(void *shared_context, unsigned char *buf, size_
         if(tcp_client_is_connected() == false)
         {
             LOG("Connection to the OTA server is lost\n");
-            return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
+
+            /* Ok so we are not connected anymore, but we got here because we received data after waiting for it. So let's process it */
+            if((clientGlobal != NULL)) // make sure the client was not deallocated
+            {   
+                LOG("Connection is lost but there is remaining data in buffer: %d bytes\n", clientGlobal->receive_length);
+            }
+            else
+            {
+                LOG("Connection is lost and the client was deallocated. We cannot process the data anymore\n");
+                return MBEDTLS_ERR_NET_CONN_RESET; // Connection reset
+            }
         }
     }
 
@@ -1330,13 +1348,19 @@ static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16
     /* Make sure client is connected so we can tell the difference between no connection and no data */
     if (!tcp_client_is_connected()) 
     {
-        LOG("Attempted to receive data while not connected. Trying to reconnect...\n");
+        if(clientGlobal->receive_length == 0)
+        {
+            LOG("No data received and client is not connected. Trying to reconnect...\n");
 #if (OTA_ENABLED == ON)
-        tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
+            tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
 #else
-        tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
+            tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
 #endif
-        return;
+        }
+        else
+        {
+            LOG("Client is not connected but there is data in the receive buffer. Processing it...\n");
+        }
     }
 
     /* Wait for the mutex before accessing the buffer */
