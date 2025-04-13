@@ -12,7 +12,6 @@
 /*******************************************************************************/
 #define MBEDTLS_ERR_NET_SEND_FAILED -0x004C  /**< Failed to send data. */
 #define MBEDTLS_ERR_NET_CONN_RESET -0x004E  /**< Connection was reset by peer. */
-#define MBEDTLS_ERR_SSL_WANT_READ  -0x6900  /**< No data available, try again. */
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
