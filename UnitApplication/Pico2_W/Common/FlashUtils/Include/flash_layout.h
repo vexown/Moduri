@@ -19,8 +19,10 @@
 #define BOOT_CONFIG_START           (BOOTLOADER_START + BOOTLOADER_SIZE)
 #define BOOT_CONFIG_SIZE            0x1000       // 4KB
 
-#define APP_BANK_A_START            (FLASH_BASE + BOOTLOADER_SIZE + BOOT_CONFIG_SIZE)   
-#define APP_BANK_SIZE               0x1E0000     // 1920KB (so 2 banks take up 3840KB)
-#define APP_BANK_B_START            (APP_BANK_A_START + APP_BANK_SIZE)  
+#define APP_BANK_A_START            (FLASH_BASE + BOOTLOADER_SIZE + BOOT_CONFIG_SIZE)   // 0x10040000
+#define APP_BANK_A_OFFSET           (APP_BANK_A_START - FLASH_BASE)                     // 0x00040000
+#define APP_BANK_SIZE               0x1E0000                                            // 1920KB (so 2 banks take up 3840KB)
+#define APP_BANK_B_START            (APP_BANK_A_START + APP_BANK_SIZE)                  // 0x10220000
+#define APP_BANK_B_OFFSET           (APP_BANK_B_START - FLASH_BASE)                     // 0x00220000
 
 #endif // FLASH_LAYOUT_H
