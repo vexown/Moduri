@@ -8,7 +8,8 @@
  * To stop the HTTPS server on the PC: sudo systemctl stop apache2
  * Verify the server is stopped: sudo systemctl status apache2
  * 
- * Uploading new firmware to the server: sudo cp /home/blankmcu/Repos/Moduri/UnitApplication/output/moduri_bank_A.bin /var/www/html/firmware.bin
+ * Uploading new firmware to the server: Use the UploadImageToServer.sh script from this repository.
+ * 
  * Ensure Apache can read the file (www-data is the default Apache user on Ubuntu): 
  *      sudo chmown www-data:www-data /var/www/html/firmware.bin
  *      sudo chmod 644 /var/www/html/firmware.bin
