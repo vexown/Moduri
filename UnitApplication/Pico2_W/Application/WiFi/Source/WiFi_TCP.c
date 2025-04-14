@@ -609,6 +609,7 @@ void tcp_client_disconnect(void)
         else
         {
             LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
+            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
         }
 
         /* As a last resort, if after the timeout the connection is still not fully closed, 
@@ -626,11 +627,6 @@ void tcp_client_disconnect(void)
             tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
 
             LOG("Connection aborted\n");
-        }
-        else
-        {
-            LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
-            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
         }
     }
     else if(clientGlobal->is_closing == true)
@@ -1352,10 +1348,11 @@ static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16
         {
             LOG("No data received and client is not connected. Trying to reconnect...\n");
 #if (OTA_ENABLED == ON)
-            tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
+            (void)tcp_client_connect(OTA_HTTPS_SERVER_IP_ADDRESS, OTA_HTTPS_SERVER_PORT);
 #else
-            tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
+            (void)tcp_client_connect(REMOTE_TCP_SERVER_IP_ADDRESS, TCP_PORT);
 #endif
+            return; // There is no data so nothing more to do. We try to reconnect but no further processing is needed, regardless of the result.
         }
         else
         {
