@@ -47,7 +47,7 @@ function(create_moduri_target target_name linker_script)
     -Wunused             # Unused entities
     -Wno-unused-function # Don't warn about unused static functions in headers
     -fstack-usage        # Generate stack usage information
-    #-Werror              # Treat warnings as errors - TODO: Uncomment this line when all warnings are fixed
+    -Werror              # Treat warnings as errors
     )
 
     # C-specific warning flags
