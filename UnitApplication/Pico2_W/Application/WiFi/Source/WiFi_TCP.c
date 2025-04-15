@@ -614,9 +614,8 @@ void tcp_client_disconnect(void)
 
         /* As a last resort, if after the timeout the connection is still not fully closed, 
            force the abort which sends a RST segment to remote host. Ugly but never fails */
-        if ((clientGlobal->pcb != NULL) && 
-            (clientGlobal->pcb->state != CLOSED) && 
-            (clientGlobal->pcb->state != TIME_WAIT))
+        if ((clientGlobal != NULL) && (clientGlobal->pcb != NULL) &&
+            (clientGlobal->pcb->state != CLOSED) && (clientGlobal->pcb->state != TIME_WAIT))
         {
             LOG("Error closing TCP connection (Client state: %d) - forcing abort... \n", clientGlobal->pcb->state);
 
