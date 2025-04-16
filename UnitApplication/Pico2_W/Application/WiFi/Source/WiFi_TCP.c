@@ -586,7 +586,8 @@ void tcp_client_disconnect(void)
             TickType_t xStartTime = xTaskGetTickCount();
             TickType_t xTimeoutTicks = pdMS_TO_TICKS(2000); // 2s
 
-            while ((clientGlobal->pcb->state != CLOSED) && (clientGlobal->pcb->state != TIME_WAIT)) 
+            bool is_closed = false;
+            while (is_closed != true) 
             {
                 /* Check if timeout has occurred */
                 if ((xTaskGetTickCount() - xStartTime) > xTimeoutTicks) 
@@ -598,7 +599,7 @@ void tcp_client_disconnect(void)
                 {
                     LOG("Connection closed successfully after a bit of waiting (Ticks waited: %lu). Client state: %d\n", xTaskGetTickCount() - xStartTime,
                                                                                                                          clientGlobal->pcb->state);
-                    break;
+                    is_closed = true;
                 }
                 else /* Block this task for 100ms allowing other tasks to run */
                 {
@@ -609,7 +610,6 @@ void tcp_client_disconnect(void)
         else
         {
             LOG("Connection closed successfully. Client state: %d\n", clientGlobal->pcb->state);
-            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
         }
 
         /* As a last resort, if after the timeout the connection is still not fully closed, 
@@ -622,11 +622,10 @@ void tcp_client_disconnect(void)
             /* Forcefully abort the connection */
             /* This will send a RST segment to the remote host and free the PCB */
             tcp_abort(clientGlobal->pcb);
-
-            tcp_client_cleanup(); // Cleanup the client resources and set is_closing to false
-
             LOG("Connection aborted\n");
         }
+
+        tcp_client_cleanup();
     }
     else if(clientGlobal->is_closing == true)
     {
