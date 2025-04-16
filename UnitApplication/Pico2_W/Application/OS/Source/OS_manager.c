@@ -122,11 +122,6 @@ static void monitorTask(__unused void *taskParams);
 /*******************************************************************************/
 /*                             STATIC VARIABLES                                */
 /*******************************************************************************/
-/* .uninitialized_data section is placed in RAM and is not initialized on startup (so-called no-init RAM)
- * Its content persists over SOFT resets, but not over HARD resets (power cycle) */
-#if (WATCHDOG_ENABLED == ON)
-static uint8_t watchdogResetCount __attribute__((section(".uninitialized_data")));
-#endif
 
 /*******************************************************************************/
 /*                             GLOBAL VARIABLES                                */
@@ -154,10 +149,18 @@ static void checkResetReason(void)
 	/* Check if the system was reset by the watchdog */
     if (watchdog_enable_caused_reboot()) 
 	{
-        watchdogResetCount++;
-        LOG("Watchdog reset detected! Count: %d\n", watchdogResetCount);
+        /* If the system was reset by the watchdog, increment the counter in the scratch register.
+         * A scratch register is a small, temporary storage location built into the hardware of a microcontroller 
+         * peripheral, such as a watchdog timer, UART, or DMA controller. 
+         * 
+         * Here we use the property of the Scratch Register which is that they retain information through a 
+         * soft reset of the chip, such as watchdog reset (they still lose their contents during a power-off though (hard reset)) */
+        watchdog_hw->scratch[0] = watchdog_hw->scratch[0] + 1;
+        uint32_t count = watchdog_hw->scratch[0];
+
+        LOG("Watchdog reset detected! Count: %ld\n", count);
         
-        if (watchdogResetCount >= MAX_WATCHDOG_RESETS) 
+        if (count >= MAX_WATCHDOG_RESETS) 
 		{
             LOG("Too many watchdog resets! Entering error state\n");
             watchdog_disable();
@@ -168,7 +171,7 @@ static void checkResetReason(void)
 	else 
 	{
         /* Reset not caused by watchdog, reset the counter */
-        watchdogResetCount = 0;
+        watchdog_hw->scratch[0] = 0;
     }
 }
 #endif
