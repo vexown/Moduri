@@ -99,6 +99,9 @@ static TickType_t timeout_value;
 /* Flag to indicate whether the HTTP headers have been processed. This is used to determine if the Content-Length header has been read and parsed. */
 static bool http_headers_processed;
 
+/* Determines which bank we should download the new firmware to. We will always download to the inactive bank. */
+static uint8_t inactive_bank;
+
 /**********************************************************************/
 /*                  STATIC FUNCTION DECLARATIONS                      */
 /**********************************************************************/
@@ -232,6 +235,17 @@ int download_firmware(void)
 
     watchdog_disable(); // Disable watchdog during OTA process
 
+    uint8_t active_bank = check_active_bank();
+    if (active_bank == INVALID_BANK) 
+    {
+        LOG("Failed to read active bank from flash\n");
+        return result;
+    }
+    else
+    {
+        inactive_bank = (active_bank == BANK_A) ? BANK_B : BANK_A; // Set the inactive bank to the opposite of the active one
+    }
+    
     /* Initialize mbedTLS */
     if (initialize_mbedtls_context(&ssl_context, &ssl_config, &CA_cert_OTA_server, &ctr_drbg_context, &entropy_context) != 0)
     {
@@ -412,7 +426,6 @@ int download_firmware(void)
     clean_up(&ssl_context, &ssl_config, &CA_cert_OTA_server, &ctr_drbg_context, &entropy_context);
 
     LOG("=== Firmware download complete ===\n");
-    watchdog_enable(((uint32_t)2000), true);
 
     return result;
 }
@@ -793,9 +806,12 @@ static int process_decrypted_data(const uint8_t *p_decrypted_data_buffer, int p_
                  * we exit the loop on after processing all available firmware bytes and return to the main loop to read more data from the socket. */
                 if (flash_buf_pos == CHUNK_SIZE) 
                 {
-                    /* Write the firmware data to the exact location where bootloader expects it (app bank B) */
-                    uint32_t write_offset = APP_BANK_B_OFFSET + total_received;
-                    LOG("Writing %d bytes to flash at offset 0x%lx\n", CHUNK_SIZE, write_offset);
+                    /* Determine the base offset based on the inactive bank */
+                    uint32_t base_offset = (inactive_bank == BANK_A) ? APP_BANK_A_OFFSET : APP_BANK_B_OFFSET;
+                    
+                    /* Write the firmware data to the exact location where bootloader expects it (inactive bank) */
+                    uint32_t write_offset = base_offset + total_received;
+                    LOG("Writing %d bytes to flash (Bank %c) at offset 0x%lx\n", CHUNK_SIZE, (inactive_bank == BANK_A ? 'A' : 'B'), write_offset);
                     if (!write_to_flash(write_offset, p_flash_buffer, CHUNK_SIZE)) 
                     {
                         LOG("Flash write failed\n");
@@ -1003,9 +1019,12 @@ static int write_last_chunk_to_flash(uint8_t *p_flash_buffer, size_t p_flash_buf
 {
     if (p_flash_buf_pos > 0) 
     {
-        /* Write the firmware data to the exact location where bootloader expects it (app bank B) */
-        uint32_t write_offset = APP_BANK_B_OFFSET + total_received;
-        LOG("Writing final %zu bytes to flash at offset 0x%lx\n", p_flash_buf_pos, write_offset);
+        /* Determine the base offset based on the inactive bank */
+        uint32_t base_offset = (inactive_bank == BANK_A) ? APP_BANK_A_OFFSET : APP_BANK_B_OFFSET;
+        
+        /* Write the firmware data to the exact location where bootloader expects it (inactive bank) */
+        uint32_t write_offset = base_offset + total_received;
+        LOG("Writing final %zu bytes to flash (Bank %c) at offset 0x%lx\n", p_flash_buf_pos, (inactive_bank == BANK_A ? 'A' : 'B'), write_offset);
         if (!write_to_flash(write_offset, p_flash_buffer, p_flash_buf_pos)) 
         {
             LOG("Final flash write failed\n");
@@ -1045,6 +1064,8 @@ static void clean_up(mbedtls_ssl_context *p_ssl_context, mbedtls_ssl_config *p_s
     mbedtls_x509_crt_free(p_CA_cert_OTA_server);
     mbedtls_ctr_drbg_free(p_ctr_drbg_context);
     mbedtls_entropy_free(p_entropy_context);
+
+    watchdog_enable(((uint32_t)2000), true); // Re-enable watchdog after OTA download
 }
 
 #endif // OTA_ENABLED

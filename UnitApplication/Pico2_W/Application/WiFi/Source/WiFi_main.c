@@ -342,13 +342,13 @@ static void WiFi_UpdateState(void)
     } 
     else if (download_result > 0) 
     {
-        LOG("Partial firmware download (%d bytes). Aborting the update. \n", download_result); //TODO - add retry mechanism
-        WiFiState = LISTENING;
+        LOG("Partial firmware download (%d bytes). Aborting the update. \n", download_result);
+        reset_system(); // reset the system to start fresh (I was seeing lwIP issues when attempting to download again without a reset, TODO - investigate)
     } 
     else 
     {
-        LOG("Failed to download firmware: error %d\n", download_result); //TODO - add retry mechanism
-        WiFiState = LISTENING;
+        LOG("Failed to download firmware: error %d\n", download_result);
+        reset_system(); // reset the system to start fresh (I was seeing lwIP issues when attempting to download again without a reset, TODO - investigate)
     }
 #else
     LOG("OTA is not enabled in the configuration\n");
