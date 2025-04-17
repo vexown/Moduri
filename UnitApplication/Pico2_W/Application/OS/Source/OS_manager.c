@@ -285,6 +285,9 @@ void OS_start( void )
  */
 void reset_system(void)
 {
+    /* Reset the watchdog reset counter since this is an intentional reset (it will still be incremented once but won't stack up) */
+    watchdog_hw->scratch[0] = 0;
+
     /* Tell the aliveTask to stop petting the watchdog in turn causing a reset */
     xTaskNotifyGive(aliveTaskHandle);
 
