@@ -112,7 +112,6 @@
 #if (WATCHDOG_ENABLED == ON)
 static void checkResetReason(void);
 #endif
-static void check_running_bank(void);
 /***************************** Tasks declarations ******************************/
 static void aliveTask(__unused void *taskParams);
 static void cyw43initTask(__unused void *taskParams);
@@ -175,40 +174,6 @@ static void checkResetReason(void)
     }
 }
 #endif
-
-/* 
- * Function: check_running_bank
- * 
- * Description: Check which bank the application is running from based on the metadata from flash
- * 
- * Parameters:
- *   - none
- * 
- * Returns: void
- */
-static void check_running_bank(void)
-{
-    boot_metadata_t current_metadata;
-    if (read_metadata_from_flash(&current_metadata)) 
-    {
-        if(current_metadata.active_bank == BANK_A)
-        {
-            LOG("Running from Bank A \n");
-        }
-        else if(current_metadata.active_bank == BANK_B)
-        {
-            LOG("Running from Bank B \n");
-        }
-        else
-        {
-            LOG("Invalid active bank \n");
-        }
-    }
-    else
-    {
-        LOG("Failed to read metadata from flash or it is corrupted \n"); // TODO - critical error handling
-    }
-}
 
 /*******************************************************************************/
 /*                          GLOBAL FUNCTION DEFINITIONS                        */
@@ -282,7 +247,19 @@ void OS_start( void )
 	}
 
     /* Check which bank is the application running from */
-    check_running_bank();
+    uint8_t active_bank = check_active_bank(); 
+    if(active_bank == BANK_A)
+    {
+        LOG("Running from Bank A \n");
+    }
+    else if(active_bank == BANK_B)
+    {
+        LOG("Running from Bank B \n");
+    }
+    else
+    {
+        LOG("Invalid bank (0xFF) \n"); // we should never get here, bootloader shall not allow to boot with invalid bank in metadata
+    }
 
 	LOG("RTOS configuration finished, starting the scheduler... \n");
 	vTaskStartScheduler();

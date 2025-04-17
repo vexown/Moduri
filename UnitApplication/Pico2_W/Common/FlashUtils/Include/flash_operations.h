@@ -82,6 +82,21 @@ bool write_metadata_to_flash(const boot_metadata_t *ram_metadata);
  */
 bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length);
 
+/* 
+ * Function: check_active_bank
+ * 
+ * Description: Check which bank the application is running from based on the metadata from flash
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: uint8_t
+ *   - BANK_A (0) if running from Bank A
+ *   - BANK_B (1) if running from Bank B
+ *   - 0xFF if invalid bank (error)
+ */
+uint8_t check_active_bank(void);
+
 bool validate_app_image(uint32_t addr);
 
 #endif // FLASH_OPERATIONS_H

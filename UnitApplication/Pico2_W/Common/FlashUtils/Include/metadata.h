@@ -10,6 +10,7 @@
 /* Bank definitions */
 #define BANK_A 0
 #define BANK_B 1
+#define INVALID_BANK 0xFF
 
 /* Metadata structure */
 typedef struct 

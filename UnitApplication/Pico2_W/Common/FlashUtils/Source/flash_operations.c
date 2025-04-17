@@ -116,4 +116,34 @@ bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length)
     return true; // All the operations are void functions, so no error checking is done, we always return true (TODO - maybe add readback verification?)
 }
 
+uint8_t check_active_bank(void)
+{
+    uint8_t active_bank;
+
+    boot_metadata_t current_metadata;
+    if (read_metadata_from_flash(&current_metadata)) 
+    {
+        if (current_metadata.active_bank == BANK_A)
+        {
+            active_bank = BANK_A;
+        }
+        else if(current_metadata.active_bank == BANK_B)
+        {
+            active_bank = BANK_B;
+        }
+        else
+        {
+            active_bank = INVALID_BANK; // Invalid active bank value in metadata, set to error value
+        }
+    }
+    else
+    {
+        active_bank = INVALID_BANK; // Failed to read metadata from flash: invalid magic number or corrupted data, set to error value
+    }
+
+    /* If active_bank is set to 0xFF, it indicates an error state.
+       Downstream code should handle this scenario appropriately. */
+    return active_bank;
+}
+
 
