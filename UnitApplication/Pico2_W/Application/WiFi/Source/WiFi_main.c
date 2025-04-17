@@ -305,6 +305,7 @@ static void WiFi_UpdateState(void)
         if (read_metadata_from_flash(&current_metadata)) 
         {
             current_metadata.update_pending = true;
+            current_metadata.version++; // Increment version for the new firmware
             if (write_metadata_to_flash(&current_metadata)) 
             {
                 /* Verify the write by reading back */

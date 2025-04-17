@@ -261,6 +261,10 @@ void OS_start( void )
         LOG("Invalid bank (0xFF) \n"); // we should never get here, bootloader shall not allow to boot with invalid bank in metadata
     }
 
+    /* Check FW version */
+    uint32_t current_version = check_current_fw_version();
+    LOG("Current firmware version: %lu \n", current_version);
+
 	LOG("RTOS configuration finished, starting the scheduler... \n");
 	vTaskStartScheduler();
 

@@ -146,4 +146,19 @@ uint8_t check_active_bank(void)
     return active_bank;
 }
 
+uint32_t check_current_fw_version(void)
+{
+    uint32_t current_version = 0;
 
+    boot_metadata_t current_metadata;
+    if (read_metadata_from_flash(&current_metadata)) 
+    {
+        current_version = current_metadata.version;
+    }
+    else
+    {
+        current_version = 0xFFFFFFFF; // Failed to read metadata from flash: invalid magic number or corrupted data, set to error value
+    }
+
+    return current_version;
+}

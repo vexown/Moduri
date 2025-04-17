@@ -97,6 +97,19 @@ bool write_to_flash(uint32_t flash_offset, const uint8_t *data, size_t length);
  */
 uint8_t check_active_bank(void);
 
+/**
+ * Function: check_current_fw_version
+ * 
+ * Description: Check the current firmware version from the metadata in flash
+ * 
+ * Parameters:
+ *   - none
+ * 
+ * Returns: uint32_t
+ *   - Current firmware version (currently just incremented on each update. TODO - come up with a better versioning scheme)
+ */
+uint32_t check_current_fw_version(void);
+
 bool validate_app_image(uint32_t addr);
 
 #endif // FLASH_OPERATIONS_H
