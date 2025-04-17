@@ -285,17 +285,44 @@ void OS_start( void )
  */
 void reset_system(void)
 {
+#if (WATCHDOG_ENABLED == ON)
     /* Reset the watchdog reset counter since this is an intentional reset (it will still be incremented once but won't stack up) */
     watchdog_hw->scratch[0] = 0;
 
-    /* Tell the aliveTask to stop petting the watchdog in turn causing a reset */
-    xTaskNotifyGive(aliveTaskHandle);
+    /* Check if the watchdog is actually enabled */
+    if (watchdog_hw->ctrl & WATCHDOG_CTRL_ENABLE_BITS)
+    {
+        /* Tell the aliveTask to stop petting the watchdog in turn causing a reset */
+        xTaskNotifyGive(aliveTaskHandle);
 
-    /* Wait for the watchdog to reset the system */
+        /* Wait for the watchdog to reset the system */
+        while(1)
+        {
+            vTaskDelay(portMAX_DELAY);
+        }
+    }
+    else
+    {
+        /* Watchdog was supposed to be enabled but isn't. Trigger a direct reset. */
+        LOG("Watchdog not enabled, triggering direct reset.\n");
+        /* Parameters: pc, sp, delay_ms */
+        watchdog_reboot(0, 0, 10); /* Reboot after 10ms */
+        /* Wait for the reset */
+        while(1)
+        {
+            vTaskDelay(portMAX_DELAY);
+        }
+    }
+#else
+    /* Watchdog is disabled in configuration, trigger a direct reset */
+    LOG("Watchdog disabled by configuration, triggering direct reset.\n");
+    watchdog_reboot(0, 0, 10); /* Reboot after 10ms */
+    /* Wait for the reset */
     while(1)
     {
         vTaskDelay(portMAX_DELAY);
     }
+#endif
 }
 
 /*******************************************************************************/
