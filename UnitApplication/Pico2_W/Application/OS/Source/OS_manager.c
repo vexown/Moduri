@@ -288,7 +288,11 @@ void reset_system(void)
     /* Tell the aliveTask to stop petting the watchdog in turn causing a reset */
     xTaskNotifyGive(aliveTaskHandle);
 
-    vTaskDelay(pdMS_TO_TICKS(WATCHDOG_TIMEOUT_MS + ALIVE_TASK_PERIOD_TICKS)); // Wait for the watchdog to reset the system
+    /* Wait for the watchdog to reset the system */
+    while(1)
+    {
+        vTaskDelay(portMAX_DELAY);
+    }
 }
 
 /*******************************************************************************/
