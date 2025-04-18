@@ -207,7 +207,7 @@ static void disassembleJ1939MessageID(  uint32_t messageID,
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
-esp_err_t send_J1393_message(void)
+esp_err_t send_J1939_message(void)
 {
     /* Below core values are often taken from one of the predefined PGNs defined in the J1939-71 standard (except manufacturer specific PGNs)
         Example of a standard PGN: 
