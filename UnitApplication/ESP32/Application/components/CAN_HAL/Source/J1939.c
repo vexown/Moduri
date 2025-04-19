@@ -25,10 +25,12 @@
 #include "driver/gpio.h"
 #include "driver/twai.h"
 #include <stdio.h>
+#include <string.h>
 #include <inttypes.h>
 #include "sdkconfig.h"
 #include "CAN_HAL.h"
 #include "Common.h"
+#include "J1939.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -249,4 +251,48 @@ esp_err_t send_J1939_message(void)
     return send_CAN_message(message_id, data_field, data_field_length);
 }
 
+esp_err_t receive_J1939_message(J1939_Message_t *message)
+{
+    uint32_t received_id;
+    uint8_t received_dlc;
+    uint8_t received_data[8]; // Max standard CAN data length
 
+    if (message == NULL) 
+    {
+        return ESP_ERR_INVALID_ARG; // Ensure the message pointer is valid
+    }
+
+    /* Assume a function receive_CAN_message exists in CAN_HAL */
+    /* This is a placeholder signature - adapt to your actual CAN_HAL function */
+    esp_err_t recv_status = receive_CAN_message(&received_id, received_data, &received_dlc);
+    if (recv_status != ESP_OK) 
+    {
+        return recv_status; // Handle timeout or other reception errors
+    }
+
+    /* Disassemble the received 29-bit ID into J1939 components */
+    disassembleJ1939MessageID(received_id, &message->priority, &message->data_page, &message->pdu_format, &message->pdu_specifics, &message->src_address);
+
+    /* Copy the received data payload */
+    /* Ensure the provided buffer is large enough (typically 8 bytes for standard CAN) */
+    /* J1939 TP messages would require additional handling for > 8 bytes */
+    if (received_dlc <= 8) 
+    { 
+        memcpy(message->data, received_data, received_dlc);
+        message->data_length = received_dlc;
+    } 
+    else 
+    {
+        // This should not happen for a single standard CAN frame
+        // Handle error or potential TP frame start
+        message->data_length = 0;
+        return ESP_FAIL; // Indicate an unexpected data length
+    }
+
+    /* TODO: Add further processing based on PGN (derived from PF/PS) */
+    /* Example: Look up PGN, parse SPNs from data_field based on PGN definition */
+    // uint32_t pgn = calculate_PGN(message->pdu_format, message->pdu_specifics); // Need a function for this
+    // process_PGN(pgn, message->data, message->data_length);
+
+    return ESP_OK;
+}
