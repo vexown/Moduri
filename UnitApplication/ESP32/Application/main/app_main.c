@@ -35,6 +35,7 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 #include "CAN_HAL.h"
+#include "J1939.h"
 #include "WiFi_AP.h"
 #include "Common.h"
 
@@ -150,29 +151,38 @@ void app_main(void)
     uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
     uint8_t data_length = sizeof(data);
 
-    uint8_t buffer[STANDARD_CAN_MAX_DATA_LENGTH];
-    uint8_t buffer_length = sizeof(buffer);
-
     /* Task loop */
     while(1) 
     {
-        /* Send a CAN message */
-        esp_err_t send_result = send_CAN_message(ESP32_1_CAN_ID, data, data_length);
+        /* Send a J1939 message */
+        esp_err_t send_result = send_J1939_message();
         if (send_result != ESP_OK) 
         {
-            LOG("Error sending CAN message: %s", esp_err_to_name(send_result));
+            LOG("Error sending J1939 message: %s", esp_err_to_name(send_result));
         } 
         vTaskDelay(pdMS_TO_TICKS(1000));
         
-        /* Receive a CAN message */
-        uint32_t message_id;
-        esp_err_t recv_result = receive_CAN_message(&message_id, buffer, &buffer_length);
-        if (recv_result != ESP_OK) 
+        /* Receive a J1939 message */
+        J1939_Message_t message;
+        esp_err_t recv_result = receive_J1939_message(&message);
+        if (recv_result == ESP_OK) 
         {
-            LOG("Error receiving CAN message: %s", esp_err_to_name(recv_result));
+            LOG("Received J1939 message. Priority: %d, Data Page: %d, PDU Format: %d, PDU Specifics: %d, Source Address: %d, Data Length: %d\n",
+                message.priority, message.data_page, message.pdu_format, message.pdu_specifics, message.src_address, message.data_length);
+            LOG("Data: ");
+            for (uint8_t i = 0; i < message.data_length; i++) 
+            {
+                LOG("0x%02X ", message.data[i]);
+            }
+            LOG("\n");
+        } 
+        else
+        {
+            LOG("Error receiving J1939 message: %s", esp_err_to_name(recv_result));
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
 
+        /* Monitor the CAN bus */
         bool monitor_result = monitor_CAN_bus();
         if (!monitor_result) 
         {
