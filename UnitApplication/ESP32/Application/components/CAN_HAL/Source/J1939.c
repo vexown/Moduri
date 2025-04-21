@@ -35,12 +35,6 @@
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
-#define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
-#define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
-
-/* Source address identifies the sender of the message. It is a unique address assigned to each device on the CAN network. */
-#define ESP32_1_SRC_ADDR    0x01  // Source Address for ESP32_1
-#define ESP32_2_SRC_ADDR    0x02  // Source Address for ESP32_2
 
 /* Priority for J1939 messages (0-7, occupies the 3 most significant bits (MSB) of the 29-bit identifier) */
 #define PRIORITY_HIGH       (uint8_t)0b000  // 0 - highest priority
@@ -76,6 +70,17 @@
 #define J1939_PF_SHIFT          16
 #define J1939_PS_SHIFT          8
 #define J1939_SA_SHIFT          0
+
+/* PGN definitions */
+#define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
+#define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
+
+/* Source address identifies the sender of the message. It is a unique address assigned to each device on the CAN network. */
+#define ESP32_1_SRC_ADDR    0x01  // Source Address for ESP32_1
+#define ESP32_2_SRC_ADDR    0x02  // Source Address for ESP32_2
+
+/* Address claiming and global address */
+#define J1939_GLOBAL_ADDRESS 0xFF // Standard global address
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
@@ -135,9 +140,37 @@ static void disassembleJ1939MessageID(  uint32_t messageID,
                                         uint8_t *pdu_format,
                                         uint8_t *pdu_specifics,
                                         uint8_t *src_address);
+
+/**
+ * @brief Finds the definition for a given PGN in the local database.
+ *
+ * @param pgn The PGN to look for.
+ * @return Pointer to the PGN definition, or NULL if not found.
+ */
+static const J1939_PGN_Definition_t* find_pgn_definition(uint32_t pgn);
+
 /*******************************************************************************/
 /*                            STATIC VARIABLES                                 */
 /*******************************************************************************/
+/**
+ * @brief Database of PGNs this ECU can send
+ * @note For PDU1 PGNs where the PS is *always* the DA, set pdu_specific_or_ge to 0xFF or similar placeholder
+ *       if the PGN definition itself doesn't imply a specific PS value beyond the DA.
+ */
+static const J1939_PGN_Definition_t supported_tx_pgns[] = {
+    // PGN          Priority         DP PF   PS/GE  Len  // Description
+    { 61444,        PRIORITY_NORMAL, 0, 240, 4,     8 }, // Example: EEC1 (0xF004) - PDU1 (PS=DA, but PGN implies content, PS field here is often DA) - Check standard for specific PGNs
+    { 60416,        PRIORITY_NORMAL, 0, 236, 0xFF,  8 }, // Example: Cruise Control/Vehicle Speed (CCVS - 0xFEF0) - PDU1 (PS=DA) - Set PS/GE to 0xFF as placeholder
+    { ESP32_1_PGN,  PRIORITY_NORMAL, 0, 0xFE, 0xEE, 8 }, // ESP32_1 (0xFEEE) - PDU2 (PS=GE)
+    { ESP32_2_PGN,  PRIORITY_NORMAL, 0, 0xFE, 0xF2, 8 }, // ESP32_2 (0xFEF2) - PDU2 (PS=GE)
+    // Add other PGNs your application needs to send here
+};
+
+/**
+ * @brief Number of supported PGNs
+ */
+static const size_t num_supported_tx_pgns = sizeof(supported_tx_pgns) / sizeof(supported_tx_pgns[0]);
+
 
 /*******************************************************************************/
 /*                            GLOBAL VARIABLES                                 */
@@ -146,6 +179,18 @@ static void disassembleJ1939MessageID(  uint32_t messageID,
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
+
+static const J1939_PGN_Definition_t* find_pgn_definition(uint32_t pgn)
+{
+    for (size_t i = 0; i < num_supported_tx_pgns; ++i) 
+    {
+        if (supported_tx_pgns[i].pgn == pgn) 
+        {
+            return &supported_tx_pgns[i];
+        }
+    }
+    return NULL; // PGN not found in our send list
+}
 
 static uint32_t assembleJ1939MessageID( uint8_t priority,
                                         uint8_t data_page,
@@ -209,6 +254,49 @@ static void disassembleJ1939MessageID(  uint32_t messageID,
 /*                        GLOBAL FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
+esp_err_t send_J1939_message_by_pgn(uint32_t pgn_to_send, uint8_t dest_address, uint8_t src_address, const uint8_t *data_payload, uint8_t actual_data_len)
+{
+    const J1939_PGN_Definition_t* pgn_def = find_pgn_definition(pgn_to_send);
+
+    if (pgn_def == NULL) {
+        // Optionally log: printf("Error: PGN %lu not supported for sending.\n", pgn_to_send);
+        return ESP_ERR_NOT_FOUND;
+    }
+
+    if (data_payload == NULL || actual_data_len > pgn_def->data_length) {
+         // Optionally log: printf("Error: Invalid data payload or length for PGN %lu (expected %u, got %u)\n", pgn_to_send, pgn_def->data_length, actual_data_len);
+         return ESP_ERR_INVALID_ARG;
+    }
+    // J1939 allows sending fewer bytes than the defined length (DLC < 8), but not more.
+    if (actual_data_len > 8) {
+         // Optionally log: printf("Error: Data length %u exceeds max CAN frame size for PGN %lu\n", actual_data_len, pgn_to_send);
+         return ESP_ERR_INVALID_ARG; // Need TP for > 8 bytes
+    }
+
+
+    uint8_t priority = pgn_def->default_priority;
+    uint8_t data_page = pgn_def->data_page;
+    uint8_t pdu_format = pgn_def->pdu_format;
+    uint8_t pdu_specific;
+
+    // Determine PDU Specific field based on PDU Format derived from the PGN definition
+    if (J1939_IS_PDU1(pdu_format)) {
+        // For PDU1 messages, PS is the Destination Address provided by the user
+        pdu_specific = dest_address;
+    } else { // PDU2
+        // For PDU2 messages, PS is the Group Extension defined by the PGN definition
+        pdu_specific = pgn_def->pdu_specific_or_ge;
+        // For PDU2, the destination address parameter is effectively ignored in ID assembly,
+        // but the standard implies broadcast (address FF).
+    }
+
+    uint32_t message_id = assembleJ1939MessageID(priority, data_page, pdu_format, pdu_specific, src_address);
+
+    // Send the message using the actual data length provided by the caller
+    return send_CAN_message(message_id, data_payload, actual_data_len);
+}
+
+//TODO - remove below function and use send_J1939_message_by_pgn instead
 esp_err_t send_J1939_message(void)
 {
     /* Below core values are often taken from one of the predefined PGNs defined in the J1939-71 standard (except manufacturer specific PGNs)
