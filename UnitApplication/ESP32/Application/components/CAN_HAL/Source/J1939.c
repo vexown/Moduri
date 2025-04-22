@@ -48,7 +48,7 @@
 #define J1939_PDU2_PF_UPPER_BOUND 0xFF
 
 /* Macro to check if a PF value corresponds to PDU1 (PDU Specific Field is then a destination address) */
-#define J1939_IS_PDU1(pf) ((pf >= J1939_PDU1_PF_LOWER_BOUND) && (pf <= J1939_PDU1_PF_UPPER_BOUND))
+#define J1939_IS_PDU1(pf) (pf <= J1939_PDU1_PF_UPPER_BOUND)
 
 /* Macro to check if a PF value corresponds to PDU2 (PDU Specific Field is then a group extension) */
 #define J1939_IS_PDU2(pf) ((pf >= J1939_PDU2_PF_LOWER_BOUND) && (pf <= J1939_PDU2_PF_UPPER_BOUND))
