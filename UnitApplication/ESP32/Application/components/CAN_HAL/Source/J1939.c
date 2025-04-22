@@ -74,8 +74,8 @@
 /* PGN definitions */
 #define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
 #define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
-#define PGN_EEC1            61444 // PGN for Engine Control (0xF004)
-#define PGN_CCVS            65264 // PGN for Cruise Control/Vehicle Speed (0xFEF0)
+#define PGN_EEC1            61444 // PGN for Electronic Engine Controller 1 - EEC1 (0xF004)
+#define PGN_CCVS            65265 // PGN for Cruise Control/Vehicle Speed - CCVS (0xFEF1)
 
 /* Source address identifies the sender of the message. It is a unique address assigned to each device on the CAN network. */
 #define ESP32_1_SRC_ADDR    0x01  // Source Address for ESP32_1
