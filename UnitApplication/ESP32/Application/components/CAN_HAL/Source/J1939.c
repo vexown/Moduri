@@ -158,13 +158,15 @@ static const J1939_PGN_Definition_t* find_pgn_definition(uint32_t pgn);
  * @brief Database of PGNs this ECU can send
  * @note For PDU1 PGNs where the PS is *always* the DA, set pdu_specific_or_ge to 0xFF or similar placeholder
  *       if the PGN definition itself doesn't imply a specific PS value beyond the DA.
+ *       For details regarding PGN definitions, see comments next to the PGN definitions and the J1939-71 standard.
  */
-static const J1939_PGN_Definition_t supported_tx_pgns[] = {
-    // PGN          Priority         DP PF   PS/GE  Len  // Description
-    { 61444,        PRIORITY_NORMAL, 0, 240, 4,     8 }, // Example: EEC1 (0xF004) - PDU1 (PS=DA, but PGN implies content, PS field here is often DA) - Check standard for specific PGNs
-    { 60416,        PRIORITY_NORMAL, 0, 236, 0xFF,  8 }, // Example: Cruise Control/Vehicle Speed (CCVS - 0xFEF0) - PDU1 (PS=DA) - Set PS/GE to 0xFF as placeholder
-    { ESP32_1_PGN,  PRIORITY_NORMAL, 0, 0xFE, 0xEE, 8 }, // ESP32_1 (0xFEEE) - PDU2 (PS=GE)
-    { ESP32_2_PGN,  PRIORITY_NORMAL, 0, 0xFE, 0xF2, 8 }, // ESP32_2 (0xFEF2) - PDU2 (PS=GE)
+static const J1939_PGN_Definition_t supported_tx_pgns[] = 
+{
+    // PGN          Priority         DP PF    PS/GE  Len 
+    { PGN_EEC1,     PRIORITY_NORMAL, 0, 240,  4,     8 },
+    { PGN_CCVS,     PRIORITY_NORMAL, 0, 254,  241,   8 },
+    { ESP32_1_PGN,  PRIORITY_NORMAL, 0, 254,  238,   8 },
+    { ESP32_2_PGN,  PRIORITY_NORMAL, 0, 254,  242,   8 }, 
     // Add other PGNs your application needs to send here
 };
 
