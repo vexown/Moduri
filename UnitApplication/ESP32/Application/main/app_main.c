@@ -148,14 +148,31 @@ void app_main(void)
     // Connect to "ESP32_AP" WiFi network and open http://192.168.4.1 in a browser
     */
 
-    uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-    uint8_t data_length = sizeof(data);
+    /* Destination address for J1939 message */
+    uint8_t dest_address = ESP32_2_SRC_ADDR;
+
+    /* Node addresses in J1939 are typically assigned via the Address Claiming process (see J1939-81) */
+    /* Here we are using static addresses for simplicity (TODO - Implement Address Claiming) */
+    uint8_t source_address = ESP32_1_SRC_ADDR;
+
+    /* Data payload for J1939 message (TODO - implement SPN structures for given PGNs since a PGN implies a certain data structure) */
+    /* J1939 CAN ID is  used along with the Data Field to form a PDU (Protocol Data Unit)
+       For messages with 8 bytes of data or less, the PDU fits in a single CAN frame.
+       For messages with more than 8 bytes of data, the PDU is split into multiple frames using the J1939 Transport Protocol (TP) */
+    /* Data Field contains the actual data of the chosen PGN. This data is identified by the corresponding SPN (Source Parameter Number)
+        Example of Data Field for EEC1 (PGN 61444) from J1939-71 (2003):
+        Bit Start Position/Bytes    Length    SPN Description                           SPN
+        1.1                         4 bits    Engine Torque Mode                        899
+        2                           1 byte    Driver Demand Engine - Percent Torque     512
+        and so on... */
+    uint8_t data_payload[8] = {0xFF, 0xFE, 0xFD, 0xFC, 0xFB, 0xFA, 0xF9, 0xF8}; // Example data payload (8 bytes)
+    uint8_t data_length = sizeof(data_payload); // Length of the data payload
 
     /* Task loop */
     while(1) 
     {
         /* Send a J1939 message */
-        esp_err_t send_result = send_J1939_message();
+        esp_err_t send_result = send_J1939_message_by_pgn(ESP32_1_PGN, dest_address, source_address, data_payload, data_length);
         if (send_result != ESP_OK) 
         {
             LOG("Error sending J1939 message: %s", esp_err_to_name(send_result));

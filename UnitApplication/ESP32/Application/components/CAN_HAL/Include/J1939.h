@@ -11,6 +11,19 @@
 /*******************************************************************************/
 #define J1939_ENABLED 1
 
+/* PGN definitions */
+#define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
+#define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
+#define PGN_EEC1            61444 // PGN for Electronic Engine Controller 1 - EEC1 (0xF004)
+#define PGN_CCVS            65265 // PGN for Cruise Control/Vehicle Speed - CCVS (0xFEF1)
+
+/* Source address identifies the sender of the message. It is a unique address assigned to each device on the CAN network. */
+#define ESP32_1_SRC_ADDR    0x01  // Source Address for ESP32_1
+#define ESP32_2_SRC_ADDR    0x02  // Source Address for ESP32_2
+
+/* Address claiming and global address */
+#define J1939_GLOBAL_ADDRESS 0xFF // Standard global address
+
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -59,15 +72,6 @@ typedef struct
  * @return esp_err_t ESP_OK on success, ESP_FAIL or other error codes on failure.
  */
 esp_err_t receive_J1939_message(J1939_Message_t *message);
-
-/**
- * @brief Sends a J1939 message.
- *
- * @param void (for now it just sends a predefined message for testing - TODO)
- *
- * @return esp_err_t ESP_OK on success, ESP_FAIL or other error codes on failure.
- */
-esp_err_t send_J1939_message(void);
 
 /**
  * @brief Sends a J1939 message for a specific PGN using its definition from the database.

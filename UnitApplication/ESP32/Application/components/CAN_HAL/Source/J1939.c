@@ -71,19 +71,6 @@
 #define J1939_PS_SHIFT          8
 #define J1939_SA_SHIFT          0
 
-/* PGN definitions */
-#define ESP32_1_PGN         65262 // PGN (Parameter Group Number) for ESP32_1 (0xFEEE)
-#define ESP32_2_PGN         65266 // PGN (Parameter Group Number) for ESP32_2 (0xFEF2)
-#define PGN_EEC1            61444 // PGN for Electronic Engine Controller 1 - EEC1 (0xF004)
-#define PGN_CCVS            65265 // PGN for Cruise Control/Vehicle Speed - CCVS (0xFEF1)
-
-/* Source address identifies the sender of the message. It is a unique address assigned to each device on the CAN network. */
-#define ESP32_1_SRC_ADDR    0x01  // Source Address for ESP32_1
-#define ESP32_2_SRC_ADDR    0x02  // Source Address for ESP32_2
-
-/* Address claiming and global address */
-#define J1939_GLOBAL_ADDRESS 0xFF // Standard global address
-
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
@@ -113,18 +100,6 @@ static uint32_t assembleJ1939MessageID( uint8_t priority,
                                         uint8_t pdu_specific,
                                         uint8_t src_address);
 
-/**
-* @brief Fills the data field with SPN (Suspect Parameter Number) values based on the PGN 
-*        (Parameter Group Number).
-*
-* @param data_field        Pointer to the data field to fill.
-* @param data_field_length Length of the data field in bytes.
-* @return void
-*
-* Note: (TODO) This function is a placeholder and should be implemented to fill the data field
-*       with meaningful values based on the PGN and SPN definitions.
-*/
-static void assembleJ1939DataField(uint8_t *data_field, uint8_t data_field_length);
 
 /**
 * @brief Disassembles a J1939 29-bit CAN message identifier into its components.
@@ -186,14 +161,17 @@ static const size_t num_supported_tx_pgns = sizeof(supported_tx_pgns) / sizeof(s
 
 static const J1939_PGN_Definition_t* find_pgn_definition(uint32_t pgn)
 {
-    for (size_t i = 0; i < num_supported_tx_pgns; ++i) 
+    /* Iterate through the supported PGNs and find the one that matches the given PGN */
+    for (size_t i = 0; i < num_supported_tx_pgns; i++) 
     {
         if (supported_tx_pgns[i].pgn == pgn) 
         {
             return &supported_tx_pgns[i];
         }
     }
-    return NULL; // PGN not found in our send list
+
+    LOG("PGN %lu not found in supported PGNs\n", pgn);
+    return NULL; // PGN not found in our database of supported PGNs
 }
 
 static uint32_t assembleJ1939MessageID( uint8_t priority,
@@ -230,15 +208,6 @@ static uint32_t assembleJ1939MessageID( uint8_t priority,
     return messageID;
 }
 
-static void assembleJ1939DataField(uint8_t *data_field, uint8_t data_field_length)
-{
-    /* Fill the data field with some example values (for demonstration purposes) TODO - make this more meaningful */
-    for (uint8_t i = 0; i < data_field_length; i++)
-    {
-        data_field[i] = i + 3; // Example data
-    }
-}
-
 static void disassembleJ1939MessageID(  uint32_t messageID,
                                         uint8_t *priority,
                                         uint8_t *data_page,
@@ -271,38 +240,16 @@ esp_err_t send_J1939_message_by_pgn(uint32_t pgn_to_send, uint8_t dest_address, 
          // Optionally log: printf("Error: Invalid data payload or length for PGN %lu (expected %u, got %u)\n", pgn_to_send, pgn_def->data_length, actual_data_len);
          return ESP_ERR_INVALID_ARG;
     }
-    // J1939 allows sending fewer bytes than the defined length (DLC < 8), but not more.
-    if (actual_data_len > 8) {
-         // Optionally log: printf("Error: Data length %u exceeds max CAN frame size for PGN %lu\n", actual_data_len, pgn_to_send);
-         return ESP_ERR_INVALID_ARG; // Need TP for > 8 bytes
+
+    /* Check if TP (Transport Protocol) is required to send the message (i.e., if the data length exceeds 8 bytes) */
+    /* J1939 messages with more than 8 bytes of data require the Transport Protocol (TP) to split the message into multiple frames */
+    if (actual_data_len > STANDARD_CAN_MAX_DATA_LENGTH) 
+    {
+        /* TODO - Implement Transport Protocol (TP) for messages larger than 8 bytes. For now, return an error. */
+        LOG("Error: Data length %u exceeds max CAN frame size for PGN %lu\n", actual_data_len, pgn_to_send);
+        return ESP_ERR_INVALID_ARG;
     }
 
-
-    uint8_t priority = pgn_def->default_priority;
-    uint8_t data_page = pgn_def->data_page;
-    uint8_t pdu_format = pgn_def->pdu_format;
-    uint8_t pdu_specific;
-
-    // Determine PDU Specific field based on PDU Format derived from the PGN definition
-    if (J1939_IS_PDU1(pdu_format)) {
-        // For PDU1 messages, PS is the Destination Address provided by the user
-        pdu_specific = dest_address;
-    } else { // PDU2
-        // For PDU2 messages, PS is the Group Extension defined by the PGN definition
-        pdu_specific = pgn_def->pdu_specific_or_ge;
-        // For PDU2, the destination address parameter is effectively ignored in ID assembly,
-        // but the standard implies broadcast (address FF).
-    }
-
-    uint32_t message_id = assembleJ1939MessageID(priority, data_page, pdu_format, pdu_specific, src_address);
-
-    // Send the message using the actual data length provided by the caller
-    return send_CAN_message(message_id, data_payload, actual_data_len);
-}
-
-//TODO - remove below function and use send_J1939_message_by_pgn instead
-esp_err_t send_J1939_message(void)
-{
     /* Below core values are often taken from one of the predefined PGNs defined in the J1939-71 standard (except manufacturer specific PGNs)
         Example of a standard PGN: 
         EEC1 (Electronic Engine Controller 1) with PGN 61444 (0xF004)
@@ -314,33 +261,30 @@ esp_err_t send_J1939_message(void)
     /* PGN (Parameter Group Number) is a key to understanding the content of a J1939 message. It enables you to find the definitions 
         of standard messages within the J1939 documentation. It is the primary way that the J1939 standard organizes its message definitions.
         PGN is not directly placed into the message ID, but is used to derive the PDU format and PDU specifics. */
-    uint8_t priority = PRIORITY_NORMAL; // Decide the priority level for the message (0-7, lower number = higher priority)
-    uint8_t data_page = 0;    // Data page (0 or 1, used for multi-page messages)
-    uint8_t pdu_format = 240; // PDU format (0-255, decides whether PDU Specific Field is a destination address (PDU1) or group extension (PDU2))
-    uint8_t pdu_specifics = ESP32_2_SRC_ADDR; // PDU Specifics (0-255, used for destination address in PDU1 or group extension in PDU2)
+    uint8_t priority = pgn_def->default_priority; // Decide the priority level for the message (0-7, lower number = higher priority)
+    uint8_t data_page = pgn_def->data_page; // Data page (0 or 1, used for multi-page messages)
+    uint8_t pdu_format = pgn_def->pdu_format; // PDU format (0-255, decides whether PDU Specific Field is a destination address (PDU1) or group ext (PDU2))
+    uint8_t pdu_specific; // PDU Specifics (0-255, used for destination address in PDU1 or group extension in PDU2)
 
-    /* Node addresses in J1939 are typically assigned via the Address Claiming process (see J1939-81) */
-    /* Here we are using static addresses for simplicity (TODO - Implement Address Claiming) */
-    uint8_t src_address = ESP32_1_SRC_ADDR; // Source address (0-255, identifies the sender of the message)
+    /* Determine PDU Specific field based on PDU Format derived from the PGN definition */
+    if (J1939_IS_PDU1(pdu_format))
+    {
+        /* For PDU1 messages, PS is the Destination Address provided by the user */
+        pdu_specific = dest_address;
+    }
+    else
+    { /* PDU2 */
+        /* For PDU2 messages, PS is the Group Extension defined by the PGN definition */
+        pdu_specific = pgn_def->pdu_specific_or_ge;
+        /* For PDU2, the destination address parameter is effectively ignored in ID assembly,
+           but the standard implies broadcast (address FF). */
+    }
 
-    uint32_t message_id = assembleJ1939MessageID(priority, data_page, pdu_format, pdu_specifics, src_address);
+    /* Shift all the values to their respective positions in the 29-bit ID */
+    uint32_t message_id = assembleJ1939MessageID(priority, data_page, pdu_format, pdu_specific, src_address);
 
-    /* J1939 CAN ID is then used along with the Data Field to form a PDU (Protocol Data Unit)
-       For messages with 8 bytes of data or less, the PDU fits in a single CAN frame.
-       For messages with more than 8 bytes of data, the PDU is split into multiple frames using the J1939 Transport Protocol (TP) */
-    /* Data Field contains the actual data of the chosen PGN. This data is identified by the corresponding SPN (Source Parameter Number)
-        Example of Data Field for EEC1 (PGN 61444) from J1939-71 (2003):
-        Bit Start Position/Bytes    Length    SPN Description                           SPN
-        1.1                         4 bits    Engine Torque Mode                        899
-        2                           1 byte    Driver Demand Engine - Percent Torque     512
-        and so on... */
-    uint8_t data_field[8] = {0};
-    uint8_t data_field_length = 8;
-    assembleJ1939DataField(data_field, data_field_length);
-
-    /* At the absolute lowest level of J1939, what actually gets transmitted on the CAN bus is just an extended CAN frame (29-bit ID) */
-    /* J1939-specific information is encoded in the CAN ID and the data field of the frame */
-    return send_CAN_message(message_id, data_field, data_field_length);
+    /* Send the message using the actual data length provided by the caller */
+    return send_CAN_message(message_id, data_payload, actual_data_len);
 }
 
 esp_err_t receive_J1939_message(J1939_Message_t *message)
