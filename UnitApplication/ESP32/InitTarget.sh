@@ -23,11 +23,16 @@ echo "---------------------------------------------------"
 idf.py set-target --help
 echo "---------------------------------------------------"
 
-# Set the target to ESP32 (default)
+# Prompt user to select target
 echo "---------------------------------------------------"
-echo "Setting the target to ESP32..."
+echo "Please enter the target you want to set. (Select from the list above, e.g., esp32, esp32s2, esp32s3, etc.)"
 echo "---------------------------------------------------"
-idf.py set-target esp32
+read -p "Target: " target
+
+echo "---------------------------------------------------"
+echo "Setting the target to $target..."
+echo "---------------------------------------------------"
+idf.py set-target "$target"
 
 echo "---------------------------------------------------"
 echo "Operation completed"
