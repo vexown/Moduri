@@ -48,6 +48,7 @@ if command -v apt-get &> /dev/null; then
         "g++" 
         "libstdc++-arm-none-eabi-newlib"
         "libusb-1.0-0-dev"
+        "pkg-config"
     )
     
     # Check each required package
