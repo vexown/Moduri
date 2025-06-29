@@ -1333,7 +1333,7 @@ static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16
     *output_buffer = '\0';
 
     /* Make sure we have a valid client and receive buffer */
-    if (clientGlobal == NULL || clientGlobal->receive_buffer == NULL || output_buffer == NULL || output_buffer_length == NULL || received_command == NULL) 
+    if (clientGlobal == NULL || output_buffer == NULL || output_buffer_length == NULL || received_command == NULL) 
     {
         LOG("Invalid client or receive buffer\n");
         WiFiState = INIT; // Reinitialize the TCP client
