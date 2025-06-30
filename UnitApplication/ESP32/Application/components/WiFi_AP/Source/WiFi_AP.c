@@ -37,23 +37,6 @@ static httpd_handle_t server = NULL;
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
 /*******************************************************************************/
-static esp_err_t root_handler(httpd_req_t *req);
-static void wifi_event_handler(void* arg, esp_event_base_t event_base,
-                              int32_t event_id, void* event_data);
-
-/*******************************************************************************/
-/*                            STATIC VARIABLES                                 */
-/*******************************************************************************/
-static httpd_uri_t root = {
-    .uri       = "/",
-    .method    = HTTP_GET,
-    .handler   = root_handler,
-    .user_ctx  = NULL
-};
-
-/*******************************************************************************/
-/*                        STATIC FUNCTION DEFINITIONS                          */
-/*******************************************************************************/
 /**
  * @brief HTTP GET handler for the root URI ('/')
  *
@@ -63,6 +46,37 @@ static httpd_uri_t root = {
  * @param req Pointer to the HTTP request structure
  * @return ESP_OK on success
  */
+static esp_err_t root_handler(httpd_req_t *req);
+
+
+/**
+ * @brief WiFi event handler for AP events
+ *
+ * Handles station connect and disconnect events for the WiFi AP.
+ * Logs when a station connects or disconnects from the AP.
+ *
+ * @param arg User-defined argument (unused)
+ * @param event_base Event base (should be WIFI_EVENT)
+ * @param event_id Event ID (WIFI_EVENT_AP_STACONNECTED or WIFI_EVENT_AP_STADISCONNECTED)
+ * @param event_data Event-specific data
+ */
+static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
+
+/*******************************************************************************/
+/*                            STATIC VARIABLES                                 */
+/*******************************************************************************/
+static httpd_uri_t root = 
+{
+    .uri       = "/",
+    .method    = HTTP_GET,
+    .handler   = root_handler,
+    .user_ctx  = NULL
+};
+
+/*******************************************************************************/
+/*                        STATIC FUNCTION DEFINITIONS                          */
+/*******************************************************************************/
+
 static esp_err_t root_handler(httpd_req_t *req)
 {
     const char* html = "<html><head><title>ESP32 AP</title></head>"
@@ -76,26 +90,22 @@ static esp_err_t root_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-/**
- * @brief WiFi event handler for AP events
- *
- * Handles station connect and disconnect events for the WiFi AP.
- * Logs when a station connects or disconnects from the AP.
- *
- * @param arg User-defined argument (unused)
- * @param event_base Event base (should be WIFI_EVENT)
- * @param event_id Event ID (WIFI_EVENT_AP_STACONNECTED or WIFI_EVENT_AP_STADISCONNECTED)
- * @param event_data Event-specific data
- */
-static void wifi_event_handler(void* arg, esp_event_base_t event_base,
-                              int32_t event_id, void* event_data)
+
+static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED) {
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STACONNECTED) 
+    {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
         LOG("Station connected, AID=%d\n", event->aid);
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STADISCONNECTED) {
+    } 
+    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_AP_STADISCONNECTED) 
+    {
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
         LOG("Station disconnected, AID=%d\n", event->aid);
+    }
+    else
+    {
+        LOG("Unhandled WiFi event: base=%s, id=%ld\n", event_base, event_id);
     }
 }
 
@@ -118,7 +128,8 @@ esp_err_t wifi_ap_init(wifi_ap_custom_config_t *config)
     
     /* Initialize NVS (Non-Volatile Storage) */
     ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) 
+    {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
@@ -151,10 +162,13 @@ esp_err_t wifi_ap_init(wifi_ap_custom_config_t *config)
     strncpy((char*)wifi_config.ap.ssid, config->ssid, sizeof(wifi_config.ap.ssid) - 1);
     wifi_config.ap.ssid_len = strlen(config->ssid);
     
-    if (config->password != NULL && strlen(config->password) > 0) {
+    if (config->password != NULL && strlen(config->password) > 0) 
+    {
         strncpy((char*)wifi_config.ap.password, config->password, sizeof(wifi_config.ap.password) - 1);
         wifi_config.ap.authmode = WIFI_AUTH_WPA2_PSK;
-    } else {
+    } 
+    else
+    {
         wifi_config.ap.authmode = WIFI_AUTH_OPEN;
     }
     
@@ -186,7 +200,8 @@ esp_err_t http_server_start(void)
     
     LOG("Starting HTTP server on port: %d\n", config.server_port);
     
-    if (httpd_start(&server, &config) == ESP_OK) {
+    if (httpd_start(&server, &config) == ESP_OK) 
+    {
         /* Register URI handlers */
         httpd_register_uri_handler(server, &root);
         return ESP_OK;
@@ -205,7 +220,8 @@ esp_err_t http_server_start(void)
  */
 esp_err_t http_server_stop(void)
 {
-    if (server != NULL) {
+    if (server != NULL) 
+    {
         httpd_stop(server);
         server = NULL;
         return ESP_OK;
