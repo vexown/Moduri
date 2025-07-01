@@ -19,11 +19,14 @@
 #include "freertos/task.h"
 #include <string.h>
 #include "Common.h"
+#include <inttypes.h>
+#include <unistd.h>
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
 /*******************************************************************************/
 #define TAG "WiFi_AP"
+#define MAX_CLIENTS 5
 
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
@@ -33,6 +36,8 @@
 /*                            STATIC VARIABLES                                 */
 /*******************************************************************************/
 static httpd_handle_t server = NULL;
+static TaskHandle_t ws_server_task_handle = NULL;
+static int client_fds[MAX_CLIENTS];
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
@@ -47,6 +52,25 @@ static httpd_handle_t server = NULL;
  * @return ESP_OK on success
  */
 static esp_err_t root_handler(httpd_req_t *req);
+
+/**
+ * @brief WebSocket sender task.
+ * 
+ * This task periodically sends a counter to all connected WebSocket clients.
+ * 
+ * @param pvParameters Unused.
+ */
+static void ws_server_task(void *pvParameters);
+
+/**
+ * @brief WebSocket handler function.
+ * 
+ * This function handles WebSocket frames, echoing back any text message it receives.
+ * 
+ * @param req Pointer to the HTTP request structure.
+ * @return esp_err_t ESP_OK on success, or an error code if an error occurs.
+ */
+static esp_err_t ws_handler(httpd_req_t *req);
 
 
 /**
@@ -73,20 +97,121 @@ static httpd_uri_t root =
     .user_ctx  = NULL
 };
 
+static const httpd_uri_t ws = {
+    .uri        = "/ws",
+    .method     = HTTP_GET,
+    .handler    = ws_handler,
+    .user_ctx   = NULL,
+    .is_websocket = true
+};
+
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
 
 static esp_err_t root_handler(httpd_req_t *req)
 {
-    const char* html = "<html><head><title>ESP32 AP</title></head>"
-                      "<body><h1>Hello World from ESP32!</h1>"
-                      "<p>This is a simple HTTP server running on an ESP32 in Access Point mode.</p>"
+    const char* html = "<html><head><title>ESP32 AP</title>" 
+                      "<script>" 
+                      "var ws = new WebSocket('ws://' + window.location.host + '/ws');" 
+                      "ws.onmessage = function(evt) { document.getElementById('ws-msg').innerHTML = evt.data; };" 
+                      "</script>" 
+                      "</head>" 
+                      "<body><h1>ESP32 WebSocket Server</h1>" 
+                      "<p>Server says: <span id='ws-msg'></span></p>" 
                       "</body></html>";
     
     httpd_resp_set_type(req, "text/html");
     httpd_resp_send(req, html, strlen(html));
     
+    return ESP_OK;
+}
+
+static void ws_server_task(void *pvParameters)
+{
+    uint32_t count = 0;
+    char buf[64];
+
+    httpd_ws_frame_t ws_pkt;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+
+    while (1)
+    {
+        snprintf(buf, sizeof(buf), "Counter: %lu", count++);
+        ws_pkt.payload = (uint8_t *)buf;
+        ws_pkt.len = strlen(buf);
+
+        for (int i = 0; i < MAX_CLIENTS; i++)
+        {
+            if (client_fds[i] != -1)
+            {
+                esp_err_t ret = httpd_ws_send_frame_async(server, client_fds[i], &ws_pkt);
+                if (ret != ESP_OK)
+                {
+                    LOG("Client disconnected, fd=%d", client_fds[i]);
+                    client_fds[i] = -1;
+                }
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(100)); // Send every 100ms
+    }
+}
+
+static esp_err_t ws_handler(httpd_req_t *req)
+{
+    if (req->method == HTTP_GET) {
+        LOG("Handshake done, the new connection was opened");
+        int fd = httpd_req_to_sockfd(req);
+        if (fd < 0) {
+            LOG("Failed to get socket descriptor");
+            return ESP_FAIL;
+        }
+
+        int i;
+        for (i = 0; i < MAX_CLIENTS; i++) {
+            if (client_fds[i] == -1) {
+                client_fds[i] = fd;
+                break;
+            }
+        }
+        if (i == MAX_CLIENTS) {
+            LOG("Too many clients!");
+            close(fd);
+            return ESP_FAIL;
+        }
+
+        return ESP_OK;
+    }
+
+    httpd_ws_frame_t ws_pkt;
+    uint8_t *buf = NULL;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    
+    esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
+    if (ret != ESP_OK) {
+        LOG("httpd_ws_recv_frame failed to get frame len with %d", ret);
+        return ret;
+    }
+
+    if (ws_pkt.len) {
+        buf = calloc(1, ws_pkt.len + 1);
+        if (buf == NULL) {
+            LOG("Failed to calloc memory for websocket frame");
+            return ESP_ERR_NO_MEM;
+        }
+        ws_pkt.payload = buf;
+        ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
+        if (ret != ESP_OK) {
+            LOG("httpd_ws_recv_frame failed with %d", ret);
+            free(buf);
+            return ret;
+        }
+        LOG("Got unexpected packet with message: %s", ws_pkt.payload);
+        free(buf);
+    }
+
     return ESP_OK;
 }
 
@@ -199,11 +324,17 @@ esp_err_t http_server_start(void)
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     
     LOG("Starting HTTP server on port: %d\n", config.server_port);
+
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        client_fds[i] = -1;
+    }
     
     if (httpd_start(&server, &config) == ESP_OK) 
     {
         /* Register URI handlers */
         httpd_register_uri_handler(server, &root);
+        httpd_register_uri_handler(server, &ws);
+        xTaskCreate(ws_server_task, "ws_server", 4096, NULL, 5, &ws_server_task_handle);
         return ESP_OK;
     }
     
@@ -222,6 +353,10 @@ esp_err_t http_server_stop(void)
 {
     if (server != NULL) 
     {
+        if (ws_server_task_handle) {
+            vTaskDelete(ws_server_task_handle);
+            ws_server_task_handle = NULL;
+        }
         httpd_stop(server);
         server = NULL;
         return ESP_OK;
