@@ -21,6 +21,7 @@
 #include "Common.h"
 #include <inttypes.h>
 #include <unistd.h>
+#include "cJSON.h"
 
 /*******************************************************************************/
 /*                                 MACROS                                      */
@@ -31,6 +32,13 @@
 /*******************************************************************************/
 /*                               DATA TYPES                                    */
 /*******************************************************************************/
+/**
+ * @brief Structure to hold the state of our simple RESTful resource.
+ */
+typedef struct {
+    char message[128];
+} rest_status_t;
+
 
 /*******************************************************************************/
 /*                            STATIC VARIABLES                                 */
@@ -38,6 +46,12 @@
 static httpd_handle_t server = NULL;
 static TaskHandle_t ws_server_task_handle = NULL;
 static int client_fds[MAX_CLIENTS];
+
+/**
+ * @brief The state of our simple RESTful resource.
+ * In a real application, this might be stored in NVS or a database.
+ */
+static rest_status_t rest_status = { .message = "OK" };
 
 /*******************************************************************************/
 /*                        STATIC FUNCTION DECLARATIONS                         */
@@ -74,6 +88,32 @@ static esp_err_t ws_handler(httpd_req_t *req);
 
 
 /**
+ * @brief RESTful GET handler for the /api/v1/status URI.
+ *
+ * This function handles GET requests to retrieve the current system status.
+ * It demonstrates a stateless, cacheable, read-only operation, which are
+ * key principles of REST.
+ *
+ * @param req Pointer to the HTTP request structure.
+ * @return ESP_OK on success.
+ */
+static esp_err_t status_get_handler(httpd_req_t *req);
+
+/**
+ * @brief RESTful PUT handler for the /api/v1/status URI.
+ *
+ * This function handles PUT requests to update the system status.
+ * It demonstrates an idempotent operation where the client sends the full
+ * new state of the resource. The request body is expected to be a JSON
+ * object with a "message" key.
+ *
+ * @param req Pointer to the HTTP request structure.
+ * @return ESP_OK on success.
+ */
+static esp_err_t status_put_handler(httpd_req_t *req);
+
+
+/**
  * @brief WiFi event handler for AP events
  *
  * Handles station connect and disconnect events for the WiFi AP.
@@ -105,6 +145,31 @@ static const httpd_uri_t ws = {
     .is_websocket = true
 };
 
+/**
+ * @brief URI handler for getting the system status.
+ * A GET request to this URI will return the current status in JSON format.
+ * This is a RESTful "read" operation.
+ */
+static const httpd_uri_t status_get_uri = {
+    .uri      = "/api/v1/status",
+    .method   = HTTP_GET,
+    .handler  = status_get_handler,
+    .user_ctx = NULL
+};
+
+/**
+ * @brief URI handler for updating the system status.
+ * A PUT request to this URI with a JSON body will update the status.
+ * This is a RESTful "update" operation. It's idempotent, meaning multiple
+ * identical requests will have the same effect as a single one.
+ */
+static const httpd_uri_t status_put_uri = {
+    .uri      = "/api/v1/status",
+    .method   = HTTP_PUT,
+    .handler  = status_put_handler,
+    .user_ctx = NULL
+};
+
 /*******************************************************************************/
 /*                        STATIC FUNCTION DEFINITIONS                          */
 /*******************************************************************************/
@@ -126,6 +191,71 @@ static esp_err_t root_handler(httpd_req_t *req)
     
     return ESP_OK;
 }
+
+/**
+ * @brief Creates a JSON representation of the status and sends it.
+ */
+static esp_err_t send_status_json(httpd_req_t *req)
+{
+    httpd_resp_set_type(req, "application/json");
+    cJSON *root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "message", rest_status.message);
+    const char *sys_info = cJSON_Print(root);
+    httpd_resp_sendstr(req, sys_info);
+    free((void *)sys_info);
+    cJSON_Delete(root);
+    return ESP_OK;
+}
+
+static esp_err_t status_get_handler(httpd_req_t *req)
+{
+    return send_status_json(req);
+}
+
+static esp_err_t status_put_handler(httpd_req_t *req)
+{
+    char buf[150]; // Larger than rest_status.message to detect overflow
+    int remaining = req->content_len;
+
+    // Read the request body
+    if (remaining >= sizeof(buf)) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Request body too large");
+        return ESP_FAIL;
+    }
+
+    int received = httpd_req_recv(req, buf, remaining);
+    if (received <= 0) { // 0 means connection closed, <0 means error
+        if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+            httpd_resp_send_408(req);
+        }
+        return ESP_FAIL;
+    }
+    buf[received] = '\0'; // Null-terminate the buffer
+
+    // Parse the JSON
+    cJSON *root = cJSON_Parse(buf);
+    if (root == NULL) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        return ESP_FAIL;
+    }
+
+    // Extract the "message" field
+    cJSON *message = cJSON_GetObjectItem(root, "message");
+    if (!cJSON_IsString(message) || (message->valuestring == NULL)) {
+        cJSON_Delete(root);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON must have a 'message' string");
+        return ESP_FAIL;
+    }
+
+    // Update the resource state
+    strncpy(rest_status.message, message->valuestring, sizeof(rest_status.message) - 1);
+    rest_status.message[sizeof(rest_status.message) - 1] = '\0'; // Ensure null-termination
+    cJSON_Delete(root);
+
+    // Respond with the updated resource
+    return send_status_json(req);
+}
+
 
 static void ws_server_task(void *pvParameters)
 {
@@ -334,6 +464,12 @@ esp_err_t http_server_start(void)
         /* Register URI handlers */
         httpd_register_uri_handler(server, &root);
         httpd_register_uri_handler(server, &ws);
+        
+        /* Register RESTful API handlers */
+        LOG("Registering RESTful API handlers");
+        httpd_register_uri_handler(server, &status_get_uri);
+        httpd_register_uri_handler(server, &status_put_uri);
+
         xTaskCreate(ws_server_task, "ws_server", 4096, NULL, 5, &ws_server_task_handle);
         return ESP_OK;
     }
