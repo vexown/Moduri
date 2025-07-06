@@ -62,14 +62,35 @@ def update_status():
     except requests.exceptions.RequestException as e:
         print_status(f"Error updating status: {e}")
 
+def post_data():
+    """Handles the POST request to /data."""
+    try:
+        print("Enter data to send as a JSON object.")
+        key = input("Enter key: ")
+        value = input("Enter value: ")
+        payload = {key: value}
+        headers = {'Content-Type': 'application/json'}
+        url = f"{BASE_URL}/data"
+        data = json.dumps(payload)
+        print_request_details("POST", url, headers, data)
+        response = requests.post(url, data=data, headers=headers, timeout=TIMEOUT)
+        response.raise_for_status()
+        data = response.json()
+        print_status(f"Server response: {data}")
+    except requests.exceptions.RequestException as e:
+        print_status(f"Error sending data: {e}")
+    except json.JSONDecodeError:
+        print_status(f"Server sent an invalid JSON response: {response.text}")
+
 def main_menu():
     """Displays the main menu and handles user input."""
     while True:
         clear_screen()
         print_header()
-        print("1. Get Status")
-        print("2. Update Status")
-        print("3. Exit")
+        print("1. Get Status (GET)")
+        print("2. Update Status (PUT)")
+        print("3. Send Data (POST)")
+        print("4. Exit")
         choice = input("\nEnter your choice: ")
 
         if choice == '1':
@@ -79,6 +100,9 @@ def main_menu():
             update_status()
             input("Press Enter to continue...")
         elif choice == '3':
+            post_data()
+            input("Press Enter to continue...")
+        elif choice == '4':
             break
         else:
             print_status("Invalid choice. Please try again.")
