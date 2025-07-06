@@ -112,6 +112,18 @@ static esp_err_t status_get_handler(httpd_req_t *req);
  */
 static esp_err_t status_put_handler(httpd_req_t *req);
 
+/**
+ * @brief RESTful POST handler for the /api/v1/data URI.
+ *
+ * This function handles POST requests to create a new data resource.
+ * It demonstrates a non-idempotent operation where the client sends
+ * data to be processed or stored. The request body is expected to be a JSON
+ * object.
+ *
+ * @param req Pointer to the HTTP request structure.
+ * @return ESP_OK on success.
+ */
+static esp_err_t data_post_handler(httpd_req_t *req);
 
 /**
  * @brief WiFi event handler for AP events
@@ -167,6 +179,18 @@ static const httpd_uri_t status_put_uri = {
     .uri      = "/api/v1/status",
     .method   = HTTP_PUT,
     .handler  = status_put_handler,
+    .user_ctx = NULL
+};
+
+/**
+ * @brief URI handler for creating a new data entry.
+ * A POST request to this URI will be processed by the data_post_handler.
+ * This is a RESTful "create" operation.
+ */
+static const httpd_uri_t data_post_uri = {
+    .uri      = "/api/v1/data",
+    .method   = HTTP_POST,
+    .handler  = data_post_handler,
     .user_ctx = NULL
 };
 
@@ -256,6 +280,35 @@ static esp_err_t status_put_handler(httpd_req_t *req)
     return send_status_json(req);
 }
 
+static esp_err_t data_post_handler(httpd_req_t *req)
+{
+    char buf[150];
+    int remaining = req->content_len;
+
+    if (remaining >= sizeof(buf)) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Request body too large");
+        return ESP_FAIL;
+    }
+
+    int received = httpd_req_recv(req, buf, remaining);
+    if (received <= 0) {
+        if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+            httpd_resp_send_408(req);
+        }
+        return ESP_FAIL;
+    }
+    buf[received] = '\0';
+
+    // Log the received JSON data
+    ESP_LOGI(TAG, "Received POST data: %s", buf);
+
+    // Respond with a success message
+    httpd_resp_set_type(req, "application/json");
+    const char* resp_str = "{\"status\":\"success\", \"message\":\"Data received\"}";
+    httpd_resp_send(req, resp_str, strlen(resp_str));
+
+    return ESP_OK;
+}
 
 static void ws_server_task(void *pvParameters)
 {
@@ -469,6 +522,7 @@ esp_err_t http_server_start(void)
         LOG("Registering RESTful API handlers");
         httpd_register_uri_handler(server, &status_get_uri);
         httpd_register_uri_handler(server, &status_put_uri);
+        httpd_register_uri_handler(server, &data_post_uri);
 
         xTaskCreate(ws_server_task, "ws_server", 4096, NULL, 5, &ws_server_task_handle);
         return ESP_OK;
