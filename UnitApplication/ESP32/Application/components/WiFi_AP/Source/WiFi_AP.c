@@ -285,24 +285,34 @@ static esp_err_t data_post_handler(httpd_req_t *req)
     char buf[150];
     int remaining = req->content_len;
 
-    if (remaining >= sizeof(buf)) {
+    /* Check if the request body is too large */
+    if (remaining >= sizeof(buf)) 
+    {
         httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Request body too large");
         return ESP_FAIL;
     }
 
+    /* Copy the request body into the buffer */
     int received = httpd_req_recv(req, buf, remaining);
-    if (received <= 0) {
-        if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+    if (received <= 0) 
+    {
+        if (received == HTTPD_SOCK_ERR_TIMEOUT) 
+        {
             httpd_resp_send_408(req);
         }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to receive POST data, error code: %d", received);
+        }
+
         return ESP_FAIL;
     }
-    buf[received] = '\0';
 
-    // Log the received JSON data
-    ESP_LOGI(TAG, "Received POST data: %s", buf);
+    buf[received] = '\0'; // Null-terminate the buffer
 
-    // Respond with a success message
+    ESP_LOGI(TAG, "Received POST data: %s", buf); // Log the received JSON data
+
+    /* Respond with a success message */
     httpd_resp_set_type(req, "application/json");
     const char* resp_str = "{\"status\":\"success\", \"message\":\"Data received\"}";
     httpd_resp_send(req, resp_str, strlen(resp_str));
