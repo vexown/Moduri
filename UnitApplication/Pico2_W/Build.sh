@@ -199,32 +199,110 @@ echo "Using picotool at: $PICOTOOL_DIR"
 echo "Using OpenOCD at: $OPENOCD_DIR"
 echo "Using debugprobe at: $DEBUGPROBE_DIR"
 
-# Parse command line arguments
+# --- Interactive Menu ---
+
 CLEAN_BUILD=0
 EXAMPLE_NAME=""
 
-for arg in "$@"
-do
-    # Check for --clean flag
-    if [[ "$arg" == "--clean" ]]; then
-        CLEAN_BUILD=1
-    fi
+# Function to display the main menu
+show_main_menu() {
+    clear
+    echo "****************************************"
+    echo "*              Build Menu              *"
+    echo "****************************************"
+    echo "1. Build Application"
+    echo "2. Clean and Build Application"
+    echo "3. Build Example"
+    echo "4. Clean and Build Example"
+    echo "5. Exit"
+    echo "****************************************"
+    echo -n "Please select an option [1-5]: "
+}
+
+# Function to select an example
+select_example() {
+    clear
+    echo "****************************************"
+    echo "*           Select Example             *"
+    echo "****************************************"
     
-    # Check for --example flag with value
-    if [[ "$arg" == --example=* ]]; then
-        EXAMPLE_NAME="${arg#*=}"
+    # Find examples
+    EXAMPLES=()
+    if [ -d "Examples" ]; then
+        for dir in Examples/*/; do
+            if [ -d "$dir" ]; then
+                EXAMPLES+=("$(basename "$dir")")
+            fi
+        done
     fi
+
+    if [ ${#EXAMPLES[@]} -eq 0 ]; then
+        echo "No examples found in the 'Examples' directory."
+        echo "Press any key to return to the main menu."
+        read -n 1 -s
+        return 1
+    fi
+
+    echo "Available examples:"
+    for i in "${!EXAMPLES[@]}"; do
+        echo "$((i+1)). ${EXAMPLES[$i]}"
+    done
+    echo "$(( ${#EXAMPLES[@]} + 1 )). Back to Main Menu"
+    echo "****************************************"
+    
+    while true; do
+        echo -n "Please select an example: "
+        read -r choice
+        if [[ "$choice" -ge 1 && "$choice" -le ${#EXAMPLES[@]} ]]; then
+            EXAMPLE_NAME="${EXAMPLES[$((choice-1))]}"
+            return 0
+        elif [[ "$choice" -eq $(( ${#EXAMPLES[@]} + 1 )) ]]; then
+            return 1
+        else
+            echo "Invalid option. Please try again."
+        fi
+    done
+}
+
+# Main menu loop
+while true; do
+    show_main_menu
+    read -r option
+    case $option in
+        1) # Build Application
+            CLEAN_BUILD=0
+            EXAMPLE_NAME=""
+            break
+            ;;
+        2) # Clean and Build Application
+            CLEAN_BUILD=1
+            EXAMPLE_NAME=""
+            break
+            ;;
+        3) # Build Example
+            if select_example; then
+                CLEAN_BUILD=0
+                break
+            fi
+            ;;
+        4) # Clean and Build Example
+            if select_example; then
+                CLEAN_BUILD=1
+                break
+            fi
+            ;;
+        5) # Exit
+            echo "Exiting script."
+            exit 0
+            ;;
+        *)
+            echo "Invalid option. Please try again."
+            sleep 1
+            ;;
+    esac
 done
 
-# List available examples if requested
-if [[ "$EXAMPLE_NAME" == "list" ]]; then
-    echo "Available examples:"
-    for dir in Examples/*/; do
-        basename "$dir"
-    done
-    echo "To build an example: ./Build.sh --example=<example_name>"
-    exit 0
-fi
+# --- End of Interactive Menu ---
 
 # Handle clean build if requested
 if [ $CLEAN_BUILD -eq 1 ]; then
