@@ -51,6 +51,6 @@ def start_tcp_client(server_ip, server_port):
         # Clean up the connection
         client_socket.close()
 if __name__ == "__main__":
-    server_ip = '192.168.1.50'  # Replace with the IP address of your Pico W
+    server_ip = '192.168.50.50'  # Replace with the IP address of your Pico W
     server_port = 8080          # Replace with the port your Pico W server is listening on
     start_tcp_client(server_ip, server_port)

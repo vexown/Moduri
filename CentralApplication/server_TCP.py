@@ -140,7 +140,7 @@ class TCPServer:
 
 if __name__ == "__main__":
     # Create and start server
-    server = TCPServer(host='192.168.1.194', port=8080)
+    server = TCPServer(host='192.168.50.194', port=8080)
     try:
         server.start()
         # Keep main thread alive

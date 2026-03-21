@@ -6,7 +6,7 @@ from datetime import datetime
 class UDPCommunicator:
     def __init__(self):
         # Hardcoded settings
-        self.pico_ip = "192.168.1.50"
+        self.pico_ip = "192.168.50.50"
         self.pico_port = 5001
         self.listen_port = 5000  # Port to listen for messages from Pico
         
