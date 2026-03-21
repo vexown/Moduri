@@ -35,6 +35,8 @@
 #include "WiFi_OTA_download.h"
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
+#define OTA_INCLUDE_CERTIFICATE
+#include "WiFi_OTA_Config.h"
 #include "Common.h"
 
 /* Disable this module if OTA is not enabled */
@@ -43,7 +45,6 @@
 /**********************************************************************/
 /*                          DEFINES                                   */
 /**********************************************************************/
-#define FIRMWARE_PATH           "/firmware.bin"
 #define CHUNK_SIZE              65536       /* 32KB read chunks */
 #define MAX_FIRMWARE_SIZE       1048576     /* 1MB maximum size */
 #define HTTP_HEADER_MAX_SIZE    2048        /* Max HTTP header size */
@@ -55,34 +56,6 @@
 /**********************************************************************/
 /*                   STATIC VARIABLE DECLARATIONS                     */
 /**********************************************************************/
-/* Self-signed certificate for the Apache server */
-static const unsigned char *CA_cert_OTA_server_raw = 
-    (const unsigned char *) // cast to unsigned char since mbedtls_x509_crt_parse expects it
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIECTCCAvGgAwIBAgIUB3E9K+/DmBkIOefd2ZOLzTZncuUwDQYJKoZIhvcNAQEL\n"
-    "BQAwgZMxCzAJBgNVBAYTAlBMMRUwEwYDVQQIDAxXaWVsa29wb2xza2ExFTATBgNV\n"
-    "BAcMDFNpZXJvc3pld2ljZTEPMA0GA1UECgwGTW9kdXJpMQwwCgYDVQQLDANPVEEx\n"
-    "FjAUBgNVBAMMDTE5Mi4xNjguMS4xOTQxHzAdBgkqhkiG9w0BCQEWEHZleG93bkBn\n"
-    "bWFpbC5jb20wHhcNMjUwMjIzMTAzODUzWhcNMjYwMjIzMTAzODUzWjCBkzELMAkG\n"
-    "A1UEBhMCUEwxFTATBgNVBAgMDFdpZWxrb3BvbHNrYTEVMBMGA1UEBwwMU2llcm9z\n"
-    "emV3aWNlMQ8wDQYDVQQKDAZNb2R1cmkxDDAKBgNVBAsMA09UQTEWMBQGA1UEAwwN\n"
-    "MTkyLjE2OC4xLjE5NDEfMB0GCSqGSIb3DQEJARYQdmV4b3duQGdtYWlsLmNvbTCC\n"
-    "ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANfxG3inpJCsvN2ESzvwH21P\n"
-    "c64ZCUgZvp8Q/HRwuB/pdK4+qmdDvmUV52n+p9szjptNMONewBby+QYvMLjO0lbi\n"
-    "9aKz1Ll8f/+7KIAEZLynctFzdXEAlApF78yX0t5yMdVMzlv7gPYrt8W6L8zd5nxK\n"
-    "1Uy17NeXIbPQUcQTU47xOm7W0SOxbamcr4jmxHDz3tAguy1a+DpDNTzHOgRo0+7W\n"
-    "S3yQ/cuSUmBH3ItfAJDTVxmc1Dl4Djjjyw1CEBhdPyjBfkt2PNmHmiCsTYN2lW2V\n"
-    "pq888+9WlFFvIOapR/yC30GR7KlUsRzjdeXqyNf2J0dTq11dJAAqaJB9BytMPuUC\n"
-    "AwEAAaNTMFEwHQYDVR0OBBYEFGmYQyvPVIY651YH+DPEDNV51YF7MB8GA1UdIwQY\n"
-    "MBaAFGmYQyvPVIY651YH+DPEDNV51YF7MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\n"
-    "hvcNAQELBQADggEBAJ87nkPJHMa7wqi8SIraQfM+wo3yzWh6oxuznz8pwgD+sjpt\n"
-    "bm/jrTugyWzEF0nkTDT9CLDgdnZwz5joAfGKZgaegXsJzpv02VxMgpm6rLBFVeeK\n"
-    "wJUGulodjVRxKQxIJM6oVKOplK7LE2MyXNRtt7ccsbqHtXTYxsqhTzELadYNShou\n"
-    "RY17M1pM5BI8k20+lP58ckEnuaNlPV6Gm0r1LV8ckCR9sJKDU9bNzVfO77lj2OXf\n"
-    "pYdGDG1mkVFhF6Ej7KtOPOeWO29fVNkwdSGjWMIbxIQhNaHN1T4T2Q6W4y4EiXKk\n"
-    "KktqIH7GPGgMmtHo5uofNt2EUrzPMHQwDz9SxN4=\n"
-    "-----END CERTIFICATE-----\n";
-
 /* Expected size of the firmware to be downloaded.
  * This is set to 0 initially and will be updated once the HTTP headers are processed based on the Content-Length header. */
 static size_t expected_size; 

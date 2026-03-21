@@ -8,6 +8,8 @@
 # to the web server directory used for Over-The-Air (OTA) updates.
 # It requires sudo privileges to copy the file to the web server directory
 # and to restart the Apache service.
+#
+# For initial Apache2 server setup, see Docs/OTA_Apache2_Setup.md
 # ****************************************************************************
 
 set -euo pipefail

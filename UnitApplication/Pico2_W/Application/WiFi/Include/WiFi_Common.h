@@ -6,20 +6,20 @@
 /*******************************************************************************/
 
 /* Server defines */
-#define REMOTE_TCP_SERVER_IP_ADDRESS "192.168.1.194"  //Either UDP or TCP external server IP address that we communicate with (e.g PC, another Pico), statically configured on that server
-#define PICO_W_STATIC_IP_ADDRESS     "192.168.1.50"   //Static IP address for the Pico W
-#define OTA_HTTPS_SERVER_IP_ADDRESS  "192.168.1.194"  //IP address of the HTTPS server for OTA updates (Apache2 server on the PC)
-#define NETMASK_ADDR                 "255.255.255.0"  //Subnet mask for the network (meaning you can use 192.168.1.1 to 192.168.1.254 for devices 
+#define REMOTE_TCP_SERVER_IP_ADDRESS "192.168.50.194"  //Either UDP or TCP external server IP address that we communicate with (e.g PC, another Pico), statically configured on that server
+#define PICO_W_STATIC_IP_ADDRESS     "192.168.50.50"   //Static IP address for the Pico W
+#define NETMASK_ADDR                 "255.255.255.0"  //Subnet mask for the network (meaning you can use 192.168.50.1 to 192.168.50.254 for devices
                                                       //(the 0 address is the network address and 255 is the broadcast address).
-#define GATEWAY_ADDR                "192.168.1.1"    //Gateway IP address (in this case the Tenda Wifi router is the gateway so it's its' address)
+#define GATEWAY_ADDR                "192.168.50.1"    //Gateway IP address (in this case the Tenda Wifi router is the gateway so it's its' address)
 #define SERVER_PORT                 (uint16_t)12345  //TODO - server port for testing, later you can think about which one to use permanently
 #define TCP_PORT                    8080
 #define TCP_HTTP_PORT               80
-#define OTA_HTTPS_SERVER_PORT       443
 #define TCP_RECV_BUFFER_SIZE        65535             //in bytes
 #define UDP_SERVER_PORT             5000
 #define UDP_CLIENT_PORT             5001
 #define UDP_RECV_BUFFER_SIZE        1024
+
+/* OTA server config (IP, port, certificate) is in WiFi_OTA_Config.h */
 
 /* Commands from PC to Pico */
 #define CMD_MIN_SIZE_BYTES              5  // "cmd:X" where X is a number from 0-9 (e.g "cmd:1" - 5 bytes, without the null terminator)

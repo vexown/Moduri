@@ -22,6 +22,7 @@
 #include "WiFi_TCP.h"
 #include "WiFi_Common.h"
 #include "WiFi_OTA_download.h"
+#include "WiFi_OTA_Config.h"
 
 /* OS includes */
 #include "OS_manager.h"

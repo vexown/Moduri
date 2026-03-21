@@ -32,6 +32,7 @@
 #include "WiFi_DHCP_server.h"
 #include "WiFi_DNS_server.h"
 #include "WiFi_OTA_download.h"
+#include "WiFi_OTA_Config.h"
 
 /* Misc includes */
 #include "Common.h"
