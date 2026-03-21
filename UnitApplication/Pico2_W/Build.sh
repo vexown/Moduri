@@ -83,7 +83,7 @@ fi
 # Check if git submodules are initialized
 echo "Checking git submodules..."
 # Create Dependencies directory if it doesn't exist
-DEPS_DIR="../Dependencies"
+DEPS_DIR="$(cd "$(dirname "$0")/../Dependencies" && pwd)"
 if [ ! -d "$DEPS_DIR" ]; then
     mkdir -p "$DEPS_DIR"
     echo "Created Dependencies directory"
