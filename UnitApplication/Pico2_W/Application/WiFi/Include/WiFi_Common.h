@@ -24,11 +24,12 @@
 /* Commands from PC to Pico */
 #define CMD_MIN_SIZE_BYTES              5  // "cmd:X" where X is a number from 0-9 (e.g "cmd:1" - 5 bytes, without the null terminator)
 #define CMD_MAX_SIZE_BYTES              8  // "cmd:XXX" where 255 is the largest number that can be sent (e.g "cmd:255" - 8 bytes, without null terminator)
-#define PICO_DO_NOTHING                 0
-#define PICO_TRANSITION_TO_ACTIVE_MODE  1
-#define PICO_TRANSITION_TO_LISTEN_MODE  2
-#define PICO_TOGGLE_MONITORING_STATE    3
-#define PICO_TRANSITION_TO_UPDATE_MODE  4
+#define PICO_NO_COMMAND                 0xFF // Sentinel: no command received, do nothing
+#define PICO_HELP                       1
+#define PICO_TRANSITION_TO_ACTIVE_MODE  2
+#define PICO_TRANSITION_TO_LISTEN_MODE  3
+#define PICO_TOGGLE_MONITORING_STATE    4
+#define PICO_TRANSITION_TO_UPDATE_MODE  5
 
 /*******************************************************************************/
 /*                               DATA TYPES                                   */

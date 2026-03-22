@@ -1330,7 +1330,7 @@ static err_t tcp_client_send(const void *data, uint16_t length)
 static void tcp_client_process_recv_message(unsigned char* output_buffer, uint16_t* output_buffer_length, uint8_t *received_command)
 {
     /* Initialize output parameters to default values */
-    *received_command = 0;
+    *received_command = PICO_NO_COMMAND;
     *output_buffer = '\0';
 
     /* Make sure we have a valid client and receive buffer */

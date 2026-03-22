@@ -123,9 +123,21 @@ static void WiFi_ProcessCommand(uint8_t command)
 {
     switch (command)
     {
-        case PICO_DO_NOTHING:
-            /* do nothing */
+        case PICO_NO_COMMAND:
             break;
+        case PICO_HELP:
+        {
+            LOG("Help command received\n");
+            const char *help_msg =
+                "Available commands:\n"
+                "  cmd:1 - Show this help message\n"
+                "  cmd:2 - Transition to Active Mode\n"
+                "  cmd:3 - Transition to Listen Mode\n"
+                "  cmd:4 - Toggle Monitoring State\n"
+                "  cmd:5 - Transition to Update Mode (OTA)\n";
+            (void)tcp_send(help_msg, (uint16_t)strlen(help_msg));
+            break;
+        }
         case PICO_TRANSITION_TO_ACTIVE_MODE:
             LOG("Transitioning to Active Mode...\n");
             WiFiState = ACTIVE_SEND_AND_RECEIVE;
@@ -161,7 +173,7 @@ static void WiFi_ProcessCommand(uint8_t command)
  */
 static void WiFi_ListenState(void)
 {
-    uint8_t received_command = PICO_DO_NOTHING;
+    uint8_t received_command = PICO_NO_COMMAND;
 
     if(TransportLayer == TCP_COMMUNICATION)
     {
@@ -201,7 +213,7 @@ static void WiFi_ListenState(void)
  */
 static void WiFi_ActiveState(void)
 {
-    uint8_t received_command = PICO_DO_NOTHING;
+    uint8_t received_command = PICO_NO_COMMAND;
     const char *message = "Yo from Pico W!";
 
     if(TransportLayer == TCP_COMMUNICATION)
