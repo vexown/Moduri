@@ -81,7 +81,7 @@
  * Formed as 1010 A2 A1 A0. Evaluates to 0x50 when all address pins are tied to GND.
  * Modify the lower 3 bits to match your hardware if multiple devices share the bus.
  */
-#define AT24C32_I2C_ADDR      0x50
+#define AT24C32_I2C_ADDR      0x57
 
 /** @brief I2C peripheral instance to use (I2C_INSTANCE_0 or I2C_INSTANCE_1). */
 #define AT24C32_I2C_INSTANCE  I2C_INSTANCE_0
