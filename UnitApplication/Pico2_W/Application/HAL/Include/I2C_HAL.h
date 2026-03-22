@@ -101,6 +101,15 @@ I2C_Status I2C_WriteMultiple(I2C_Instance instance, uint8_t dev_addr, uint8_t re
 /* Read multiple bytes from I2C device */
 I2C_Status I2C_ReadMultiple(I2C_Instance instance, uint8_t dev_addr, uint8_t reg_addr, uint8_t* data, size_t length);
 
+/* Write multiple bytes to an I2C device that uses a 16-bit register address (e.g. EEPROM).
+ * Sends [reg_addr_msb, reg_addr_lsb, data[0], ..., data[length-1]] in one transaction. */
+I2C_Status I2C_WriteMultiple16(I2C_Instance instance, uint8_t dev_addr, uint16_t reg_addr, const uint8_t* data, size_t length);
+
+/* Read multiple bytes from an I2C device that uses a 16-bit register address (e.g. EEPROM).
+ * Performs a dummy write of [reg_addr_msb, reg_addr_lsb] to set the address pointer,
+ * followed by a read of the requested number of bytes. */
+I2C_Status I2C_ReadMultiple16(I2C_Instance instance, uint8_t dev_addr, uint16_t reg_addr, uint8_t* data, size_t length);
+
 /* Check if device is present on the bus */
 I2C_Status I2C_IsDeviceReady(I2C_Instance instance, uint8_t dev_addr);
 

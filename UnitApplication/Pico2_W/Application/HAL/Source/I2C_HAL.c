@@ -251,6 +251,85 @@ I2C_Status I2C_ReadMultiple(I2C_Instance instance, uint8_t dev_addr, uint8_t reg
     return I2C_OK;
 }
 
+/* Description: Write multiple bytes to an I2C device that uses a 16-bit register address.
+ *              Intended for devices such as EEPROMs where the internal address space exceeds
+ *              8 bits and requires two address bytes to be sent before the data payload.
+ * Parameters:
+ *  - instance: I2C peripheral instance (I2C_INSTANCE_0 or I2C_INSTANCE_1)
+ *  - dev_addr: 7-bit I2C device address
+ *  - reg_addr: 16-bit register/memory address (sent MSB first, then LSB)
+ *  - *data:    pointer to the data to write
+ *  - length:   number of data bytes to write
+ * Returns: I2C_Status: I2C_ERROR_WRITE_FAILED, I2C_ERROR_WRITE_TIMEOUT or I2C_OK
+ */
+I2C_Status I2C_WriteMultiple16(I2C_Instance instance, uint8_t dev_addr, uint16_t reg_addr, const uint8_t* data, size_t length)
+{
+    i2c_inst_t* i2c = get_i2c_inst(instance);
+
+    uint8_t buffer[length + 2]; // Two extra bytes for the 16-bit register address
+    buffer[0] = (uint8_t)(reg_addr >> 8);   // Address MSB
+    buffer[1] = (uint8_t)(reg_addr & 0xFF); // Address LSB
+    memcpy(buffer + 2, data, length);
+
+    int status = i2c_write_timeout_us(i2c, dev_addr, buffer, length + 2, I2C_SEND_STOP, I2C_TIMEOUT_US);
+
+    switch (status)
+    {
+        case PICO_ERROR_GENERIC:
+            return I2C_ERROR_WRITE_FAILED;
+
+        case PICO_ERROR_TIMEOUT:
+            return I2C_ERROR_WRITE_TIMEOUT;
+
+        default:
+            return I2C_OK;
+    }
+}
+
+/* Description: Read multiple bytes from an I2C device that uses a 16-bit register address.
+ *              Performs a dummy write of the two-byte address to position the device's internal
+ *              address counter, then issues a separate read transaction to fetch the data.
+ * Parameters:
+ *  - instance: I2C peripheral instance (I2C_INSTANCE_0 or I2C_INSTANCE_1)
+ *  - dev_addr: 7-bit I2C device address
+ *  - reg_addr: 16-bit register/memory address (sent MSB first, then LSB)
+ *  - *data:    pointer to buffer where read bytes will be stored
+ *  - length:   number of bytes to read
+ * Returns: I2C_Status: I2C_ERROR_WRITE_FAILED, I2C_ERROR_WRITE_TIMEOUT, I2C_ERROR_READ_FAILED,
+ *          I2C_ERROR_READ_TIMEOUT or I2C_OK
+ */
+I2C_Status I2C_ReadMultiple16(I2C_Instance instance, uint8_t dev_addr, uint16_t reg_addr, uint8_t* data, size_t length)
+{
+    i2c_inst_t* i2c = get_i2c_inst(instance);
+
+    /* Step 1: Write the 16-bit address to position the device's internal address counter */
+    uint8_t addr_buf[2] = {(uint8_t)(reg_addr >> 8), (uint8_t)(reg_addr & 0xFF)};
+    int status = i2c_write_timeout_us(i2c, dev_addr, addr_buf, sizeof(addr_buf), I2C_SEND_STOP, I2C_TIMEOUT_US);
+
+    if (status == PICO_ERROR_GENERIC)
+    {
+        return I2C_ERROR_WRITE_FAILED;
+    }
+    else if (status == PICO_ERROR_TIMEOUT)
+    {
+        return I2C_ERROR_WRITE_TIMEOUT;
+    }
+
+    /* Step 2: Read the requested bytes; the device auto-increments its address counter */
+    status = i2c_read_timeout_us(i2c, dev_addr, data, length, I2C_SEND_STOP, I2C_TIMEOUT_US);
+
+    if (status == PICO_ERROR_GENERIC)
+    {
+        return I2C_ERROR_READ_FAILED;
+    }
+    else if (status == PICO_ERROR_TIMEOUT)
+    {
+        return I2C_ERROR_READ_TIMEOUT;
+    }
+
+    return I2C_OK;
+}
+
 /* Description: Check if the I2C of the specified address exists on the bus and is ready to communicate
  * Parameters: 
  * 	- instance: abstraction of the i2c_inst_t, you choose either I2C0 or I2C1 available on Pico
