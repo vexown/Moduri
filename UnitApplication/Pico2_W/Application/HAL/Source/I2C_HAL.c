@@ -220,7 +220,7 @@ I2C_Status I2C_WriteMultiple(I2C_Instance instance, uint8_t dev_addr, uint8_t re
  * 	- length:   length of the data
  * Returns: I2C_Status: I2C_ERROR_WRITE_FAILED, I2C_ERROR_WRITE_TIMEOUT, I2C_ERROR_READ_FAILED, I2C_ERROR_READ_TIMEOUT or I2C_OK 
  */
-I2C_Status I2C_ReadMultipleRegisters(I2C_Instance instance, uint8_t dev_addr, uint8_t reg_addr, uint8_t* data, size_t length) 
+I2C_Status I2C_ReadMultiple(I2C_Instance instance, uint8_t dev_addr, uint8_t reg_addr, uint8_t* data, size_t length)
 {
     i2c_inst_t* i2c = get_i2c_inst(instance);
     uint8_t buffer[1] = {reg_addr};  // Buffer to hold the starting register address
