@@ -352,7 +352,7 @@ cmake $CMAKE_ARGS
 # This command compiles the project based on the configuration done by the previous cmake command.
 # It uses the generated Makefiles or project files to compile the source code into executables or libraries.
 echo "Building..."
-cmake --build .
+cmake --build . -- -j$(nproc)
 
 echo "Build complete."
 
