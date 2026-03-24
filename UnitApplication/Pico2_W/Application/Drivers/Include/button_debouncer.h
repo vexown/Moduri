@@ -25,6 +25,12 @@
  *  5 ms              | 8 samples     | 40 ms (responsive, good-quality switches)
  * 10 ms              | 8 samples     | 80 ms (safe for old/scratchy switches)
  *
+ * History depth is currently 8-bit (uint8_t). If you encounter switches that
+ * still double-trigger, prefer widening to 16-bit (uint16_t) over slowing the
+ * sample rate — this doubles the window to 80ms while keeping the same 5ms
+ * temporal resolution. Update the history field in Debounce_Entry and adjust
+ * DEBOUNCE_MASK accordingly (e.g. 0xE007 for 3 oldest + 3 newest of 16 bits).
+ *
  *
  * @section Usage
  *
