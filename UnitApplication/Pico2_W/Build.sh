@@ -89,11 +89,34 @@ if [ ! -d "$DEPS_DIR" ]; then
     echo "Created Dependencies directory"
 fi
 
-# Initialize all git submodules if not already done
-if [ ! -d "$DEPS_DIR/FreeRTOS-Kernel/.git" ] || [ ! -d "$DEPS_DIR/pico-sdk/.git" ] || [ ! -d "$DEPS_DIR/picotool/.git" ] || [ ! -d "$DEPS_DIR/openocd/.git" ] || [ ! -d "$DEPS_DIR/debugprobe/.git" ]; then
-    echo "Initializing git submodules..."
-    git submodule update --init --recursive
-fi
+# Get git repo root
+REPO_ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
+
+# Add or initialize a submodule.
+# If not registered in .gitmodules (e.g. fresh repo copy), runs git submodule add.
+# If registered but not cloned, runs git submodule update --init.
+add_or_init_submodule()
+{
+    local NAME="$1"
+    local URL="$2"
+    local EXTRA_ARGS="$3"
+    local SUBMODULE_PATH="UnitApplication/Dependencies/$NAME"
+    local SUBMODULE_DIR="$REPO_ROOT/$SUBMODULE_PATH"
+
+    if ! git -C "$REPO_ROOT" config --file "$REPO_ROOT/.gitmodules" --get "submodule.$SUBMODULE_PATH.url" &>/dev/null 2>&1; then
+        echo "Registering and cloning submodule $NAME..."
+        git -C "$REPO_ROOT" submodule add $EXTRA_ARGS "$URL" "$SUBMODULE_PATH"
+    elif [ ! -d "$SUBMODULE_DIR/.git" ]; then
+        echo "Initializing submodule $NAME..."
+        git -C "$REPO_ROOT" submodule update --init --recursive -- "$SUBMODULE_PATH"
+    fi
+}
+
+add_or_init_submodule "FreeRTOS-Kernel" "https://github.com/raspberrypi/FreeRTOS-Kernel.git"
+add_or_init_submodule "pico-sdk"        "https://github.com/raspberrypi/pico-sdk.git"
+add_or_init_submodule "picotool"        "https://github.com/raspberrypi/picotool.git"
+add_or_init_submodule "openocd"         "https://github.com/raspberrypi/openocd.git" "--branch sdk-2.0.0"
+add_or_init_submodule "debugprobe"      "https://github.com/raspberrypi/debugprobe.git"
 
 # Verify FreeRTOS-Kernel is at the correct commit
 FREERTOS_DIR="$DEPS_DIR/FreeRTOS-Kernel"
