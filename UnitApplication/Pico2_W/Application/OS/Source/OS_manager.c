@@ -89,6 +89,7 @@
 /* Task periods */
 #define ALIVE_TASK_PERIOD_TICKS			    pdMS_TO_TICKS(500)  //500ms
 #define NETWORK_TASK_PERIOD_TICKS			pdMS_TO_TICKS(200)  //200ms
+#define WIFI_RETRY_DELAY_TICKS				pdMS_TO_TICKS(30000) //30s
 #define MONITOR_TASK_PERIOD_TICKS			pdMS_TO_TICKS(11000) //11s
 
 /* Stack sizes - This parameter is in WORDS (on Pico W: 1 word = 32bit = 4bytes) */ 
@@ -410,20 +411,21 @@ static void networkTask(__unused void *taskParams)
 	/*                          Task Initialization Code                           */
 	/*******************************************************************************/
 #if (PICO_AS_ACCESS_POINT == ON)
-	if(setupWifiAccessPoint() == false)
+	setupWifiAccessPoint();
 #else
-	if(connectToWifi() == false)
-#endif
+	while (connectToWifi() == false)
 	{
-		CriticalErrorHandler(MODULE_ID_OS, ERROR_ID_WIFI_DID_NOT_CONNECT);
+		LOG("Wi-Fi connect failed, retrying in 30s...\n");
+		vTaskDelay(WIFI_RETRY_DELAY_TICKS);
 	}
+#endif
 
 	/*******************************************************************************/
 	/*                               Task Loop Code                                */
 	/*******************************************************************************/
     for( ;; )
 	{
-        vTaskDelay(NETWORK_TASK_PERIOD_TICKS); 
+        vTaskDelay(NETWORK_TASK_PERIOD_TICKS);
 
 		WiFi_MainFunction();
 	}
